@@ -68,5 +68,12 @@
     "title": "Hands-on Exercise 1",
     "section": "Plotting a Violin Plot of science scores in the different classes",
     "text": "Plotting a Violin Plot of science scores in the different classes\n\nggplot(data=exam_data, \n       aes(y = SCIENCE, \n           x= CLASS)) +\n  geom_violin()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-simple-bar-chart",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-simple-bar-chart",
+    "title": "Hands-on Exercise 1",
+    "section": "Plotting a simple bar chart",
+    "text": "Plotting a simple bar chart\n\nggplot(data = exam_data,\n       aes(x = RACE)) +\n  geom_bar()"
   }
 ]

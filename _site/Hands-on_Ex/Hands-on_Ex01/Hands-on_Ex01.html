@@ -165,8 +165,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#install-and-launching-r-packages" id="toc-install-and-launching-r-packages" class="nav-link" data-scroll-target="#install-and-launching-r-packages">Install and launching R packages</a></li>
   <li><a href="#importing-the-data" id="toc-importing-the-data" class="nav-link" data-scroll-target="#importing-the-data">Importing the data</a></li>
   </ul></li>
-  <li><a href="#plotting-a-simple-bar-chart" id="toc-plotting-a-simple-bar-chart" class="nav-link" data-scroll-target="#plotting-a-simple-bar-chart">Plotting a simple bar chart</a>
+  <li><a href="#plotting-charts" id="toc-plotting-charts" class="nav-link" data-scroll-target="#plotting-charts">Plotting Charts</a>
   <ul class="collapse">
+  <li><a href="#plotting-a-simple-bar-chart" id="toc-plotting-a-simple-bar-chart" class="nav-link" data-scroll-target="#plotting-a-simple-bar-chart">Plotting a simple bar chart</a></li>
   <li><a href="#plotting-bar-chart-of-science-score-distribution" id="toc-plotting-bar-chart-of-science-score-distribution" class="nav-link" data-scroll-target="#plotting-bar-chart-of-science-score-distribution">Plotting Bar Chart of Science score Distribution</a></li>
   <li><a href="#plotting-a-box-plot-of-the-english-scores-of-the-different-races" id="toc-plotting-a-box-plot-of-the-english-scores-of-the-different-races" class="nav-link" data-scroll-target="#plotting-a-box-plot-of-the-english-scores-of-the-different-races">Plotting a Box Plot of the English scores of the different races</a></li>
   <li><a href="#plotting-a-scatter-plot-of-the-science-vs-math-scores" id="toc-plotting-a-scatter-plot-of-the-science-vs-math-scores" class="nav-link" data-scroll-target="#plotting-a-scatter-plot-of-the-science-vs-math-scores">Plotting a Scatter Plot of the Science vs Math scores</a></li>
@@ -230,8 +231,10 @@ dbl (3): ENGLISH, MATHS, SCIENCE
 </div>
 </section>
 </section>
-<section id="plotting-a-simple-bar-chart" class="level1">
-<h1>Plotting a simple bar chart</h1>
+<section id="plotting-charts" class="level1">
+<h1>Plotting Charts</h1>
+<section id="plotting-a-simple-bar-chart" class="level2">
+<h2 class="anchored" data-anchor-id="plotting-a-simple-bar-chart">Plotting a simple bar chart</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> exam_data,</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> RACE)) <span class="sc">+</span></span>
@@ -244,6 +247,7 @@ dbl (3): ENGLISH, MATHS, SCIENCE
 </div>
 </div>
 </div>
+</section>
 <section id="plotting-bar-chart-of-science-score-distribution" class="level2">
 <h2 class="anchored" data-anchor-id="plotting-bar-chart-of-science-score-distribution">Plotting Bar Chart of Science score Distribution</h2>
 <div class="cell">
