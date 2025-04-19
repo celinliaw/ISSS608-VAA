@@ -26,3 +26,51 @@ ggplot(data = exam_data,
        aes(x = RACE)) +
   geom_bar()
 ```
+
+## Plotting Bar Chart of Science score Distribution
+
+```{r}
+ggplot(data=exam_data, aes(x = SCIENCE)) +
+  geom_histogram(bins=10, 
+                 boundary = 100,
+                 color="Yellow", 
+                 fill="Blue") +
+  ggtitle("Distribution of Science scores")
+```
+
+## Plotting a Box Plot of the English scores of the different races
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = ENGLISH, 
+           x= RACE)) +
+  geom_boxplot()                     
+```
+
+## Plotting a Scatter Plot of the Science vs Math scores
+
+```{R}
+ggplot(data=exam_data, 
+       aes(x= SCIENCE, y=MATHS)) +
+  geom_point() +
+  geom_smooth(size=0.5)
+```
+
+## Plotting a Line graph of the scores of the different classes
+
+```{R}
+#| echo: false
+ggplot(data=exam_data, 
+       aes(x = ENGLISH, 
+           colour = CLASS)) +
+  geom_density()
+```
+
+## Plotting a Violin Plot of science scores in the different classes
+
+```{R}
+ggplot(data=exam_data, 
+       aes(y = SCIENCE, 
+           x= CLASS)) +
+  geom_violin()
+```

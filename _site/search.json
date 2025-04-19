@@ -33,5 +33,40 @@
     "title": "Hands-on Exercise 1",
     "section": "",
     "text": "exam_data &lt;- read_csv(\"data/Exam_data.csv\")\n\nRows: 322 Columns: 7\n── Column specification ────────────────────────────────────────────────────────\nDelimiter: \",\"\nchr (4): ID, CLASS, GENDER, RACE\ndbl (3): ENGLISH, MATHS, SCIENCE\n\nℹ Use `spec()` to retrieve the full column specification for this data.\nℹ Specify the column types or set `show_col_types = FALSE` to quiet this message."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-bar-chart-of-science-score-distribution",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-bar-chart-of-science-score-distribution",
+    "title": "Hands-on Exercise 1",
+    "section": "Plotting Bar Chart of Science score Distribution",
+    "text": "Plotting Bar Chart of Science score Distribution\n\nggplot(data=exam_data, aes(x = SCIENCE)) +\n  geom_histogram(bins=10, \n                 boundary = 100,\n                 color=\"Yellow\", \n                 fill=\"Blue\") +\n  ggtitle(\"Distribution of Science scores\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-box-plot-of-the-english-scores-of-the-different-races",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-box-plot-of-the-english-scores-of-the-different-races",
+    "title": "Hands-on Exercise 1",
+    "section": "Plotting a Box Plot of the English scores of the different races",
+    "text": "Plotting a Box Plot of the English scores of the different races\n\nggplot(data=exam_data, \n       aes(y = ENGLISH, \n           x= RACE)) +\n  geom_boxplot()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-scatter-plot-of-the-science-vs-math-scores",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-scatter-plot-of-the-science-vs-math-scores",
+    "title": "Hands-on Exercise 1",
+    "section": "Plotting a Scatter Plot of the Science vs Math scores",
+    "text": "Plotting a Scatter Plot of the Science vs Math scores\n\nggplot(data=exam_data, \n       aes(x= SCIENCE, y=MATHS)) +\n  geom_point() +\n  geom_smooth(size=0.5)\n\nWarning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.\nℹ Please use `linewidth` instead.\n\n\n`geom_smooth()` using method = 'loess' and formula = 'y ~ x'"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-line-graph-of-the-scores-of-the-different-classes",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-line-graph-of-the-scores-of-the-different-classes",
+    "title": "Hands-on Exercise 1",
+    "section": "Plotting a Line graph of the scores of the different classes",
+    "text": "Plotting a Line graph of the scores of the different classes"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-violin-plot-of-science-scores-in-the-different-classes",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-violin-plot-of-science-scores-in-the-different-classes",
+    "title": "Hands-on Exercise 1",
+    "section": "Plotting a Violin Plot of science scores in the different classes",
+    "text": "Plotting a Violin Plot of science scores in the different classes\n\nggplot(data=exam_data, \n       aes(y = SCIENCE, \n           x= CLASS)) +\n  geom_violin()"
   }
 ]
