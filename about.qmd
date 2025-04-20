@@ -2,7 +2,7 @@
 title: "About"
 ---
 
-About this site
+This site will document what Celin Liaw learnt from this course.
 
 ```{r}
 1 + 1
