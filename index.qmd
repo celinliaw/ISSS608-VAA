@@ -1,5 +1,5 @@
 ---
-title: "ISSS608-Celin Liaw"
+title: "Celin's ISSS608"
 author: Celin Liaw
 date: last-modified
 toc: true
