@@ -76,3 +76,68 @@ ggplot(data=exam_data,
            x= CLASS)) +
   geom_violin()
 ```
+
+## Plotting Age-Sex Pyramid (Using CLASS as Proxy for Age Group)
+
+```{R}
+pyramid_data <- exam_data %>% group_by(CLASS, GENDER) %>% summarise(Count = n(), .groups = "drop") %>% mutate(Count = ifelse(GENDER == "Male", -Count, Count))
+
+ggplot(pyramid_data, aes(x = CLASS, y = Count, fill = GENDER)) + geom_bar(stat = "identity") + coord_flip() + labs(title = "Class-Gender Pyramid", x = "Class", y = "Number of Students") + theme_minimal()
+```
+
+```{R}
+pacman::p_load(qcc)
+
+race_freq <- exam_data %>%
+  count(RACE, sort = TRUE)
+
+pareto.chart(race_freq$n, names = race_freq$RACE,
+             main = "Pareto Chart of Race")
+
+```
+
+```{R}
+
+library(tidyverse)
+
+# Reshape to long format
+long_avg_data <- exam_data %>%
+  pivot_longer(cols = c(ENGLISH), 
+               names_to = "Subject", 
+               values_to = "Score") %>%
+  group_by(CLASS, GENDER, Subject) %>%
+  summarise(Avg_Score = mean(Score, na.rm = TRUE), .groups = "drop")
+
+# Set custom shapes and colors
+gender_shapes <- c("Female" = 16, "Male" = 3)  # Circle and cross
+gender_colors <- c("Female" = "darkgreen", "Male" = "orangered")
+
+# Plot
+ggplot(long_avg_data, aes(x = Avg_Score, y = Subject, color = GENDER, shape = GENDER)) +
+  geom_point(size = 3) +
+  facet_wrap(~ CLASS, ncol = 1, strip.position = "right") +
+  scale_color_manual(values = gender_colors) +
+  scale_shape_manual(values = gender_shapes) +
+  labs(
+    title = "Average Scores by Subject and Gender Across Classes",
+    x = "Average Score",
+    y = NULL,
+    color = "Gender",
+    shape = "Gender"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    strip.text = element_text(face = "bold", size = 12),
+    axis.text.y = element_text(size = 11, hjust = 1),  # Justified and consistent label styling
+    panel.spacing = unit(1.5, "lines"),
+    legend.position = "top",
+    strip.background = element_blank(),  # Optional: remove background for facet labels
+    axis.title.y = element_blank()  # Remove y-axis title for more space
+  ) +
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 10))  # Wrap y-axis labels
+
+
+
+
+
+```
