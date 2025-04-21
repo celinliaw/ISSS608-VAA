@@ -8,7 +8,7 @@
 
 <meta name="author" content="Liaw Ying Ting, Celin">
 
-<title>Hands-on Exercise 1 – ISSS608-VAA</title>
+<title>Hands-on Exercise 1 – Celin’s Visual Analytics Site</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,6 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
+<link href="../../Assets/orange_cat_favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -114,7 +115,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
-    <span class="navbar-title">ISSS608-VAA</span>
+    <span class="navbar-title">Celin’s Visual Analytics Site</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -131,6 +132,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li>
     <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html">
  <span class="dropdown-text">Hands-on Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html">
+ <span class="dropdown-text">Hands-on Exercise 2</span></a>
   </li>  
     </ul>
   </li>
@@ -185,6 +190,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#plotting-a-line-graph-of-the-scores-of-the-different-classes" id="toc-plotting-a-line-graph-of-the-scores-of-the-different-classes" class="nav-link" data-scroll-target="#plotting-a-line-graph-of-the-scores-of-the-different-classes">Plotting a Line graph of the scores of the different classes</a></li>
   <li><a href="#plotting-a-violin-plot-of-science-scores-in-the-different-classes" id="toc-plotting-a-violin-plot-of-science-scores-in-the-different-classes" class="nav-link" data-scroll-target="#plotting-a-violin-plot-of-science-scores-in-the-different-classes">Plotting a Violin Plot of science scores in the different classes</a></li>
   <li><a href="#plotting-age-sex-pyramid-using-class-as-proxy-for-age-group" id="toc-plotting-age-sex-pyramid-using-class-as-proxy-for-age-group" class="nav-link" data-scroll-target="#plotting-age-sex-pyramid-using-class-as-proxy-for-age-group">Plotting Age-Sex Pyramid (Using CLASS as Proxy for Age Group)</a></li>
+  <li><a href="#plotting-pareto-chart-of-race" id="toc-plotting-pareto-chart-of-race" class="nav-link" data-scroll-target="#plotting-pareto-chart-of-race">Plotting Pareto Chart of Race</a></li>
+  <li><a href="#plotting-trellis-display-for-english-scores" id="toc-plotting-trellis-display-for-english-scores" class="nav-link" data-scroll-target="#plotting-trellis-display-for-english-scores">Plotting Trellis Display for English Scores</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -359,6 +366,9 @@ dbl (3): ENGLISH, MATHS, SCIENCE
 </div>
 </div>
 </div>
+</section>
+<section id="plotting-pareto-chart-of-race" class="level2">
+<h2 class="anchored" data-anchor-id="plotting-pareto-chart-of-race">Plotting Pareto Chart of Race</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(qcc)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -384,6 +394,9 @@ Pareto chart analysis for race_freq$n
   D   9.000000 322.000000   2.795031   100.000000</code></pre>
 </div>
 </div>
+</section>
+<section id="plotting-trellis-display-for-english-scores" class="level2">
+<h2 class="anchored" data-anchor-id="plotting-trellis-display-for-english-scores">Plotting Trellis Display for English Scores</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -406,7 +419,7 @@ Pareto chart analysis for race_freq$n
 <span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> gender_colors) <span class="sc">+</span></span>
 <span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> gender_shapes) <span class="sc">+</span></span>
 <span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Average Scores by Subject and Gender Across Classes"</span>,</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Average English Scores and Gender Across Classes"</span>,</span>
 <span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Average Score"</span>,</span>
 <span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="cn">NULL</span>,</span>
 <span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Gender"</span>,</span>
@@ -416,7 +429,7 @@ Pareto chart analysis for race_freq$n
 <span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
 <span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
 <span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>, <span class="at">hjust =</span> <span class="dv">1</span>),  <span class="co"># Justified and consistent label styling</span></span>
-<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.spacing =</span> <span class="fu">unit</span>(<span class="fl">1.5</span>, <span class="st">"lines"</span>),</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.spacing =</span> <span class="fu">unit</span>(<span class="dv">1</span>, <span class="st">"lines"</span>),</span>
 <span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"top"</span>,</span>
 <span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.background =</span> <span class="fu">element_blank</span>(),  <span class="co"># Optional: remove background for facet labels</span></span>
 <span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>()  <span class="co"># Remove y-axis title for more space</span></span>

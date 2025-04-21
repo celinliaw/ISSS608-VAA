@@ -85,6 +85,8 @@ pyramid_data <- exam_data %>% group_by(CLASS, GENDER) %>% summarise(Count = n(),
 ggplot(pyramid_data, aes(x = CLASS, y = Count, fill = GENDER)) + geom_bar(stat = "identity") + coord_flip() + labs(title = "Class-Gender Pyramid", x = "Class", y = "Number of Students") + theme_minimal()
 ```
 
+## Plotting Pareto Chart of Race
+
 ```{R}
 pacman::p_load(qcc)
 
@@ -94,7 +96,10 @@ race_freq <- exam_data %>%
 pareto.chart(race_freq$n, names = race_freq$RACE,
              main = "Pareto Chart of Race")
 
+
 ```
+
+## Plotting Trellis Display for English Scores
 
 ```{R}
 
@@ -119,7 +124,7 @@ ggplot(long_avg_data, aes(x = Avg_Score, y = Subject, color = GENDER, shape = GE
   scale_color_manual(values = gender_colors) +
   scale_shape_manual(values = gender_shapes) +
   labs(
-    title = "Average Scores by Subject and Gender Across Classes",
+    title = "Average English Scores and Gender Across Classes",
     x = "Average Score",
     y = NULL,
     color = "Gender",
@@ -129,15 +134,12 @@ ggplot(long_avg_data, aes(x = Avg_Score, y = Subject, color = GENDER, shape = GE
   theme(
     strip.text = element_text(face = "bold", size = 12),
     axis.text.y = element_text(size = 11, hjust = 1),  # Justified and consistent label styling
-    panel.spacing = unit(1.5, "lines"),
+    panel.spacing = unit(1, "lines"),
     legend.position = "top",
     strip.background = element_blank(),  # Optional: remove background for facet labels
     axis.title.y = element_blank()  # Remove y-axis title for more space
   ) +
   scale_y_discrete(labels = function(x) str_wrap(x, width = 10))  # Wrap y-axis labels
-
-
-
 
 
 ```
