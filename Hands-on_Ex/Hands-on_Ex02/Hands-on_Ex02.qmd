@@ -2,3 +2,177 @@
 title: "Hands-on Exercise 2"
 author: "Liaw Ying Ting, Celin"
 ---
+
+# Extension of ggplot 2 
+
+```{R}
+pacman::p_load(ggrepel, patchwork, ggthemes, hrbrthemes, tidyverse)
+```
+
+```{R}
+exam_data <- read_csv("Exam_data.csv")
+```
+
+## Overlapping Annotations
+
+```{R}
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y=ENGLISH)) +
+  geom_point() +
+  geom_smooth(method=lm, 
+              size=0.5) +  
+  geom_label(aes(label = ID), 
+             hjust = .5, 
+             vjust = -.5) +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100)) +
+  ggtitle("English scores versus Maths scores for Primary 3")
+```
+
+## Using ggrepel to repel overlapping text
+
+```{R}
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y=ENGLISH)) +
+  geom_point() +
+  geom_smooth(method=lm, 
+              size=0.5) +  
+  geom_label_repel(aes(label = ID), 
+                   fontface = "bold") +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100)) +
+  ggtitle("English scores versus Maths scores for Primary 3")
+```
+
+# Ggplot2 Themes:
+
+## Classic Theme
+
+```{R}
+ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  theme_classic() +
+  ggtitle("Distribution of Maths scores") 
+```
+
+## Economist Theme
+
+```{R}
+ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  ggtitle("Distribution of Maths scores") +
+  theme_economist()
+```
+
+```{R}
+ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  ggtitle("Distribution of Maths scores") +
+  theme_ipsum()
+```
+
+## Combining ggplot2 graphs
+
+```{R}
+ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  ggtitle("Distribution of Maths scores") +
+  theme_ipsum(axis_title_size = 18,
+              base_size = 15,
+              grid = "Y")
+```
+
+```{R}
+p1 <- ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") + 
+  coord_cartesian(xlim=c(0,100)) +
+  ggtitle("Distribution of Maths scores")
+
+
+```
+
+```{R}
+p2 <- ggplot(data=exam_data, 
+             aes(x = ENGLISH)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  coord_cartesian(xlim=c(0,100)) +
+  ggtitle("Distribution of English scores")
+
+```
+
+```{R}
+p3 <- ggplot(data=exam_data, 
+             aes(x= MATHS, 
+                 y=ENGLISH)) +
+  geom_point() +
+  geom_smooth(method=lm, 
+              size=0.5) +  
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100)) +
+  ggtitle("English scores versus Maths scores for Primary 3")
+
+```
+
+## Combining 2 Plots side by side
+
+```{R}
+p1 + p2
+```
+
+## Combining 3 graphs - Using "/" to stack 2 graphs and \| to place the plots beside each other
+
+```{R}
+(p1 / p2) | p3
+```
+
+## Placing plots next to each other based on the provided layout - using inset_element
+
+inset_element:
+
+-   Left = 0.02 - left edge start 2% from left side of the main plot
+
+-   Bottom = 0.7 - Bottom edge start 70% from the bottom of the main plot (Near the top)
+
+-   Right = 0.5 - Right edge ends at 50% of the width
+
+-   top = 1 top edge ends at 100% of height
+
+```{r}
+p3 + inset_element(p2, 
+                   left = 0.02, 
+                   bottom = 0.7, 
+                   right = 0.5, 
+                   top = 1)
+```
+
+## Using patchwork and theme together
+
+```{r}
+patchwork <- (p1 / p2) | p3
+patchwork & theme_economist()
+```
