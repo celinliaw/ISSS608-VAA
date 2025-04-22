@@ -206,7 +206,7 @@ patchwork & theme_economist()
 ggplot(data=exam_data, aes(y = ENGLISH, x= CLASS)) + geom_boxplot()
 ```
 
-##  Plotting a Violin Plot of science scores in the different Races
+## Plotting a Violin Plot of science scores in the different Races
 
 -   From the violin plot, it can be seen that there is a majority of "Chinese" students who scored in the 75 range and "Other" students scoring in the 68 range for science subject
 
@@ -219,7 +219,7 @@ ggplot(data=exam_data,
   geom_violin()
 ```
 
-## Plotting a pie chart of the proportion of the different races 
+## Plotting a pie chart of the proportion of the different races
 
 -   It can be seen from the pie chart that more than half of the student population are Chinese and the next majority is Malay
 
