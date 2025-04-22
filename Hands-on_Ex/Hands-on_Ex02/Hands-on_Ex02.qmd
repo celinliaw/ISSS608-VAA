@@ -3,14 +3,30 @@ title: "Hands-on Exercise 2"
 author: "Liaw Ying Ting, Celin"
 ---
 
-# Extension of ggplot 2 
+# Extension of ggplot 2
 
 ```{R}
 pacman::p_load(ggrepel, patchwork, ggthemes, hrbrthemes, tidyverse)
 ```
 
+```{r}
+#| label: setup
+#| include: false
+# This chunk sets up fonts and themes
+library(ggplot2)
+library(hrbrthemes)
+library(sysfonts)
+library(showtext)
+
+# Add and activate font (only needed once per session)
+font_add_google("IBM Plex Sans", "ibm")
+showtext_auto()
+
+```
+
 ```{R}
 exam_data <- read_csv("Exam_data.csv")
+
 ```
 
 ## Overlapping Annotations
@@ -82,7 +98,7 @@ ggplot(data=exam_data,
                  color="grey25", 
                  fill="grey90") +
   ggtitle("Distribution of Maths scores") +
-  theme_ipsum()
+  theme_ipsum(base_family = "sans")
 ```
 
 ## Combining ggplot2 graphs
@@ -97,7 +113,8 @@ ggplot(data=exam_data,
   ggtitle("Distribution of Maths scores") +
   theme_ipsum(axis_title_size = 18,
               base_size = 15,
-              grid = "Y")
+              grid = "Y",
+              base_family = "sans")
 ```
 
 ```{R}
@@ -144,7 +161,7 @@ p3 <- ggplot(data=exam_data,
 p1 + p2
 ```
 
-## Combining 3 graphs - Using "/" to stack 2 graphs and \| to place the plots beside each other
+## Combining 3 graphs - Using "/" to stack 2 graphs and "\|" to place the plots beside each other
 
 ```{R}
 (p1 / p2) | p3
@@ -175,4 +192,65 @@ p3 + inset_element(p2,
 ```{r}
 patchwork <- (p1 / p2) | p3
 patchwork & theme_economist()
+```
+
+# Visual Analytics Methods of the Week
+
+## Plotting a Box Plot of the English scores of the different classes
+
+-   From the box plot below, there is a downward trend of English scores from 3A to 3I, showing that students from Class 3A generally scored better than students in the other classes
+
+-   There are also some classes with outliers, for example class 3E and 3F where there are one or more students who scored significantly lower than the rest of the class
+
+```{r}
+ggplot(data=exam_data, aes(y = ENGLISH, x= CLASS)) + geom_boxplot()
+```
+
+##  Plotting a Violin Plot of science scores in the different Races
+
+-   From the violin plot, it can be seen that there is a majority of "Chinese" students who scored in the 75 range and "Other" students scoring in the 68 range for science subject
+
+-   For Indian students, their science scores are quite evenly spread out from 12.5 to 87.5
+
+```{R}
+ggplot(data=exam_data, 
+       aes(y = SCIENCE, 
+           x= RACE)) +
+  geom_violin()
+```
+
+## Plotting a pie chart of the proportion of the different races 
+
+-   It can be seen from the pie chart that more than half of the student population are Chinese and the next majority is Malay
+
+-   The Indian and Other students seem to have the same proportion
+
+```{r}
+library(dplyr)
+race_counts <- exam_data %>%
+  count(RACE)
+
+ggplot(race_counts, aes(x = "", y = n, fill = RACE)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  labs(title = "Student Distribution by Race",
+       y = NULL,
+       x = NULL,
+       fill = "Race") +
+  theme_void() +
+  theme(plot.title = element_text(hjust = 0.5, size = 16))
+```
+
+## Dot Plot of Math Scores
+
+```{r}
+ggplot(exam_data, aes(x = MATHS)) +
+  geom_dotplot(binwidth = 1, 
+               fill = "skyblue", 
+               color = "black") +
+  labs(title = "Dot Plot of Maths Scores",
+       x = "Maths Score",
+       y = "Count") +
+  theme_minimal()
+
 ```
