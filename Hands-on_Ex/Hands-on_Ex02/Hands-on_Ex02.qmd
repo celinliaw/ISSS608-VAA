@@ -6,7 +6,7 @@ author: "Liaw Ying Ting, Celin"
 # Extension of ggplot 2
 
 ```{R}
-pacman::p_load(ggrepel, patchwork, ggthemes, hrbrthemes, tidyverse)
+  pacman::p_load(ggrepel, patchwork, ggthemes, hrbrthemes, tidyverse)
 ```
 
 ```{r}
@@ -20,12 +20,14 @@ library(showtext)
 
 # Add and activate font (only needed once per session)
 font_add_google("IBM Plex Sans", "ibm")
+font_add_google("Roboto Condensed", "Roboto Condensed")
 showtext_auto()
 
 ```
 
 ```{R}
 exam_data <- read_csv("Exam_data.csv")
+
 
 ```
 
@@ -241,16 +243,230 @@ ggplot(race_counts, aes(x = "", y = n, fill = RACE)) +
   theme(plot.title = element_text(hjust = 0.5, size = 16))
 ```
 
-## Dot Plot of Math Scores
+## Raincloud Plots of Scores by Gender
 
 ```{r}
-ggplot(exam_data, aes(x = MATHS)) +
-  geom_dotplot(binwidth = 1, 
-               fill = "skyblue", 
-               color = "black") +
-  labs(title = "Dot Plot of Maths Scores",
-       x = "Maths Score",
-       y = "Count") +
-  theme_minimal()
+library(ggdist)
+
+# ensure GENDER is a factor
+exam_data$GENDER <- as.factor(exam_data$GENDER)
+
+a1 <- ggplot(exam_data, aes(x = ENGLISH, y = GENDER, fill = GENDER)) +
+  # lighter half-density cloud
+  stat_halfeye(
+    side          = "right",
+    adjust        = 0.5,
+    width         = 0.6,
+    justification = 0.1,
+    .width        = 0,
+    point_colour  = NA,
+    alpha         = 0.3
+  ) +
+  # central boxplot
+  geom_boxplot(
+    width         = 0.12,
+    outlier.shape = NA,
+    position      = position_nudge(y = 0.2),
+    alpha         = 0.8
+  ) +
+  # jittered points on top
+  geom_jitter(
+    width  = 0,
+    height = 0.15,
+    size   = 1.5,
+    alpha  = 0.6,
+    aes(color = GENDER)
+  ) +
+  # matching palette
+  scale_fill_manual(values = c("Female" = "#00AFBB", "Male" = "#FC4E07")) +
+  scale_color_manual(values = c("Female" = "#00AFBB", "Male" = "#FC4E07")) +
+  # side-by-side panels
+  facet_wrap(~ GENDER, nrow = 1, scales = "free_y") +
+  theme_ipsum_rc(base_size = 12) +
+  labs(
+    title = "Raincloud Plot of English Scores by Gender",
+    x     = "English Score",
+    y     = NULL
+  ) +
+  theme(
+    legend.position    = "none",
+    axis.text.y        = element_blank(),
+    axis.ticks.y       = element_blank(),
+    panel.grid.major.y = element_blank()
+  )
+
+```
+
+```{r}
+
+# ensure GENDER is a factor
+exam_data$GENDER <- as.factor(exam_data$GENDER)
+
+a2 <- ggplot(exam_data, aes(x = MATHS, y = GENDER, fill = GENDER)) +
+  # lighter half-density cloud
+  stat_halfeye(
+    side          = "right",
+    adjust        = 0.5,
+    width         = 0.6,
+    justification = 0.1,
+    .width        = 0,
+    point_colour  = NA,
+    alpha         = 0.3
+  ) +
+  # central boxplot
+  geom_boxplot(
+    width         = 0.12,
+    outlier.shape = NA,
+    position      = position_nudge(y = 0.2),
+    alpha         = 0.8
+  ) +
+  # jittered points on top
+  geom_jitter(
+    width  = 0,
+    height = 0.15,
+    size   = 1.5,
+    alpha  = 0.6,
+    aes(color = GENDER)
+  ) +
+  # matching palette
+  scale_fill_manual(values = c("Female" = "#00AFBB", "Male" = "#FC4E07")) +
+  scale_color_manual(values = c("Female" = "#00AFBB", "Male" = "#FC4E07")) +
+  # side-by-side panels
+  facet_wrap(~ GENDER, nrow = 1, scales = "free_y") +
+  theme_ipsum_rc(base_size = 12) +
+  labs(
+    title = "Raincloud Plot of Maths Scores by Gender",
+    x     = "English Score",
+    y     = NULL
+  ) +
+  theme(
+    legend.position    = "none",
+    axis.text.y        = element_blank(),
+    axis.ticks.y       = element_blank(),
+    panel.grid.major.y = element_blank()
+  )
+
+```
+
+```{r}
+
+# ensure GENDER is a factor
+exam_data$GENDER <- as.factor(exam_data$GENDER)
+
+a3 <- ggplot(exam_data, aes(x = SCIENCE, y = GENDER, fill = GENDER)) +
+  # lighter half-density cloud
+  stat_halfeye(
+    side          = "right",
+    adjust        = 0.5,
+    width         = 0.6,
+    justification = 0.1,
+    .width        = 0,
+    point_colour  = NA,
+    alpha         = 0.3
+  ) +
+  # central boxplot
+  geom_boxplot(
+    width         = 0.12,
+    outlier.shape = NA,
+    position      = position_nudge(y = 0.2),
+    alpha         = 0.8
+  ) +
+  # jittered points on top
+  geom_jitter(
+    width  = 0,
+    height = 0.15,
+    size   = 1.5,
+    alpha  = 0.6,
+    aes(color = GENDER)
+  ) +
+  # matching palette
+  scale_fill_manual(values = c("Female" = "#00AFBB", "Male" = "#FC4E07")) +
+  scale_color_manual(values = c("Female" = "#00AFBB", "Male" = "#FC4E07")) +
+  # side-by-side panels
+  facet_wrap(~ GENDER, nrow = 1, scales = "free_y") +
+  theme_ipsum_rc(base_size = 12) +
+  labs(
+    title = "Raincloud Plot of Science Scores by Gender",
+    x     = "English Score",
+    y     = NULL
+  ) +
+  theme(
+    legend.position    = "none",
+    axis.text.y        = element_blank(),
+    axis.ticks.y       = element_blank(),
+    panel.grid.major.y = element_blank()
+  )
+
+```
+
+Using "/" to combine the charts, we can get the figures below.
+
+```{r combined-raincloud, fig.width=8, fig.height=20, echo=FALSE}
+a1/a2/a3
+
+```
+
+## Diverging Stacked Bar Chart split by Gender
+
+The subjects are split into 3 bands for each subject: Low(0-39), Medium(40-69), High(70-100).
+
+From the charts, there are more females in the High band for English and Science Subjects while the Math subjects are more or less equal for both females and males.
+
+In the medium band for English, there are more males then females while for Math and Science, there are more females than males.
+
+In the low band, however, there are consistently more males than females.
+
+To conclude, females generally score higher for English and Science subjects and score higher than males in general.
+
+```{r}
+# Load libraries
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(forcats)
+
+# 1. Categorize each subject into performance bands
+exam_bands <- exam_data %>%
+  mutate(
+    ENGLISH_BAND = cut(ENGLISH, breaks = c(-Inf, 39, 69, 100),
+                       labels = c("Low", "Medium", "High")),
+    MATHS_BAND   = cut(MATHS,   breaks = c(-Inf, 39, 69, 100),
+                       labels = c("Low", "Medium", "High")),
+    SCIENCE_BAND = cut(SCIENCE, breaks = c(-Inf, 39, 69, 100),
+                       labels = c("Low", "Medium", "High"))
+  )
+
+# 2. Reshape data to long format for faceting
+long_bands <- exam_bands %>%
+  select(GENDER, ENGLISH_BAND, MATHS_BAND, SCIENCE_BAND) %>%
+  pivot_longer(cols = ends_with("_BAND"),
+               names_to = "SUBJECT",
+               values_to = "PERFORMANCE") %>%
+  mutate(
+    SUBJECT = recode(SUBJECT,
+                     ENGLISH_BAND = "English",
+                     MATHS_BAND = "Maths",
+                     SCIENCE_BAND = "Science"),
+    PERFORMANCE = factor(PERFORMANCE, levels = c("Low", "Medium", "High"))
+  )
+
+# 3. Prepare data for plotting
+plot_data <- long_bands %>%
+  count(SUBJECT, GENDER, PERFORMANCE) %>%
+  mutate(n = ifelse(GENDER == "Male", -n, n))
+
+# 4. Create diverging stacked bar chart with facets
+ggplot(plot_data, aes(x = PERFORMANCE, y = n, fill = GENDER)) +
+  geom_bar(stat = "identity", width = 0.7) +
+  coord_flip() +
+  facet_wrap(~ SUBJECT, ncol = 1, scales = "free_y") +
+  scale_y_continuous(labels = abs) +
+  scale_fill_manual(values = c("Female" = "#00AFBB", "Male" = "#FC4E07")) +
+  labs(
+    title = "Diverging Stacked Bar Charts: Performance Bands by Gender",
+    x = "Performance Band",
+    y = "Number of Students"
+  ) +
+  theme_minimal(base_size = 14)
 
 ```
