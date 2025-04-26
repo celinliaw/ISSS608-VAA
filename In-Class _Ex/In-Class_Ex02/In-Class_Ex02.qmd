@@ -1,4 +1,4 @@
 ---
-title: "In-Class Exercise 1"
+title: "In-Class Exercise 02"
 author: "Liaw Ying Ting, Celin"
 ---
