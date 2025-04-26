@@ -18,7 +18,7 @@
     "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html",
     "title": "Hands-on Exercise 1",
     "section": "",
-    "text": "The code chunk below uses p_load() of pacman package to check if tidyverse packages are installed in the computer. If they are, then they willl be launched into R.\n\npacman::p_load(tidyverse)\n\n\n\n\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")\n\nRows: 322 Columns: 7\n── Column specification ────────────────────────────────────────────────────────\nDelimiter: \",\"\nchr (4): ID, CLASS, GENDER, RACE\ndbl (3): ENGLISH, MATHS, SCIENCE\n\nℹ Use `spec()` to retrieve the full column specification for this data.\nℹ Specify the column types or set `show_col_types = FALSE` to quiet this message."
+    "text": "The code chunk below uses p_load() of pacman package to check if tidyverse packages are installed in the computer. If they are, then they willl be launched into R.\n\npacman::p_load(tidyverse)\n\n\n\n\n\nexam_data &lt;- read_csv(\"data/Exam_data.csv\")"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#install-and-launching-r-packages",
@@ -32,7 +32,7 @@
     "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#importing-the-data",
     "title": "Hands-on Exercise 1",
     "section": "",
-    "text": "exam_data &lt;- read_csv(\"data/Exam_data.csv\")\n\nRows: 322 Columns: 7\n── Column specification ────────────────────────────────────────────────────────\nDelimiter: \",\"\nchr (4): ID, CLASS, GENDER, RACE\ndbl (3): ENGLISH, MATHS, SCIENCE\n\nℹ Use `spec()` to retrieve the full column specification for this data.\nℹ Specify the column types or set `show_col_types = FALSE` to quiet this message."
+    "text": "exam_data &lt;- read_csv(\"data/Exam_data.csv\")"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-bar-chart-of-science-score-distribution",
@@ -53,7 +53,7 @@
     "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-scatter-plot-of-the-science-vs-math-scores",
     "title": "Hands-on Exercise 1",
     "section": "Plotting a Scatter Plot of the Science vs Math scores",
-    "text": "Plotting a Scatter Plot of the Science vs Math scores\n\nggplot(data=exam_data, \n       aes(x= SCIENCE, y=MATHS)) +\n  geom_point() +\n  geom_smooth(size=0.5)\n\nWarning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.\nℹ Please use `linewidth` instead.\n\n\n`geom_smooth()` using method = 'loess' and formula = 'y ~ x'"
+    "text": "Plotting a Scatter Plot of the Science vs Math scores\n\nggplot(data=exam_data, \n       aes(x= SCIENCE, y=MATHS)) +\n  geom_point() +\n  geom_smooth(size=0.5)"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-a-line-graph-of-the-scores-of-the-different-classes",
@@ -102,21 +102,21 @@
     "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html",
     "title": "Hands-on Exercise 2",
     "section": "",
-    "text": "pacman::p_load(ggrepel, patchwork, ggthemes, hrbrthemes, tidyverse)\n\n\nexam_data &lt;- read_csv(\"Exam_data.csv\")\n\nRows: 322 Columns: 7\n── Column specification ────────────────────────────────────────────────────────\nDelimiter: \",\"\nchr (4): ID, CLASS, GENDER, RACE\ndbl (3): ENGLISH, MATHS, SCIENCE\n\nℹ Use `spec()` to retrieve the full column specification for this data.\nℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.\n\n\n\n\n\nggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  geom_label(aes(label = ID), \n             hjust = .5, \n             vjust = -.5) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")\n\nWarning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.\nℹ Please use `linewidth` instead.\n\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  geom_label_repel(aes(label = ID), \n                   fontface = \"bold\") +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\nWarning: ggrepel: 301 unlabeled data points (too many overlaps). Consider\nincreasing max.overlaps"
+    "text": "pacman::p_load(ggrepel, patchwork, ggthemes, hrbrthemes, tidyverse)\n\n\nexam_data &lt;- read_csv(\"Exam_data.csv\")\n\n\n\n\nggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  geom_label(aes(label = ID), \n             hjust = .5, \n             vjust = -.5) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  geom_label_repel(aes(label = ID), \n                   fontface = \"bold\") +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#overlapping-annotations",
     "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#overlapping-annotations",
     "title": "Hands-on Exercise 2",
     "section": "",
-    "text": "ggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  geom_label(aes(label = ID), \n             hjust = .5, \n             vjust = -.5) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")\n\nWarning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.\nℹ Please use `linewidth` instead.\n\n\n`geom_smooth()` using formula = 'y ~ x'"
+    "text": "ggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  geom_label(aes(label = ID), \n             hjust = .5, \n             vjust = -.5) +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#using-ggrepel-to-repel-overlapping-text",
     "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#using-ggrepel-to-repel-overlapping-text",
     "title": "Hands-on Exercise 2",
     "section": "",
-    "text": "ggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  geom_label_repel(aes(label = ID), \n                   fontface = \"bold\") +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\nWarning: ggrepel: 301 unlabeled data points (too many overlaps). Consider\nincreasing max.overlaps"
+    "text": "ggplot(data=exam_data, \n       aes(x= MATHS, \n           y=ENGLISH)) +\n  geom_point() +\n  geom_smooth(method=lm, \n              size=0.5) +  \n  geom_label_repel(aes(label = ID), \n                   fontface = \"bold\") +\n  coord_cartesian(xlim=c(0,100),\n                  ylim=c(0,100)) +\n  ggtitle(\"English scores versus Maths scores for Primary 3\")"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#classic-theme",
@@ -151,21 +151,21 @@
     "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#combining-3-graphs---using-to-stack-2-graphs-and-to-place-the-plots-beside-each-other",
     "title": "Hands-on Exercise 2",
     "section": "Combining 3 graphs - Using “/” to stack 2 graphs and “|” to place the plots beside each other",
-    "text": "Combining 3 graphs - Using “/” to stack 2 graphs and “|” to place the plots beside each other\n\n(p1 / p2) | p3\n\n`geom_smooth()` using formula = 'y ~ x'"
+    "text": "Combining 3 graphs - Using “/” to stack 2 graphs and “|” to place the plots beside each other\n\n(p1 / p2) | p3"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#placing-plots-next-to-each-other-based-on-the-provided-layout---using-inset_element",
     "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#placing-plots-next-to-each-other-based-on-the-provided-layout---using-inset_element",
     "title": "Hands-on Exercise 2",
     "section": "Placing plots next to each other based on the provided layout - using inset_element",
-    "text": "Placing plots next to each other based on the provided layout - using inset_element\ninset_element:\n\nLeft = 0.02 - left edge start 2% from left side of the main plot\nBottom = 0.7 - Bottom edge start 70% from the bottom of the main plot (Near the top)\nRight = 0.5 - Right edge ends at 50% of the width\ntop = 1 top edge ends at 100% of height\n\n\np3 + inset_element(p2, \n                   left = 0.02, \n                   bottom = 0.7, \n                   right = 0.5, \n                   top = 1)\n\n`geom_smooth()` using formula = 'y ~ x'"
+    "text": "Placing plots next to each other based on the provided layout - using inset_element\ninset_element:\n\nLeft = 0.02 - left edge start 2% from left side of the main plot\nBottom = 0.7 - Bottom edge start 70% from the bottom of the main plot (Near the top)\nRight = 0.5 - Right edge ends at 50% of the width\ntop = 1 top edge ends at 100% of height\n\n\np3 + inset_element(p2, \n                   left = 0.02, \n                   bottom = 0.7, \n                   right = 0.5, \n                   top = 1)"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#using-patchwork-and-theme-together",
     "href": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#using-patchwork-and-theme-together",
     "title": "Hands-on Exercise 2",
     "section": "Using patchwork and theme together",
-    "text": "Using patchwork and theme together\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_economist()\n\n`geom_smooth()` using formula = 'y ~ x'"
+    "text": "Using patchwork and theme together\n\npatchwork &lt;- (p1 / p2) | p3\npatchwork & theme_economist()"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html#plotting-a-box-plot-of-the-english-scores-of-the-different-classes",

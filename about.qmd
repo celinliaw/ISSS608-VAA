@@ -1,5 +1,10 @@
 ---
 title: "About"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
 ---
 
 This site will document what Celin Liaw learnt from this course.
