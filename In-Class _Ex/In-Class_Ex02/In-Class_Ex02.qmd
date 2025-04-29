@@ -1,4 +1,11 @@
 ---
 title: "In-Class Exercise 02"
 author: "Liaw Ying Ting, Celin"
+date: 26 Apr 2025
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
 ---
