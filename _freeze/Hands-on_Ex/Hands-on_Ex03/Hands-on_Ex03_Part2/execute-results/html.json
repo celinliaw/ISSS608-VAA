@@ -1,0 +1,17 @@
+{
+  "hash": "63f47006304230e314492b1c6f91d6c8",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Hands-on Exercise 3 Part 2\"\ndate: 30 Apr 2025\ndate-modified: \"last-modified\"\nauthor: \"Liaw Ying Ting, Celin\"\nexecute: \n  eval: true\n  echo: true\n  warning: false\n  freeze: true\n---\n\n\n\n# 4.1 Programming Animated Statistical Graphics with R\n\n-   Creating animated data visualisation by using **gganimate** and **plotly r** packages\n\n-   Learn how to reshape data by using **tidyr** package\n\n-   Process, wrangle and transform data by using **dplyr** package\n\n## 4.1.1 Basic Concepts of animation\n\n-   Plots do not move\n\n-   Many individual plots are built and stitched together as movie frames\n\n-   Each frame is a different plot and subset drives the flow of the animation when stitched back together\n\n## 4.1.2 Terminology\n\n-   Frame: Represents a different point in time or a different category\n\n-   Animation Attributes: Settings that control how the animation behaves\n\n# 4.2 Getting Started\n\n## 4.2.1 Loading the R packages\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(readxl, gifski, gapminder,\n               plotly, gganimate, tidyverse)\n```\n:::\n\n\n\n## 4.2.2 Importing the data\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\ncol <- c(\"Country\", \"Continent\")\nglobalPop <- read_xls(\"GlobalPopulation.xls\",\n                      sheet=\"Data\") %>%\n  mutate_at(col, as.factor) %>%\n  mutate(Year = as.integer(Year))\n```\n:::\n\n\n\n# 4.3 Animated Data Visualisation: gganimate methods\n\n-   gganimate extends the grammar of graphics as implemented by ggplot2 to include the description of animation\n\n-   transition\\_\\*() - how data should be spread out and how it relates to itself across time\n\n-   view\\_\\*() - how the positional scales should change along the animation\n\n-   shadow\\_\\*() - how data from other points in time should be presented in the given point in time\n\n-   enter\\_\\*()/exit\\_\\*() - how new data should appear and how old data should disappear during the course of the animation\n\n-   ease_aes() - how different aesthetics should be eased during transitions\n\n## 4.3.1 Building a static population bubble plot\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nggplot(globalPop, aes(x = Old, y = Young, \n                      size = Population, \n                      colour = Country)) +\n  geom_point(alpha = 0.7, \n             show.legend = FALSE) +\n  scale_colour_manual(values = country_colors) +\n  scale_size(range = c(2, 12)) +\n  labs(title = 'Year: {frame_time}', \n       x = '% Aged', \n       y = '% Young') \n```\n\n::: {.cell-output-display}\n![](Hands-on_Ex03_Part2_files/figure-html/unnamed-chunk-3-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "Hands-on_Ex03_Part2_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

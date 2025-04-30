@@ -1,5 +1,5 @@
 ---
-title: "Hands-on_Ex03"
+title: "Hands on Exercise 3 Part 1"
 author: "Liaw Ying Ting, Celin"
 date: 29 Apr 2025
 date-modified: "last-modified"

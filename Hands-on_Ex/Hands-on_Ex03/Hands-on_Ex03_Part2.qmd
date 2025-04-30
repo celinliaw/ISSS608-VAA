@@ -1,0 +1,81 @@
+---
+title: "Hands-on Exercise 3 Part 2"
+date: 30 Apr 2025
+date-modified: "last-modified"
+author: "Liaw Ying Ting, Celin"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# 4.1 Programming Animated Statistical Graphics with R
+
+-   Creating animated data visualisation by using **gganimate** and **plotly r** packages
+
+-   Learn how to reshape data by using **tidyr** package
+
+-   Process, wrangle and transform data by using **dplyr** package
+
+## 4.1.1 Basic Concepts of animation
+
+-   Plots do not move
+
+-   Many individual plots are built and stitched together as movie frames
+
+-   Each frame is a different plot and subset drives the flow of the animation when stitched back together
+
+## 4.1.2 Terminology
+
+-   Frame: Represents a different point in time or a different category
+
+-   Animation Attributes: Settings that control how the animation behaves
+
+# 4.2 Getting Started
+
+## 4.2.1 Loading the R packages
+
+```{r}
+pacman::p_load(readxl, gifski, gapminder,
+               plotly, gganimate, tidyverse)
+```
+
+## 4.2.2 Importing the data
+
+```{r}
+col <- c("Country", "Continent")
+globalPop <- read_xls("GlobalPopulation.xls",
+                      sheet="Data") %>%
+  mutate_at(col, as.factor) %>%
+  mutate(Year = as.integer(Year))
+```
+
+# 4.3 Animated Data Visualisation: gganimate methods
+
+-   gganimate extends the grammar of graphics as implemented by ggplot2 to include the description of animation
+
+-   transition\_\*() - how data should be spread out and how it relates to itself across time
+
+-   view\_\*() - how the positional scales should change along the animation
+
+-   shadow\_\*() - how data from other points in time should be presented in the given point in time
+
+-   enter\_\*()/exit\_\*() - how new data should appear and how old data should disappear during the course of the animation
+
+-   ease_aes() - how different aesthetics should be eased during transitions
+
+## 4.3.1 Building a static population bubble plot
+
+```{r}
+ggplot(globalPop, aes(x = Old, y = Young, 
+                      size = Population, 
+                      colour = Country)) +
+  geom_point(alpha = 0.7, 
+             show.legend = FALSE) +
+  scale_colour_manual(values = country_colors) +
+  scale_size(range = c(2, 12)) +
+  labs(title = 'Year: {frame_time}', 
+       x = '% Aged', 
+       y = '% Young') 
+```
