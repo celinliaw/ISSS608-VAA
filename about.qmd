@@ -7,4 +7,4 @@ execute:
   freeze: true
 ---
 
-Hi! This webpage will detail all my learnings from ISSS608 Visual Analytics Course.
+Hi, My name is Celin! This webpage will detail all my learnings from ISSS608 Visual Analytics Course.
