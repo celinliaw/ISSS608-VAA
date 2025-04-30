@@ -1,1 +1,19 @@
 /* css styles */
+/* Adjust heading sizes */
+h1 {
+  font-size: 1.8rem;  /* default is ~2.5–3rem */
+}
+
+h2 {
+  font-size: 1.6rem;
+}
+
+h3 {
+  font-size: 1.3rem;
+}
+
+h4 {
+  font-size: 1.1rem;
+}
+
+

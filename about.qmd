@@ -7,8 +7,4 @@ execute:
   freeze: true
 ---
 
-This site will document what Celin Liaw learnt from this course.
-
-```{r}
-1 + 1
-```
+Hi! This webpage will detail all my learnings from ISSS608 Visual Analytics Course.
