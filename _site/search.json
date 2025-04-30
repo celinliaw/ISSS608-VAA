@@ -263,7 +263,7 @@
     "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#creating-an-interactive-scatter-plot-plot_ly-method",
     "title": "Hands-on_Ex03",
     "section": "3.7.1 Creating an interactive scatter plot: plot_ly() method",
-    "text": "3.7.1 Creating an interactive scatter plot: plot_ly() method\n\nlibrary(plotly)\n\nplot_ly(data = exam_data, \n        x = ~MATHS, \n        y = ~ENGLISH,\n        type = 'scatter',\n        mode = 'markers')"
+    "text": "3.7.1 Creating an interactive scatter plot: plot_ly() method\n\nThe PlotThe Code\n\n\n\n\n\n\n\n\n\n\n\nplot_ly(data = exam_data, \n             x = ~MATHS, \n             y = ~ENGLISH)"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#creating-an-interactive-scatter-plot-plot_ly-method-.tabset",

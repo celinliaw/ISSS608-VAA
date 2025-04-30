@@ -290,14 +290,198 @@ There are two ways to create interactive graph by using plotly, they are:
 
 -   by using *ggplotly()*
 
-### 3.7.1 Creating an interactive scatter plot: plot_ly() method  {.tabset}
+## 3.7.1 Creating an interactive scatter plot: plot_ly() method
+
+::: panel-tabset
+### The Plot
 
 ```{r}
-library(plotly)
-
+#| echo: false
 plot_ly(data = exam_data, 
-        x = ~MATHS, 
-        y = ~ENGLISH,
-        type = 'scatter',
-        mode = 'markers')
+             x = ~MATHS, 
+             y = ~ENGLISH)
 ```
+
+### The Code
+
+```{r}
+#| eval: false
+plot_ly(data = exam_data, 
+             x = ~MATHS, 
+             y = ~ENGLISH)
+```
+:::
+
+## 3.7.2 Working with visual variable: plot_ly() method
+
+-   color argument is mapped to a qualitative visual variable (i.e. RACE)
+
+::: panel-tabset
+### The Plot
+
+```{r}
+#| echo: false 
+plot_ly(data = exam_data, 
+        x = ~ENGLISH, 
+        y = ~MATHS, 
+        color = ~RACE)
+```
+
+### The Code
+
+```{r}
+#| eval: false 
+plot_ly(data = exam_data, 
+        x = ~ENGLISH, 
+        y = ~MATHS, 
+        color = ~RACE)
+```
+:::
+
+## 3.7.3 Creating an interactive scatter plot: ggplotly() method
+
+::: panel-tabset
+### The Plot
+
+```{r}
+#| echo: false 
+p <- ggplot(data=exam_data, 
+            aes(x = MATHS,
+                y = ENGLISH)) +
+  geom_point(size=1) +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100))
+ggplotly(p)
+```
+
+### The Code
+
+```{r}
+#| eval: false 
+p <- ggplot(data=exam_data, 
+            aes(x = MATHS,
+                y = ENGLISH)) +
+  geom_point(size=1) +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100))
+ggplotly(p)
+```
+:::
+
+## 3.7.4 Coordinated Multiple Views with plotly
+
+-   *highlight_key()* of plotly package is used as shared data
+
+-   two scatterplots will be created by using ggplot2 functions
+
+-   *subplot()* of plotly package is used to place them next to each other side-by-side
+
+::: panel-tabset
+### The Plot
+
+```{r}
+#| echo: false  
+d <- highlight_key(exam_data)
+p1 <- ggplot(data=d, 
+            aes(x = MATHS,
+                y = ENGLISH)) +
+  geom_point(size=1) +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100))
+
+p2 <- ggplot(data=d, 
+            aes(x = MATHS,
+                y = SCIENCE)) +
+  geom_point(size=1) +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100))
+subplot(ggplotly(p1),
+        ggplotly(p2))
+```
+
+### The Code
+
+```{r}
+#| eval: false  
+d <- highlight_key(exam_data)
+p1 <- ggplot(data=d, 
+            aes(x = MATHS,
+                y = ENGLISH)) +
+  geom_point(size=1) +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100))
+
+p2 <- ggplot(data=d, 
+            aes(x = MATHS,
+                y = SCIENCE)) +
+  geom_point(size=1) +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100))
+subplot(ggplotly(p1),
+        ggplotly(p2))
+```
+:::
+
+# 3.8 Interactive Data Visualisation - Crosstalk Methods!
+
+Crosstalk is an add-on to the htmlwidgets package. It extends htmlwidgets with a set of classes, functions and conventions for implementing cross-widget interactions (currently, linked brushing and filtering)
+
+## 3.8.1 Interactive Data Table: DT Package
+
+-   A wrapper of the JavaScript Library DataTables
+
+-   Data objects in R can be rendered as HTML tables using the JavaScript library 'DataTables' (typically via R Markdown or Shiny)
+
+```{r}
+DT::datatable(exam_data, class= "compact")
+```
+
+## 3.8.2 Linked brushing: crosstalk method
+
+Learning points:
+
+-   *highlight()* is a function of plotly package. It sets a variety of options for highlighting multiple plot. These options are primarily designed for linking multiple plotly graphs, and may not behave as expected when linking plotly to another htmlwidget package via crosstalk. In some cases, other htmlwidgets will respect these options, such as persistent selection in leaflet
+
+-   *bscols()* is a helper function of crosstalk package. It makes it easy to put HTML elements side by side. It can be called directly from the console but is especially designed to work in an R Markdown document.
+
+::: panel-tabset
+### The Plot
+
+```{r}
+#| echo: false  
+d <- highlight_key(exam_data) 
+p <- ggplot(d, 
+            aes(ENGLISH, 
+                MATHS)) + 
+  geom_point(size=1) +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100))
+
+gg <- highlight(ggplotly(p),        
+                "plotly_selected")  
+
+crosstalk::bscols(gg,               
+                  DT::datatable(d), 
+                  widths = 5)        
+```
+
+### The Code
+
+```{r}
+#| eval: false  
+d <- highlight_key(exam_data) 
+p <- ggplot(d, 
+            aes(ENGLISH, 
+                MATHS)) + 
+  geom_point(size=1) +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100))
+
+gg <- highlight(ggplotly(p),        
+                "plotly_selected")  
+
+crosstalk::bscols(gg,               
+                  DT::datatable(d), 
+                  widths = 5)        
+```
+:::
