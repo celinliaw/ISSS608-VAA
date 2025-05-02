@@ -152,8 +152,6 @@ As there are too many planning areas, to make things easier to visualise, I cate
 
     Areas like **North-Eastern Islands** and **Western islands** are intentionally left out as they do not belong to any of the areas
 
-## 3.1 Age-Sex Pyramid
-
 Steps:
 
 Step 1: I first created a new list called **region_map** to categorise them into the 5 categories
@@ -220,6 +218,70 @@ resident_regioned <- resident_regioned %>%
   )
 ```
 
+## 3.1 Pie Chart By Regions
+
+```{r}
+# Summarise population by Region and Sex
+pie_all_regions <- resident_regioned %>%
+  group_by(Region, Sex) %>%
+  summarise(Population = sum(Population), .groups = "drop")
+
+
+# Define the correct stacking order for pie slices
+ordered_levels <- rev(c(
+  "Central.Males", "Central.Females",
+  "East.Males", "East.Females",
+  "North.Males", "North.Females",
+  "North-East.Males", "North-East.Females",
+  "West.Males", "West.Females"
+))
+
+# Prepare the data
+pie_all_regions <- pie_all_regions %>%
+  mutate(
+    RegionSex = factor(paste(Region, Sex, sep = "."), levels = ordered_levels),
+    label = paste0(round(Population / sum(Population) * 100, 1), "%")
+  )
+
+# Plot: simple, clean pie with percentages inside
+ggplot(pie_all_regions, aes(x = "", y = Population, fill = RegionSex)) +
+  geom_col(width = 1, color = "white") +
+  geom_text(
+    aes(label = label),
+    position = position_stack(vjust = 0.5),
+    size = 3,
+    color = "black"
+  ) +
+  coord_polar(theta = "y") +
+  theme_void() +
+  labs(
+    title = "Population Composition by Region and Gender (2024)",
+    fill = "Region & Sex"
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Central.Males"     = "#f4cccc",
+      "Central.Females"   = "#a94442",
+      "East.Males"        = "#d9ead3",
+      "East.Females"      = "#6aa84f",
+      "North.Males"       = "#fce5cd",
+      "North.Females"     = "#e69138",
+      "North-East.Males"  = "#d9d2e9",
+      "North-East.Females"= "#8e7cc3",
+      "West.Males"        = "#cfe2f3",
+      "West.Females"      = "#3c78d8"
+    ),
+    breaks = rev(ordered_levels)
+  )
+
+```
+
+From the pie chart, it can be seen that the proportion of male and females in each area is quite proportionate, only differing by 1-2%.
+
+Additionally, the West and North-East Areas made up 25% of the total population, accounting for half the population in Singapore.
+
+## 3.2 Age Sex Pyramid by Regions
+
 Step 4: A new data object **pyramid_data** was created to create the pyramid table. <code style="color: blue;">groupby()</code> and <code style="color: blue;">summarise()</code> functions were used to group them by region, age group and sex, before summing them up.
 
 <code style="color: blue;">ifelse()</code> was then used to flip males to negative values so they will be plotted to the left.
@@ -271,54 +333,4 @@ girafe(
 )
 ```
 
-## 3.2 Pie Chart to Visualise Total Population by Gender
-
-```{r}
-# Define the correct stacking order for pie slices
-ordered_levels <- rev(c(
-  "Central.Males", "Central.Females",
-  "East.Males", "East.Females",
-  "North.Males", "North.Females",
-  "North-East.Males", "North-East.Females",
-  "West.Males", "West.Females"
-))
-
-# Prepare the data
-pie_all_regions <- pie_all_regions %>%
-  mutate(
-    RegionSex = factor(paste(Region, Sex, sep = "."), levels = ordered_levels),
-    label = paste0(round(Population / sum(Population) * 100, 1), "%")
-  )
-
-# Plot: simple, clean pie with percentages inside
-ggplot(pie_all_regions, aes(x = "", y = Population, fill = RegionSex)) +
-  geom_col(width = 1, color = "white") +
-  geom_text(
-    aes(label = label),
-    position = position_stack(vjust = 0.5),
-    size = 3,
-    color = "black"
-  ) +
-  coord_polar(theta = "y") +
-  theme_void() +
-  labs(
-    title = "Population Composition by Region and Gender (2024)",
-    fill = "Region & Sex"
-  ) +
-  scale_fill_manual(
-    values = c(
-      "Central.Males"     = "#f4cccc",
-      "Central.Females"   = "#a94442",
-      "East.Males"        = "#d9ead3",
-      "East.Females"      = "#6aa84f",
-      "North.Males"       = "#fce5cd",
-      "North.Females"     = "#e69138",
-      "North-East.Males"  = "#d9d2e9",
-      "North-East.Females"= "#8e7cc3",
-      "West.Males"        = "#cfe2f3",
-      "West.Females"      = "#3c78d8"
-    ),
-    breaks = rev(ordered_levels)
-  )
-
-```
+## 
