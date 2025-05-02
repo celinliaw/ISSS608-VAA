@@ -284,7 +284,7 @@ ordered_levels <- rev(c(
 ))
 
 # Prepare the data
-pie_all_regions <- resident_regioned %>%
+pie_all_regions <- pie_all_regions %>%
   mutate(
     RegionSex = factor(paste(Region, Sex, sep = "."), levels = ordered_levels),
     label = paste0(round(Population / sum(Population) * 100, 1), "%")
