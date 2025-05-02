@@ -10,6 +10,8 @@ execute:
   freeze: true
 ---
 
+
+
 # 1. Overview
 
 ## 1.1 Setting the scene
@@ -48,6 +50,8 @@ We load the following packages using the <code style="color: blue;">pacman::p_lo
 
 -   **patchwork:** to prepare composite figure created using ggplot2
 
+
+
 ```{r}
 pacman::p_load(tidyverse, ggrepel, 
                ggthemes,  hrbrthemes,
@@ -56,13 +60,19 @@ pacman::p_load(tidyverse, ggrepel,
 
 ```
 
+
+
 ## 2.2 Import Data
 
 The data that has been used has been mentioned in Chapter 1.2 above. We import this dataset as *resident_data.*
 
+
+
 ```{r}
 resident_data <- read_csv("respopagesex2024.csv")
 ```
+
+
 
 ## 2.3 Data Wrangling
 
@@ -70,10 +80,14 @@ resident_data <- read_csv("respopagesex2024.csv")
 
 We first take a look at the data and check if there are any duplicate entries using <code style="color: blue;">any(duplicated())</code>.
 
+
+
 ```{r}
 any(duplicated(resident_data))
 
 ```
+
+
 
 Since "FALSE" is returned, there are no duplicated entries
 
@@ -81,9 +95,13 @@ Since "FALSE" is returned, there are no duplicated entries
 
 The <code style="color: blue;">colSums</code> function is being used to check for missing values.
 
+
+
 ```{r}
 colSums(is.na(resident_data))
 ```
+
+
 
 Since there are no missing values in any of the rows, we will proceed with the next step.
 
@@ -111,6 +129,8 @@ Ensuring population and age is categorised as numerical data by using the <code 
 
 For the Age column, it is slightly special as I used <code style="color: blue;">levels = as.character</code> function as R sorts alphabetically by default and "10" will come before "2" instead. But by using this function, i am forcing R to treat the ages in true numeric order when i plot or tabulate them. A new column, **Age_numeric**, is also created in the new object.
 
+
+
 ```{r}
 resident_data_clean <- resident_data %>%
   rename(
@@ -128,11 +148,17 @@ resident_data_clean <- resident_data %>%
 
 ```
 
+
+
 2.3.4 Preview processed data
+
+
 
 ```{r}
 head(resident_data_clean)
 ```
+
+
 
 Now that data wrangling is complete, we will proceed to share 3 key visualisations performed on this data set.
 
@@ -157,6 +183,8 @@ As there are too many planning areas, to make things easier to visualise, I cate
 Steps:
 
 Step 1: I first created a new list called **region_map** to categorise them into the 5 categories
+
+
 
 ```{r}
 # 1. Step 1
@@ -187,7 +215,11 @@ region_map <- list(
 )
 ```
 
+
+
 Step 2: A new data object **resident_regioned** was then created with their region matched to them and those who are not found are removed using <code style="color: blue;">filter()</code> function.
+
+
 
 ```{r}
 # Step 2
@@ -205,7 +237,11 @@ resident_regioned <- resident_data_clean %>%
   filter(!is.na(Region))
 ```
 
+
+
 Step 3: The data was then mutated using <code style="color: blue;">cut()</code> and <code style="color: blue;">breaks()</code> function to split them into Age categories: "0-9", "10-19" and so on. In the <code style="color: blue;">cut()</code> function, "right = FALSE" was used to exclude the upper bound of the bins so that they will consider 0-9 instead of 0-10 for each bin. A new column **Age_bin** was created.
+
+
 
 ```{r}
 # 3. Step 3
@@ -220,11 +256,15 @@ resident_regioned <- resident_regioned %>%
   )
 ```
 
+
+
 Step 4: A new data object **pyramid_data** was created to create the pyramid table. <code style="color: blue;">groupby()</code> and <code style="color: blue;">summarise()</code> functions were used to group them by region, age group and sex, before summing them up.
 
 <code style="color: blue;">ifelse()</code> was then used to flip males to negative values so they will be plotted to the left.
 
 <code style="color: blue;">tooltip()</code> is used for each bar so that it displays age group and population
+
+
 
 ```{r}
 # 4
@@ -238,7 +278,11 @@ pyramid_data <- resident_regioned %>%
   )
 ```
 
+
+
 Step 5: Create interactive plot
+
+
 
 ```{r}
 pyramid_plot <- ggplot(pyramid_data, aes(x = Value, y = Age_bin, fill = Sex)) +
@@ -271,7 +315,11 @@ girafe(
 )
 ```
 
+
+
 ## 3.2 Pie Chart to Visualise Total Population by Gender
+
+
 
 ```{r}
 # Define the correct stacking order for pie slices
@@ -322,3 +370,4 @@ ggplot(pie_all_regions, aes(x = "", y = Population, fill = RegionSex)) +
   )
 
 ```
+
