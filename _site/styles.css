@@ -16,4 +16,16 @@ h4 {
   font-size: 1.0rem;
 }
 
+.blue-code {
+  color: blue;
+  font-family: monospace;
+  background-color: #f8f8f8;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+p, li {
+  line-height: 1.3; /* Adjust this value to control spacing */
+  margin-bottom: 0.5em; /* Optional: reduces gap between paragraphs/list items */
+}
 
