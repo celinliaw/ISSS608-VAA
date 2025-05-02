@@ -138,172 +138,167 @@ Now that data wrangling is complete, we will proceed to share 3 key visualisatio
 
 # 3 Data Visualisation
 
-## 3.1 Age-Sex Pyramid 
+## 3.1 Age-Sex Pyramid
+
+I created an Age-Sex Pyramid by first categorising them into 5 areas: North, North-East, East, West and Central. This is done by using the categories on the [Urban Redevelopment Authority(URA)](https://eservice.ura.gov.sg/maps/?service=MP) website:
+
+-   **North**: Central Water Cachement, Lim Chu Kang, Mandai, Sembawang, Simpang, Sungei Kadut, Woodlands, Yishun
+
+-   **North-East**: Ang Mo Kio, Hougang, Punggol, Sengkang, Serangoon, Seletar
+
+-   **East**: Bedok, Changi, Changi Bay, Pasir Ris, Paya Lebar, Tampines
+
+-   **West**: Boon Lay, Bukit Batok, Bukit Panjang, Choa Chu Kang, Clementi, Jurong East, Jurong West, Pioneer, Tengah, Tuas, Western Water Cachement
+
+-   **Central**: Bishan, Bukit Merah, Bukit Timah, Central Area, Downtown Core, Marina East, Marina South, Museum, Newton, Novena, Orchard, Outram, River Valley, Rochor, Singapore River, Straits View, Tanglin
+
+    Areas like **North-Eastern Islands** and **Western islands** are intentionally left out as they do not belong to any of the areas
+
+Steps:
+
+Step 1: I first created a new list called **region_map** to categorise them into the 5 catergories
 
 ```{r}
-# 1. Summarise population by Planning Area & Sex
-pa_sex_totals <- resident_data_clean %>%
-  group_by(Planning_Area, Sex) %>%
-  summarise(Total = sum(Population), .groups = "drop") %>%
-  # make Male negative so they extend left
-  mutate(Value = ifelse(Sex == "Male", -Total, Total))
-
-# 2. Build interactive pyramid by Planning Area
-p_pa_pyramid <- ggplot(pa_sex_totals,
-                       aes(x       = Value,
-                           y       = fct_reorder(Planning_Area, Value, .fun = sum),
-                           fill    = Sex,
-                           tooltip = paste0("Area: ", Planning_Area,
-                                            "\nSex: ", Sex,
-                                            "\nPop: ", Total))) +
-  geom_col_interactive(width = 0.8) +            # interactive horizontal bars
-  scale_x_continuous(labels = abs) +             # show absolute values
-  scale_fill_manual(values = c(
-    Male   = "#4472C4",   # blue
-    Female = "#F4A261"    # peach
-  )) +
-  labs(
-    title = "Population “Pyramid” by Planning Area and Sex (June 2024)",
-    x     = "Population",
-    y     = "Planning Area"
-  ) +
-  theme_ipsum_rc() +                              # clean theme
-  theme(
-    legend.position = "bottom",
-    plot.title    = element_text(size = 16, face = "bold")
+# 1. Step 1
+region_map <- list(
+  North = c(
+    "Central Water Catchment", "Lim Chu Kang", "Mandai",
+    "Sembawang", "Simpang", "Sungei Kadut", "Woodlands", "Yishun"
+  ),
+  `North-East` = c(
+    "Ang Mo Kio", "Hougang", "Punggol", "Sengkang", 
+    "Serangoon", "Seletar"
+  ),
+  East = c(
+    "Bedok", "Changi", "Changi Bay", 
+    "Pasir Ris", "Paya Lebar", "Tampines"
+  ),
+  West = c(
+    "Boon Lay", "Bukit Batok", "Bukit Panjang", "Choa Chu Kang",
+    "Clementi", "Jurong East", "Jurong West", "Pioneer", 
+    "Tengah", "Tuas", "Western Water Catchment"
+  ),
+  Central = c(
+    "Bishan", "Bukit Merah", "Bukit Timah", "Central Area",
+    "Downtown Core", "Marina East", "Marina South", "Museum",
+    "Newton", "Novena", "Orchard", "Outram", "River Valley",
+    "Rochor", "Singapore River", "Straits View", "Tanglin"
   )
-
-# 3. Render interactive plot
-girafe(ggobj = p_pa_pyramid,
-       width_svg = 8, height_svg = 10,
-       options = list(
-         opts_tooltip(css = "background:lightgray;
-                            padding:5px;
-                            border-radius:4px;")
-       ))
-
+)
 ```
 
-```{r}
-library(dplyr)
-library(ggplot2)
-library(ggiraph)
-library(hrbrthemes)
+Step 2: A new data object **resident_regioned** was then created with their region matched to them and those who are not found are removed using <code style="color: blue;">filter()</code> function.
 
-# 1. Aggregate national totals by Age & Sex
-pyramid_data <- resident_data_clean %>%
-  group_by(Age, Sex) %>%
+```{r}
+# Step 2
+resident_regioned <- resident_data_clean %>%
+  mutate(
+    Region = case_when(
+      Planning_Area %in% region_map$North        ~ "North",
+      Planning_Area %in% region_map$`North-East` ~ "North-East",
+      Planning_Area %in% region_map$East         ~ "East",
+      Planning_Area %in% region_map$West         ~ "West",
+      Planning_Area %in% region_map$Central      ~ "Central",
+      TRUE                                       ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(Region))
+```
+
+Step 3: The data was then mutated using <code style="color: blue;">cut()</code> and <code style="color: blue;">breaks()</code> function to split them into Age categories: "0-9", "10-19" and so on. In the <code style="color: blue;">cut()</code> function, "right = FALSE" was used to exclude the upper bound of the bins so that they will consider 0-9 instead of 0-10 for each bin. A new column **Age_bin** was created.
+
+```{r}
+# 3. Step 3
+resident_regioned <- resident_regioned %>%
+  mutate(
+    Age_bin = cut(
+      Age_numeric,
+      breaks = c(seq(0, 90, by = 10), Inf),
+      labels = c(paste0(seq(0,80,by=10), "-", seq(9,89,by=10)), "90 and Above"),
+      right = FALSE
+    )
+  )
+```
+
+Step 4: A new data object **pyramid_data** was created to create the pyramid table. <code style="color: blue;">groupby()</code> and <code style="color: blue;">summarise()</code> functions were used to group them by region, age group and sex, before summing them up.
+
+<code style="color: blue;">ifelse()</code> was then used to flip males to negative values so they will be plotted to the left.
+
+<code style="color: blue;">tooltip()</code> is used for each bar so that it displays age group and population
+
+```{r}
+# 4
+pyramid_data <- resident_regioned %>%
+  group_by(Region, Age_bin, Sex) %>%
   summarise(Total = sum(Population), .groups = "drop") %>%
   mutate(
-    Value   = ifelse(Sex == "Male", -Total, Total),              # negative for males
-    tooltip = paste0("Age: ", Age,
-                     "\nSex: ", Sex,
-                     "\nPopulation: ", Total)                   # hover text
+    Value   = ifelse(Sex == "Males", -Total, Total),
+    tooltip = paste0("Age: ", Age_bin,
+                     "\nPopulation: ", Total)
   )
+```
 
-# 2. Build the interactive vertical pyramid
-p_vertical <- ggplot(pyramid_data, aes(x = Age, y = Value, fill = Sex)) +
-  geom_col_interactive(aes(tooltip = tooltip), width = 0.8) +     # interactive bars
-  scale_y_continuous(
-    labels = abs,                                                # absolute values on axis
-    breaks = scales::pretty_breaks(n = 8)                        # nice breakpoints
-  ) +
-  scale_fill_manual(
-    values = c(Male = "#4472C4", Female = "#ED7D31")             # blue & pink
-  ) +
+Step 5: Create interactive plot
+
+```{r}
+pyramid_plot <- ggplot(pyramid_data, aes(x = Value, y = Age_bin, fill = Sex)) +
+  geom_col_interactive(aes(tooltip = tooltip), width = 0.8) +
+  facet_wrap(~ Region, ncol = 2) +
+  scale_x_continuous(labels = abs, breaks = scales::pretty_breaks(n = 5)) +
+  scale_fill_manual(values = c(Males = "#4472C4", Females = "#ED7D31")) +
   labs(
-    title = "Population Pyramid by Age & Sex (Singapore, June 2024)",
-    x     = "Age (years)",
-    y     = "Population"
+    title = "Interactive Age–Sex Pyramids by Region (June 2024)",
+    x     = "Population",
+    y     = "Age Group"
   ) +
   theme_ipsum_rc(base_size = 12) +
   theme(
-    legend.position = "bottom",
-    axis.text.x     = element_text(angle = 45, hjust = 1)       # tilt age labels if needed
+    legend.position    = "bottom",
+    strip.text         = element_text(face = "bold"),
+    axis.title.y       = element_blank(),
+    panel.grid.major.y = element_blank()
   )
+```
 
-# 3. Render it
+::: no-padding
+```{r}
+# 6. Step 6
 girafe(
-  ggobj = p_vertical,
-  width_svg  = 8, height_svg = 5,
+  ggobj = pyramid_plot,
+  width_svg  = 10, height_svg = 15,
   options = list(
-    opts_tooltip(css = "background: #f7f7f7; padding: 5px; border-radius: 4px;")
+    opts_tooltip(css = "background: #f0f0f0; padding: 5px; border-radius: 4px;")
   )
 )
 
 ```
+:::
 
 ```{r fig.width=8, fig.height=15, echo=FALSE}
-pyramid_data <- resident_data_clean %>% 
-  group_by(Planning_Area, Sex) %>% 
-  summarise(Count = n(), .groups = "drop") %>% 
-  mutate(Count = ifelse(Sex == "Males", -Count, Count))
-
-ggplot(pyramid_data, aes(x = Planning_Area, y = Count, fill = Sex)) + 
-  geom_bar(stat = "identity") + 
-  coord_flip() + 
-  labs(title = "Age-Sex Pyramid", x = "Planning Area", y = "Sex") + theme_minimal()
-```
-
-```{r fig.width=8, fig.height=15, echo=FALSE}
-library(dplyr)
-library(ggplot2)
-library(forcats)   # for fct_reorder
-
-# 1. Build your pyramid data, flipping male counts negative
-pyramid_data <- resident_data_clean %>%
-  group_by(Planning_Area, Sex) %>%
-  summarise(Count = n(), .groups = "drop") %>%     # or sum(Population) if you want population totals
-  mutate(Count = ifelse(Sex == "Males", -Count, Count))
-
-# 2. Compute total magnitude per area (abs to ignore sign)
-area_order <- pyramid_data %>%
-  group_by(Planning_Area) %>%
-  summarise(TotalMag = sum(abs(Count)), .groups = "drop") %>%
-  arrange(desc(TotalMag)) %>%
-  pull(Planning_Area)
-
-# 3. Re­order the factor levels of Planning_Area
-pyramid_data <- pyramid_data %>%
-  mutate(Planning_Area = factor(Planning_Area, levels = area_order))
-
-# 4. Plot with 0 in the middle, males to the left, females to the right
-ggplot(pyramid_data, aes(x = Planning_Area, y = Count, fill = Sex)) +
-  geom_col(width = 0.8) +
-  coord_flip() +
-  scale_y_continuous(
-    breaks = scales::pretty_breaks(n=5),
-    labels = abs) +
-  scale_fill_manual(values = c(Males = "#4472C4", Females = "#ED7D31")) +
-  labs(
-    title = "Population Pyramid by Planning Area & Sex (Jun 2024)",
-    x     = "Planning Area",
-    y     = "Count"
-  ) +
-  theme_minimal() +
-  theme(
-    legend.position = "bottom",
-    axis.text.y     = element_text(size = 10)
-  )
-  
-```
-
-```{r fig.width=8, fig.height=15, echo=FALSE}
-library(dplyr)
-library(ggplot2)
-library(hrbrthemes)
-library(forcats)
-
-# 1. Define your region groups
 region_map <- list(
-  North      = c("Sembawang", "Woodlands", "Yishun"),
-  `North-East` = c("Ang Mo Kio", "Hougang", "Punggol", "Sengkang", "Serangoon"),
-  East       = c("Bedok", "Pasir Ris", "Tampines"),
-  West       = c("Bukit Batok", "Bukit Panjang", "Choa Chu Kang",
-                 "Clementi", "Jurong East", "Jurong West", "Tengah"),
-  Central    = c("Bishan", "Bukit Merah", "Bukit Timah", "Central Area",
-                 "Geylang", "Kallang", "Whampoa", "Marine Parade",
-                 "Queenstown", "Toa Payoh")
+  North = c(
+    "Central Water Catchment", "Lim Chu Kang", "Mandai",
+    "Sembawang", "Simpang", "Sungei Kadut", "Woodlands", "Yishun"
+  ),
+  `North-East` = c(
+    "Ang Mo Kio", "Hougang", "Punggol", "Sengkang", 
+    "Serangoon", "Seletar"
+  ),
+  East = c(
+    "Bedok", "Changi", "Changi Bay", 
+    "Pasir Ris", "Paya Lebar", "Tampines"
+  ),
+  West = c(
+    "Boon Lay", "Bukit Batok", "Bukit Panjang", "Choa Chu Kang",
+    "Clementi", "Jurong East", "Jurong West", "Pioneer", 
+    "Tengah", "Tuas", "Western Water Catchment"
+  ),
+  Central = c(
+    "Bishan", "Bukit Merah", "Bukit Timah", "Central Area",
+    "Downtown Core", "Marina East", "Marina South", "Museum",
+    "Newton", "Novena", "Orchard", "Outram", "River Valley",
+    "Rochor", "Singapore River", "Straits View", "Tanglin"
+  )
 )
 
 # 2. Tag each row with its region
