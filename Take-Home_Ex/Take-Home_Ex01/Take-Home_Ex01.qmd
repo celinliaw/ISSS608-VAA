@@ -24,10 +24,6 @@ To accomplish the task, the data: *Singapore Residents by Planning Area/Subzone,
 
 ## 1.3 Breaking down the question
 
-Demographic Structure refers to: Age distribution, Gender Ratio and Dependency Ratio (Elderly per working adult)
-
-Demographic Distribution refers to: Planning Area or Subzone, Urban vs Suburban, Age or gender concentrations in specific areas
-
 Based on these information, i plan to answer the following questions:
 
 -   What is the proportion of male and females in Singapore and are there different proportions in different Regions in Singapore
@@ -508,7 +504,7 @@ Additionally, the population in the **Age range of 0 to 29** has consistently **
 
 ## 3.3 Bar Graph of Retirees to Working Adults
 
-As the current retirement age is at 68 years old and Singaporeans usually start work around 23 to 25 years old at graduation, we will use the population of those **above 68 years old** over the population of those **Aged 24 to 67** tofind the **ratio of Retirees to working adults.**
+As the current retirement age is at 68 years old and Singaporeans usually start work around 23 to 25 years old at graduation, we will use the population of those **above 68 years old** over the population of those **Aged 24 to 67** to find the **Dependency Ratio**(ratio of Retirees to working adults).
 
 <code style="color: blue;">adjusted_ageing_ratio_by_region</code> is the new object created to add new custom age groups.
 
@@ -548,7 +544,7 @@ ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_
   labs(
     title = "Ratio of Retirees(68YO+) to Working Adults(24-67YO)",
     x = "Region",
-    y = "Adjusted Ageing Ratio"
+    y = "Dependency Ratio"
   ) +
   coord_flip() +
   theme_minimal()
@@ -580,7 +576,7 @@ ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_
   labs(
     title = "Ratio of Retirees(68YO+) to Working Adults(24-67YO)",
     x = "Region",
-    y = "Adjusted Ageing Ratio"
+    y = "Dependency Ratio"
   ) +
   coord_flip() +
   theme_minimal()
