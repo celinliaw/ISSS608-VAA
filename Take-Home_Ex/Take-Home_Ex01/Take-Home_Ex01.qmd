@@ -583,7 +583,7 @@ ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_
 ```
 :::
 
-***Observation:*** From the bar graphs above, it can be seen that the ratio of retirees to working adults is the **largest in the Central** and the **smallest in the North,** meaning that there are **more retirees to working adults** living **in Central compared to the North**. Additionally, the ratio hovers **around 0.2+** for most areas, meaning that there are about **1 retiree to 4 working adults** in Singapore, which is a healthy ratio.
+***Observation:*** From the bar graphs above, it can be seen that the ratio of retirees to working adults is the **largest in the Central** and the **smallest in the North,** meaning that there are **more retirees to working adults** living **in Central compared to the North**. Additionally, the ratio hovers **around 0.2+** for most areas, meaning that there are about **1 retiree to 4 working adults** in Singapore, which is a healthy dependency ratio.
 
 # 4. Conclusion
 
