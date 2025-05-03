@@ -9,3 +9,18 @@ execute:
   warning: false
   freeze: true
 ---
+
+Tableau Exercise - Using superstore 2020 data from lesson 2
+
+Creating a sales vs profit graph
+
+1.  Drag Profit to rows and Sales to Columns
+2.  Drag State to detail under Marks
+3.  Drag Sales to Size to adjust the size of the bubble
+4.  Drag Profit to Color to adjust the colour of the bubbles
+5.  Drag Order Date to filters to filter based on the year of the profit - Click on the dropdown
+
+Creating
+
+1.  Drag sales to Rows and Order date to column
+2.  To create a dual axis graph, drag Profit to the graph until you see the dotted horizontal line and drop it

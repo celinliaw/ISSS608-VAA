@@ -51,7 +51,7 @@ We load the following packages using the <code style="color: blue;">pacman::p_lo
 ```{r}
 pacman::p_load(tidyverse, ggrepel, 
                ggthemes,  hrbrthemes,
-               patchwork, ggiraph,
+               patchwork,
                dplyr, forcats) 
 
 ```
@@ -203,24 +203,19 @@ resident_regioned <- resident_data_clean %>%
   filter(!is.na(Region))
 ```
 
-Step 3: The data was then mutated using <code style="color: blue;">cut()</code> and <code style="color: blue;">breaks()</code> function to split them into Age categories: "0-9", "10-19" and so on. In the <code style="color: blue;">cut()</code> function, "right = FALSE" was used to exclude the upper bound of the bins so that they will consider 0-9 instead of 0-10 for each bin. A new column **Age_bin** was created.
-
-```{r}
-# 3. Step 3
-resident_regioned <- resident_regioned %>%
-  mutate(
-    Age_bin = cut(
-      Age_numeric,
-      breaks = c(seq(0, 90, by = 10), Inf),
-      labels = c(paste0(seq(0,80,by=10), "-", seq(9,89,by=10)), "90 and Above"),
-      right = FALSE
-    )
-  )
-```
+This will enable me to group them into their respective regions for the analysis.
 
 ## 3.1 Pie Chart By Regions
 
+First, i create groups using <code style="color: blue;">groupby()</code> to group them by regions and sex (Eg. East Males and East Females) so that i can get the total number of each group using <code style="color: blue;">sum()</code>. After that, <code style="color: blue;">.groups = "drop"</code> will remove the groups as ggplot doesn't use groupings to plot and some functions that "mutate" may not turn out as expected.
+
+Next, <code style="color: blue;">ordered_levels</code> is created to define the stacking order for the pie slices in a clockwise direction.
+
+
+::: panel-tabset
+### The Plot
 ```{r}
+#| echo: false
 # Summarise population by Region and Sex
 pie_all_regions <- resident_regioned %>%
   group_by(Region, Sex) %>%
@@ -276,61 +271,286 @@ ggplot(pie_all_regions, aes(x = "", y = Population, fill = RegionSex)) +
 
 ```
 
-From the pie chart, it can be seen that the proportion of male and females in each area is quite proportionate, only differing by 1-2%.
+### The Code
+```{r}
+#| echo: false
+# Summarise population by Region and Sex
+pie_all_regions <- resident_regioned %>%
+  group_by(Region, Sex) %>%
+  summarise(Population = sum(Population), .groups = "drop")
 
-Additionally, the West and North-East Areas made up 25% of the total population, accounting for half the population in Singapore.
+
+# Define the correct stacking order for pie slices
+ordered_levels <- rev(c(
+  "Central.Males", "Central.Females",
+  "East.Males", "East.Females",
+  "North.Males", "North.Females",
+  "North-East.Males", "North-East.Females",
+  "West.Males", "West.Females"
+))
+
+# Prepare the data
+pie_all_regions <- pie_all_regions %>%
+  mutate(
+    RegionSex = factor(paste(Region, Sex, sep = "."), levels = ordered_levels),
+    label = paste0(round(Population / sum(Population) * 100, 1), "%")
+  )
+
+# Plot: simple, clean pie with percentages inside
+ggplot(pie_all_regions, aes(x = "", y = Population, fill = RegionSex)) +
+  geom_col(width = 1, color = "white") +
+  geom_text(
+    aes(label = label),
+    position = position_stack(vjust = 0.5),
+    size = 3,
+    color = "black"
+  ) +
+  coord_polar(theta = "y") +
+  theme_void() +
+  labs(
+    title = "Population Composition by Region and Gender (2024)",
+    fill = "Region & Sex"
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Central.Males"     = "#f4cccc",
+      "Central.Females"   = "#a94442",
+      "East.Males"        = "#d9ead3",
+      "East.Females"      = "#6aa84f",
+      "North.Males"       = "#fce5cd",
+      "North.Females"     = "#e69138",
+      "North-East.Males"  = "#d9d2e9",
+      "North-East.Females"= "#8e7cc3",
+      "West.Males"        = "#cfe2f3",
+      "West.Females"      = "#3c78d8"
+    ),
+    breaks = rev(ordered_levels)
+  )
+
+```
+:::
+
+From the pie chart, it can be seen that the **proportion of males and females in each area is quite similar**, only differing by 1-2%. However, it can be seen from the pie chart that the proportion of **males are consistently lesser** that the proportion of females in each area. We can then conclude that there are **slightly less males that females in Singapore**.
+
+Additionally, the **West and North-East Areas each made up 25%** of the total population, accounting for half the population in Singapore while the North, Central and and East made up of the other half of Singapore's population.
 
 ## 3.2 Age Sex Pyramid by Regions
 
-Step 4: A new data object **pyramid_data** was created to create the pyramid table. <code style="color: blue;">groupby()</code> and <code style="color: blue;">summarise()</code> functions were used to group them by region, age group and sex, before summing them up.
-
-<code style="color: blue;">ifelse()</code> was then used to flip males to negative values so they will be plotted to the left.
-
-<code style="color: blue;">tooltip()</code> is used for each bar so that it displays age group and population
+The data was then mutated using <code style="color: blue;">cut()</code> and <code style="color: blue;">breaks()</code> function to split them into Age categories: "0-9", "10-19" and so on. In the <code style="color: blue;">cut()</code> function, "right = FALSE" was used to exclude the upper bound of the bins so that they will consider 0-9 instead of 0-10 for each bin. A new column **Age_bin** was created.
 
 ```{r}
-# 4
+# Step 3
+resident_regioned <- resident_regioned %>%
+  mutate(
+    Age_bin = cut(
+      Age_numeric,
+      breaks = c(seq(0, 90, by = 10), Inf),
+      labels = c(paste0(seq(0,80,by=10), "-", seq(9,89,by=10)), "90 and Above"),
+      right = FALSE
+    )
+  )
+```
+
+A new data object **pyramid_data** was created to create the pyramid table. <code style="color: blue;">groupby()</code> and <code style="color: blue;">summarise(Total = sum())</code> functions were used to group them by region(East, West etc), age group(Eg. 0-9, 10-19 etc) and sex(Males or females), before summing them up.
+
+<code style="color: blue;">Value = ifelse(Sex == "Males, -Total, Total")</code> was then used to flip males to negative values so they will be plotted to the left, while the female values remain as positive.
+
+<code style="color: blue;">Label = format(Total, big.mark = ",")</code> is used to convert the numbers from 52300 to 52,300. These labels will be shown beside the bar graph.
+
+<code style="color: blue;">hjust = ifelse(Sex == "Males", 1.1, -0.1)</code> aligns the male label to the left of the graph and aligns the female label to the right of the graph.
+
+```{r}
+# Step 4: Prepare pyramid data for static chart
 pyramid_data <- resident_regioned %>%
   group_by(Region, Age_bin, Sex) %>%
   summarise(Total = sum(Population), .groups = "drop") %>%
   mutate(
-    Value   = ifelse(Sex == "Males", -Total, Total),
-    tooltip = paste0("Age: ", Age_bin,
-                     "\nPopulation: ", Total)
+    Value = ifelse(Sex == "Males", -Total, Total),
+    Label = format(Total, big.mark = ","),
+    hjust = ifelse(Sex == "Males", 1.1, -0.1)  # push left or right based on sex
   )
 ```
 
-Step 5: Create interactive plot
+In this section, I will be plotting individual plots and putting them together with <code style="color: blue;">patchwork</code>.
 
-```{r}
-pyramid_plot <- ggplot(pyramid_data, aes(x = Value, y = Age_bin, fill = Sex)) +
-  geom_col_interactive(aes(tooltip = tooltip), width = 0.8) +
-  facet_wrap(~ Region, ncol = 2) +
-  scale_x_continuous(labels = abs, breaks = scales::pretty_breaks(n = 5)) +
-  scale_fill_manual(values = c(Males = "#4472C4", Females = "#ED7D31")) +
-  labs(
-    title = "Interactive Age–Sex Pyramids by Region (June 2024)",
-    x     = "Population",
-    y     = "Age Group"
+First, i created a reusable function called <code style="color: blue;">plot_region_pyramid</code> so that i am able to call it by its region name.
+
+<code style="color: blue;">ggplot</code> is then used next to plot the graph. <code style="color: blue;">aes( x = Value, y = Age_bin, fill = Sex)</code> uses x-axis as Values so that Males are negative and Females are positive, y-axis is using the <code style="color: blue;">Age_bin</code> which was created previously ranging from "0-9", "10-19" etc and fill is coloured by the different Sex.
+
+<code style="color: blue;">geom_col(width = 0.8)</code> makes the width slightly smaller than 1 so that they do not touch.
+
+<code style="color: blue;">geom_text(aes(label = Label, hjust = hjust), size = 2.8, color = "black")</code> is an aesthetic label that uses the pre-formatted functions in the code chunk before this.
+
+<code style="color: blue;">scale_x_continuous()</code> helps to adjust the labels of the axis to follow pre-defined values that i mentioned in the code
+
+<code style="color: blue;">coord_cartesian()</code> adjusts the actual values of the axis.
+
+<code style="color: blue;">scale_fill_manual</code> sets the fill colour for males and females.
+
+<code style="color: blue;">labs()</code> add a title for each pane with the region name.
+
+<code style="color: blue;">theme_minimal()</code> uses the minimal theme.
+
+<code style="color: blue;">(p1 / p2 / p3 / p4 / p5) + plot_layout(guides = "collect")</code> helps to put the graphs together and show only 1 legend.
+
+::: panel-tabset
+### The plot
+
+```{r fig.width=8, fig.height=15, echo=FALSE}
+#| echo: false
+plot_region_pyramid <- function(region_name) {
+  base_plot <- ggplot(
+    data = filter(pyramid_data, Region == region_name),
+    aes(x = Value, y = Age_bin, fill = Sex)
   ) +
-  theme_ipsum_rc(base_size = 12) +
-  theme(
-    legend.position    = "bottom",
-    strip.text         = element_text(face = "bold"),
-    axis.title.y       = element_blank(),
-    panel.grid.major.y = element_blank()
-  )
+    geom_col(width = 0.8) +
+    geom_text(aes(label = Label, hjust = hjust), size = 2.8, color = "black") +
+    scale_x_continuous(
+      breaks = c(-75000, -50000, -25000, 0, 25000, 50000, 75000),
+      labels = function(x) paste0(abs(x) / 1000, "K")
+    ) +
+    coord_cartesian(xlim = c(-85000, 85000)) +
+    scale_fill_manual(values = c(Males = "#4472C4", Females = "#ED7D31")) +
+    labs(
+      title = paste("Region:", region_name),
+      x = "Population",
+      y = "Age Group"
+    ) +
+    theme_minimal(base_size = 9) +
+    theme(
+      strip.text = element_text(face = "bold"),
+      axis.title.y = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.major.x = element_line(color = "grey80")
+    )
+}
+
+# Generate plots for each region
+p1 <- plot_region_pyramid("Central")
+p2 <- plot_region_pyramid("East")
+p3 <- plot_region_pyramid("North")
+p4 <- plot_region_pyramid("North-East")
+p5 <- plot_region_pyramid("West")
+
+# Arrange using patchwork (2 columns)
+(p1 / p2 / p3 / p4 / p5) + plot_layout(guides = "collect")
+
+
 ```
+
+### The code
 
 ```{r}
-# 6. Step 6
-girafe(
-  ggobj = pyramid_plot,
-  width_svg  = 10, height_svg = 15,
-  options = list(
-    opts_tooltip(css = "background: #f0f0f0; padding: 5px; border-radius: 4px;")
-  )
-)
+#| eval: false
+
+plot_region_pyramid <- function(region_name) {
+  ggplot(
+    data = filter(pyramid_data, Region == region_name),
+    aes(x = Value, y = Age_bin, fill = Sex)
+  ) +
+    geom_col(width = 0.8) +
+    geom_text(aes(label = Label, hjust = hjust), size = 2.8, color = "black") +
+    scale_x_continuous(
+      breaks = c(-75000, -50000, -25000, 0, 25000, 50000, 75000),
+      labels = function(x) paste0(abs(x) / 1000, "K")
+    ) +
+    coord_cartesian(xlim = c(-85000, 85000)) +
+    scale_fill_manual(values = c(Males = "#4472C4", Females = "#ED7D31")) +
+    labs(
+      title = paste("Region:", region_name),
+      x = "Population",
+      y = "Age Group"
+    ) +
+    theme_minimal(base_size = 9) +
+    theme(
+      legend.position = "none",
+      strip.text = element_text(face = "bold"),
+      axis.title.y = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.major.x = element_line(color = "grey80")
+    )
+}
+
+# Generate plots for each region
+p1 <- plot_region_pyramid("Central")
+p2 <- plot_region_pyramid("East")
+p3 <- plot_region_pyramid("North")
+p4 <- plot_region_pyramid("North-East")
+p5 <- plot_region_pyramid("West")
+
+# Arrange using patchwork (2 columns)
+(p1 / p2 / p3 / p4 / p5) + plot_layout(guides = "collect")
+
+```
+:::
+
+From the graphs, it can be seen that the population of **Ages** **30 to 69** are consistently larger than the population of **Ages** **0 to 29** in most areas, proving that there are lower birth rates in the recent years.
+
+## 3.3 Bar Graph of Retirees to Working Adults
+
+As the current retirement age is at 68 years old and Singaporeans usually start work around 23 to 25 years old at graduation, we will use the population of those **above 68 years old** over the population of those **Aged 24 to 67** and find the **ratio of Retirees to working adults.**
+
+::: panel-tabset
+### The Plot
+
+```{r}
+#| echo: false
+adjusted_ageing_ratio_by_region <- resident_regioned %>%
+  mutate(Age_numeric = as.numeric(as.character(Age))) %>%
+  filter(!is.na(Age_numeric)) %>%
+  mutate(Age_Group = case_when(
+    Age_numeric >= 68 ~ "68+",
+    Age_numeric >= 24 & Age_numeric <= 67 ~ "24-67",
+    TRUE ~ "Other"
+  )) %>%
+  filter(Age_Group != "Other") %>%
+  group_by(Region, Age_Group) %>%
+  summarise(Population = sum(Population), .groups = "drop") %>%
+  pivot_wider(names_from = Age_Group, values_from = Population) %>%
+  mutate(Adjusted_Ageing_Ratio = `68+` / `24-67`)
+
+ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_Ratio), y = Adjusted_Ageing_Ratio)) +
+  geom_col(fill = "#80CBC4") +
+  geom_text(aes(label = round(Adjusted_Ageing_Ratio, 3)), hjust = -0.1) +
+  expand_limits(y = max(adjusted_ageing_ratio_by_region$Adjusted_Ageing_Ratio) * 1.1) +
+  labs(
+    title = "Ratio of Retirees(68YO+) to Working Adults(24-67YO)",
+    x = "Region",
+    y = "Adjusted Ageing Ratio"
+  ) +
+  coord_flip() +
+  theme_minimal()
+
 ```
 
-## 
+### The Code
+
+```{r}
+#| eval: false
+adjusted_ageing_ratio_by_region <- resident_regioned %>%
+  mutate(Age_numeric = as.numeric(as.character(Age))) %>%
+  filter(!is.na(Age_numeric)) %>%
+  mutate(Age_Group = case_when(
+    Age_numeric >= 68 ~ "68+",
+    Age_numeric >= 24 & Age_numeric <= 67 ~ "24-67",
+    TRUE ~ "Other"
+  )) %>%
+  filter(Age_Group != "Other") %>%
+  group_by(Region, Age_Group) %>%
+  summarise(Population = sum(Population), .groups = "drop") %>%
+  pivot_wider(names_from = Age_Group, values_from = Population) %>%
+  mutate(Adjusted_Ageing_Ratio = `68+` / `24-67`)
+
+ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_Ratio), y = Adjusted_Ageing_Ratio)) +
+  geom_col(fill = "#80CBC4") +
+  geom_text(aes(label = round(Adjusted_Ageing_Ratio, 3)), hjust = -0.1) +
+  expand_limits(y = max(adjusted_ageing_ratio_by_region$Adjusted_Ageing_Ratio) * 1.1) +
+  labs(
+    title = "Ratio of Retirees(68YO+) to Working Adults(24-67YO)",
+    x = "Region",
+    y = "Adjusted Ageing Ratio"
+  ) +
+  coord_flip() +
+  theme_minimal()
+```
+:::
