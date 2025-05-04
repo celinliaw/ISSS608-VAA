@@ -346,7 +346,7 @@ ggplot(pie_all_regions, aes(x = "", y = Population, fill = RegionSex)) +
 ```
 :::
 
-***Observation***: From the pie chart, it can be seen that the **proportion of males and females in each area is quite similar**, only differing by 1-2%. However, it can be seen from the pie chart that the proportion of **males are consistently lesser** that the proportion of females in each area. We can then conclude that there are **slightly less males than females in Singapore**. Overall, gender balance is consistent across Singapore.
+***Observations***: From the pie chart, it can be seen that the **proportion of males and females in each area is quite similar**, only differing by 1-2%. However, it can be seen from the pie chart that the proportion of **males are consistently lesser** that the proportion of females in each area. We can then conclude that there are **slightly less males than females in Singapore**. Overall, gender balance is consistent across Singapore.
 
 Additionally, the **West and North-East Areas each made up 25%** of the total population, accounting for half the population in Singapore while the **North, Central and and East made up of the other half** of Singapore's population.
 
@@ -430,7 +430,7 @@ plot_region_pyramid <- function(region_name) {
       x = "Population",
       y = "Age Group"
     ) +
-    theme_minimal(base_size = 9) +
+    theme_minimal(base_size = 11) +
     theme(
       strip.text = element_text(face = "bold"),
       axis.title.y = element_blank(),
@@ -475,7 +475,7 @@ plot_region_pyramid <- function(region_name) {
       x = "Population",
       y = "Age Group"
     ) +
-    theme_minimal(base_size = 9) +
+    theme_minimal(base_size = 11) +
     theme(
       legend.position = "none",
       strip.text = element_text(face = "bold"),
@@ -498,7 +498,7 @@ p5 <- plot_region_pyramid("West")
 ```
 :::
 
-***Observation:*** From the graphs, it can be seen that the population of **Ages** **30 to 69** are consistently larger than the population in the **Age Range** **0 to 29** and **Ages 70 and above** in most areas, resulting in a bulge in the middle of all the graphs in the five areas. This also shows that birth rates has decreased in the recent years.
+***Observations:*** From the graphs, it can be seen that the population of **Ages** **30 to 69** are consistently larger than the population in the **Age Range** **0 to 29** and **Ages 70 and above** in most areas, resulting in a bulge in the middle of all the graphs in the five areas. This also shows that birth rates has decreased in the recent years.
 
 Additionally, the population in the **Age range of 0 to 29** has consistently **more males than females** in all areas **except in the Central Area.** However, those in the **Age range 30 and above** has **more females than males** in all areas with those aged 60 to 69 in the North area being the exception.
 
@@ -587,7 +587,7 @@ ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_
 ```
 :::
 
-***Observation:*** From the bar graphs above, it can be seen that the **dependency ratio** (Population aged\<15 and \>65 / Population aged 15-65) **ranges from 0.402 to 0.528**. A ratio of 0.4 means that for every 2.5 working adults, there is 1 dependent, and a ratio of 0.528 means that for every 1.9 working adult, there is 1 dependent.
+***Observations:*** From the bar graphs above, it can be seen that the **dependency ratio** (Population aged\<15 and \>65 / Population aged 15-65) **ranges from 0.402 to 0.528**. A ratio of 0.4 means that for every 2.5 working adults, there is 1 dependent, and a ratio of 0.528 means that for every 1.9 working adult, there is 1 dependent.
 
 This **average** out to about **1 dependent to 2 working adults** in Singapore, showing a healthy demographic structure.
 
