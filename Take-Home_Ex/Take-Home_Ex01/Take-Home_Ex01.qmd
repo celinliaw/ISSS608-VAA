@@ -576,7 +576,7 @@ ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_
   geom_text(aes(label = round(Adjusted_Ageing_Ratio, 3)), hjust = -0.1) +
   expand_limits(y = max(adjusted_ageing_ratio_by_region$Adjusted_Ageing_Ratio) * 1.1) +
   labs(
-    title = "Ratio of Dependents(<=14YO & >=65YO) to Working Adults(15-65YO)",
+    title = "Ratio of Dependents to Working Adults",
     x = "Region",
     y = "Dependency Ratio"
   ) +
