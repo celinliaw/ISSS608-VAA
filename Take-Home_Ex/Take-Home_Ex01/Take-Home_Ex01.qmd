@@ -57,7 +57,7 @@ pacman::p_load(tidyverse, ggrepel,
 
 ## 2.2 Import Data
 
-The data that has been used has been mentioned in Chapter 1.2 above. his dataset will be imported as *resident_data.*
+The data that has been used has been mentioned in Chapter 1.2 above. This dataset will be imported as *resident_data.*
 
 ```{r}
 resident_data <- read_csv("respopagesex2024.csv")
@@ -84,7 +84,7 @@ The <code style="color: blue;">colSums</code> function is being used to check fo
 colSums(is.na(resident_data))
 ```
 
-There are no missing values in any of the rows and the next step will be filtering and renaming the data.
+There are no missing values in any of the rows.
 
 ### 2.3.3 Filtering for relevant variables & renaming them
 
@@ -102,13 +102,13 @@ There are 60424 rows x 6 columns in the data, where the columns are labelled as:
 
 -   **Time** - Year (We will only be looking at 2024 data)
 
-A new object called **resident_data_clean** is created where it will renamed **PA, SZ** and **Pop** for easy reading by using the <code style="color: blue;">rename()</code> function.
+A new object called **resident_data_clean** is created where it will rename **PA, SZ** and **Pop** for easy reading by using the <code style="color: blue;">rename()</code> function.
 
 Those labelled as "90_and_Over" in the Age Column will be renamed as "90" using the <code style="color: blue;">ifelse()</code> function for easier data plots.
 
 Population and age will then be categorised as numerical data by using the <code style="color: blue;">as.numeric</code> function.
 
-For the Age column, it is slightly special as <code style="color: blue;">levels = as.character</code> function in R sorts alphabetically by default and "10" will come before "2" instead. But by using this function, R will be forced to treat the ages in true numeric order when plotting or tabulating them. A new column, **Age_numeric**, is also created in the new object.
+For the Age column, it is slightly special as <code style="color: blue;">levels = as.character</code> function in R sorts alphabetically by default and "10" will come before "2". By using this function, R will be forced to treat the ages in true numeric order when plotting or tabulating them. A new column, **Age_numeric**, was also created in the new object.
 
 ```{r}
 resident_data_clean <- resident_data %>%
@@ -135,7 +135,7 @@ head(resident_data_clean)
 
 ### 2.3.5 Grouping them into Regions for Easy Visualisation
 
-As there are too many planning areas, to make things easier to visualise, the planning areas have been further categorised into 5 areas: North, North-East, East, West and Central. This is done by using the categories on the [Urban Redevelopment Authority(URA)](https://eservice.ura.gov.sg/maps/?service=MP) website:
+As there are too many planning areas, to make things easier to visualise, the planning areas have been further categorised into 5 areas: North, North-East, East, West and Central. This was done by using the categories on the [Urban Redevelopment Authority(URA)](https://eservice.ura.gov.sg/maps/?service=MP) website:
 
 -   **North**: Central Water Catchment, Lim Chu Kang, Mandai, Sembawang, Simpang, Sungei Kadut, Woodlands, Yishun
 
@@ -147,11 +147,11 @@ As there are too many planning areas, to make things easier to visualise, the pl
 
 -   **Central**: Bishan, Bukit Merah, Bukit Timah, Central Area, Downtown Core, Marina East, Marina South, Museum, Newton, Novena, Orchard, Outram, River Valley, Rochor, Singapore River, Straits View, Tanglin
 
-    Areas like **North-Eastern Islands** and **Western islands** are intentionally left out as they do not belong to any of the areas
+    Areas like **North-Eastern Islands** and **Western islands** were intentionally left out as they do not belong to any of the areas
 
 **Steps:**
 
-**Step 1:** I first created a new list called **region_map** to categorise them into the 5 categories
+**Step 1:** A new list called **region_map** was created to categorise them into the 5 categories
 
 ```{r}
 # 1. Step 1
@@ -182,7 +182,7 @@ region_map <- list(
 )
 ```
 
-**Step 2:** A new data object **resident_regioned** was then created with their region matched to them and those who are not found are removed using <code style="color: blue;">filter()</code> function.
+**Step 2:** A new data object **resident_regioned** was then created with their region matched to them and those who were not found are removed using <code style="color: blue;">filter()</code> function.
 
 ```{r}
 # Step 2
@@ -202,29 +202,29 @@ resident_regioned <- resident_data_clean %>%
 
 The data will then be grouped into their respective regions for the analysis.
 
-Now that data wrangling is complete, 3 key visualisations will be performed on this data set.
+Now that data wrangling is complete, 3 key visualizations will be performed on this data set.
 
-# 3. Data Visualisation
+# 3. Data Visualization
 
 ## 3.1 Pie Chart By Regions
 
-First, groups are being created using <code style="color: blue;">groupby()</code> to group them by regions and sex (Eg. East Males and East Females) so that the total population of each group can be found using <code style="color: blue;">sum()</code>. After that, <code style="color: blue;">.groups = "drop"</code> will remove the groups as ggplot doesn't use groupings to plot and some functions that "mutate" may not turn out as expected.
+First, groups were being created using <code style="color: blue;">groupby()</code> to group them by regions and sex (Eg. East Males and East Females) so that the total population of each group can be found using <code style="color: blue;">sum()</code>. After that, <code style="color: blue;">.groups = "drop"</code> will remove the groups as ggplot doesn't use groupings to plot and some functions that "mutate" may not turn out as expected.
 
-Next, <code style="color: blue;">ordered_levels</code> is created to define the stacking order for the pie slices in an anti-clockwise direction.
+Next, <code style="color: blue;">ordered_levels</code> was created to define the stacking order for the pie slices in an anti-clockwise direction.
 
-<code style="color: blue;">mutate()</code> is used to add new columns to the pie_all_regions object.
+<code style="color: blue;">mutate()</code> was used to add new columns to the pie_all_regions object.
 
 <code style="color: blue;">ggplot()</code> initializes a ggplot and the factors **y = Population** defines the height of each bar to be turned into pie slices and **fill = RegionSex** means the colour fill will be based on Sex.
 
 <code style="color: blue;">geom_col</code> draws bars with heights corresponding to population with **width of 1** and **white borders between pie slices.**
 
-<code style="color: blue;">geom_text</code> is used to add percentage labels inside each pie slice with **size of 3** and **text colour black.**
+<code style="color: blue;">geom_text</code> was used to add percentage labels inside each pie slice with **size of 3** and **text colour black.**
 
 <code style="color: blue;">coord_polar(theta = "y")</code> converts stacked bar into a circular pie chart where the y-axis becomes the angle.
 
 <code style="color: blue;">labs()</code> help to add chart title and legend title.
 
-<code style="color: blue;">scale_fill_manual</code> is used to set custom colours for each Region-Sex.
+<code style="color: blue;">scale_fill_manual</code> was used to set custom colours for each Region-Sex.
 
 ::: panel-tabset
 ### The Plot

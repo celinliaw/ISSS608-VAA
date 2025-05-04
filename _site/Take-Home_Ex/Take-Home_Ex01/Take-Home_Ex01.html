@@ -231,7 +231,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#grouping-them-into-regions-for-easy-visualisation" id="toc-grouping-them-into-regions-for-easy-visualisation" class="nav-link" data-scroll-target="#grouping-them-into-regions-for-easy-visualisation">2.3.5 Grouping them into Regions for Easy Visualisation</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#data-visualisation" id="toc-data-visualisation" class="nav-link" data-scroll-target="#data-visualisation">3. Data Visualisation</a>
+  <li><a href="#data-visualization" id="toc-data-visualization" class="nav-link" data-scroll-target="#data-visualization">3. Data Visualization</a>
   <ul class="collapse">
   <li><a href="#pie-chart-by-regions" id="toc-pie-chart-by-regions" class="nav-link" data-scroll-target="#pie-chart-by-regions">3.1 Pie Chart By Regions</a></li>
   <li><a href="#age-sex-pyramid-by-regions" id="toc-age-sex-pyramid-by-regions" class="nav-link" data-scroll-target="#age-sex-pyramid-by-regions">3.2 Age-Sex Pyramid by Regions</a></li>
@@ -324,7 +324,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="import-data" class="level2">
 <h2 class="anchored" data-anchor-id="import-data">2.2 Import Data</h2>
-<p>The data that has been used has been mentioned in Chapter 1.2 above. his dataset will be imported as <em>resident_data.</em></p>
+<p>The data that has been used has been mentioned in Chapter 1.2 above. This dataset will be imported as <em>resident_data.</em></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>resident_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"respopagesex2024.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -352,7 +352,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    0    0    0    0    0    0 </code></pre>
 </div>
 </div>
-<p>There are no missing values in any of the rows and the next step will be filtering and renaming the data.</p>
+<p>There are no missing values in any of the rows.</p>
 </section>
 <section id="filtering-for-relevant-variables-renaming-them" class="level3">
 <h3 class="anchored" data-anchor-id="filtering-for-relevant-variables-renaming-them">2.3.3 Filtering for relevant variables &amp; renaming them</h3>
@@ -365,10 +365,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><strong>Pop</strong> - Resident Count (Has been rounded to the nearest 10)</p></li>
 <li><p><strong>Time</strong> - Year (We will only be looking at 2024 data)</p></li>
 </ul>
-<p>A new object called <strong>resident_data_clean</strong> is created where it will renamed <strong>PA, SZ</strong> and <strong>Pop</strong> for easy reading by using the <code style="color: blue;">rename()</code> function.</p>
+<p>A new object called <strong>resident_data_clean</strong> is created where it will rename <strong>PA, SZ</strong> and <strong>Pop</strong> for easy reading by using the <code style="color: blue;">rename()</code> function.</p>
 <p>Those labelled as “90_and_Over” in the Age Column will be renamed as “90” using the <code style="color: blue;">ifelse()</code> function for easier data plots.</p>
 <p>Population and age will then be categorised as numerical data by using the <code style="color: blue;">as.numeric</code> function.</p>
-<p>For the Age column, it is slightly special as <code style="color: blue;">levels = as.character</code> function in R sorts alphabetically by default and “10” will come before “2” instead. But by using this function, R will be forced to treat the ages in true numeric order when plotting or tabulating them. A new column, <strong>Age_numeric</strong>, is also created in the new object.</p>
+<p>For the Age column, it is slightly special as <code style="color: blue;">levels = as.character</code> function in R sorts alphabetically by default and “10” will come before “2”. By using this function, R will be forced to treat the ages in true numeric order when plotting or tabulating them. A new column, <strong>Age_numeric</strong>, was also created in the new object.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>resident_data_clean <span class="ot">&lt;-</span> resident_data <span class="sc">%&gt;%</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
@@ -404,17 +404,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="grouping-them-into-regions-for-easy-visualisation" class="level3">
 <h3 class="anchored" data-anchor-id="grouping-them-into-regions-for-easy-visualisation">2.3.5 Grouping them into Regions for Easy Visualisation</h3>
-<p>As there are too many planning areas, to make things easier to visualise, the planning areas have been further categorised into 5 areas: North, North-East, East, West and Central. This is done by using the categories on the <a href="https://eservice.ura.gov.sg/maps/?service=MP">Urban Redevelopment Authority(URA)</a> website:</p>
+<p>As there are too many planning areas, to make things easier to visualise, the planning areas have been further categorised into 5 areas: North, North-East, East, West and Central. This was done by using the categories on the <a href="https://eservice.ura.gov.sg/maps/?service=MP">Urban Redevelopment Authority(URA)</a> website:</p>
 <ul>
 <li><p><strong>North</strong>: Central Water Catchment, Lim Chu Kang, Mandai, Sembawang, Simpang, Sungei Kadut, Woodlands, Yishun</p></li>
 <li><p><strong>North-East</strong>: Ang Mo Kio, Hougang, Punggol, Sengkang, Serangoon, Seletar</p></li>
 <li><p><strong>East</strong>: Bedok, Changi, Changi Bay, Pasir Ris, Paya Lebar, Tampines</p></li>
 <li><p><strong>West</strong>: Boon Lay, Bukit Batok, Bukit Panjang, Choa Chu Kang, Clementi, Jurong East, Jurong West, Pioneer, Tengah, Tuas, Western Water Cachement</p></li>
 <li><p><strong>Central</strong>: Bishan, Bukit Merah, Bukit Timah, Central Area, Downtown Core, Marina East, Marina South, Museum, Newton, Novena, Orchard, Outram, River Valley, Rochor, Singapore River, Straits View, Tanglin</p>
-<p>Areas like <strong>North-Eastern Islands</strong> and <strong>Western islands</strong> are intentionally left out as they do not belong to any of the areas</p></li>
+<p>Areas like <strong>North-Eastern Islands</strong> and <strong>Western islands</strong> were intentionally left out as they do not belong to any of the areas</p></li>
 </ul>
 <p><strong>Steps:</strong></p>
-<p><strong>Step 1:</strong> I first created a new list called <strong>region_map</strong> to categorise them into the 5 categories</p>
+<p><strong>Step 1:</strong> A new list called <strong>region_map</strong> was created to categorise them into the 5 categories</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Step 1</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>region_map <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
@@ -443,7 +443,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><strong>Step 2:</strong> A new data object <strong>resident_regioned</strong> was then created with their region matched to them and those who are not found are removed using <code style="color: blue;">filter()</code> function.</p>
+<p><strong>Step 2:</strong> A new data object <strong>resident_regioned</strong> was then created with their region matched to them and those who were not found are removed using <code style="color: blue;">filter()</code> function.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>resident_regioned <span class="ot">&lt;-</span> resident_data_clean <span class="sc">%&gt;%</span></span>
@@ -460,23 +460,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Region))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The data will then be grouped into their respective regions for the analysis.</p>
-<p>Now that data wrangling is complete, 3 key visualisations will be performed on this data set.</p>
+<p>Now that data wrangling is complete, 3 key visualizations will be performed on this data set.</p>
 </section>
 </section>
 </section>
-<section id="data-visualisation" class="level1">
-<h1>3. Data Visualisation</h1>
+<section id="data-visualization" class="level1">
+<h1>3. Data Visualization</h1>
 <section id="pie-chart-by-regions" class="level2">
 <h2 class="anchored" data-anchor-id="pie-chart-by-regions">3.1 Pie Chart By Regions</h2>
-<p>First, groups are being created using <code style="color: blue;">groupby()</code> to group them by regions and sex (Eg. East Males and East Females) so that the total population of each group can be found using <code style="color: blue;">sum()</code>. After that, <code style="color: blue;">.groups = “drop”</code> will remove the groups as ggplot doesn’t use groupings to plot and some functions that “mutate” may not turn out as expected.</p>
-<p>Next, <code style="color: blue;">ordered_levels</code> is created to define the stacking order for the pie slices in an anti-clockwise direction.</p>
-<p><code style="color: blue;">mutate()</code> is used to add new columns to the pie_all_regions object.</p>
+<p>First, groups were being created using <code style="color: blue;">groupby()</code> to group them by regions and sex (Eg. East Males and East Females) so that the total population of each group can be found using <code style="color: blue;">sum()</code>. After that, <code style="color: blue;">.groups = “drop”</code> will remove the groups as ggplot doesn’t use groupings to plot and some functions that “mutate” may not turn out as expected.</p>
+<p>Next, <code style="color: blue;">ordered_levels</code> was created to define the stacking order for the pie slices in an anti-clockwise direction.</p>
+<p><code style="color: blue;">mutate()</code> was used to add new columns to the pie_all_regions object.</p>
 <p><code style="color: blue;">ggplot()</code> initializes a ggplot and the factors <strong>y = Population</strong> defines the height of each bar to be turned into pie slices and <strong>fill = RegionSex</strong> means the colour fill will be based on Sex.</p>
 <p><code style="color: blue;">geom_col</code> draws bars with heights corresponding to population with <strong>width of 1</strong> and <strong>white borders between pie slices.</strong></p>
-<p><code style="color: blue;">geom_text</code> is used to add percentage labels inside each pie slice with <strong>size of 3</strong> and <strong>text colour black.</strong></p>
+<p><code style="color: blue;">geom_text</code> was used to add percentage labels inside each pie slice with <strong>size of 3</strong> and <strong>text colour black.</strong></p>
 <p><code style="color: blue;">coord_polar(theta = “y”)</code> converts stacked bar into a circular pie chart where the y-axis becomes the angle.</p>
 <p><code style="color: blue;">labs()</code> help to add chart title and legend title.</p>
-<p><code style="color: blue;">scale_fill_manual</code> is used to set custom colours for each Region-Sex.</p>
+<p><code style="color: blue;">scale_fill_manual</code> was used to set custom colours for each Region-Sex.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">The Plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">The Code</a></li></ul>
 <div class="tab-content">
