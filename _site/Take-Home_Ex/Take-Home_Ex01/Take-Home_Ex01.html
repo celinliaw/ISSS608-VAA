@@ -235,7 +235,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#pie-chart-by-regions" id="toc-pie-chart-by-regions" class="nav-link" data-scroll-target="#pie-chart-by-regions">3.1 Pie Chart By Regions</a></li>
   <li><a href="#age-sex-pyramid-by-regions" id="toc-age-sex-pyramid-by-regions" class="nav-link" data-scroll-target="#age-sex-pyramid-by-regions">3.2 Age-Sex Pyramid by Regions</a></li>
-  <li><a href="#bar-graph-of-retirees-to-working-adults" id="toc-bar-graph-of-retirees-to-working-adults" class="nav-link" data-scroll-target="#bar-graph-of-retirees-to-working-adults">3.3 Bar Graph of Retirees to Working Adults</a></li>
+  <li><a href="#bar-graph-of-dependency-ratio" id="toc-bar-graph-of-dependency-ratio" class="nav-link" data-scroll-target="#bar-graph-of-dependency-ratio">3.3 Bar Graph of Dependency Ratio</a></li>
   </ul></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">4. Conclusion</a></li>
   <li><a href="#key-references" id="toc-key-references" class="nav-link" data-scroll-target="#key-references">5. Key References</a></li>
@@ -286,7 +286,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>1. Overview</h1>
 <section id="setting-the-scene" class="level2">
 <h2 class="anchored" data-anchor-id="setting-the-scene">1.1 Setting the scene</h2>
-<p>A local online media company that publishes daily content on digital platforms is planning to release an article on demographic structures and distribution of Singapore in 2024</p>
+<p>A local online media company that publishes daily content on digital platforms is planning to release an article on demographic structures and distribution of Singapore in 2024.</p>
 </section>
 <section id="the-task" class="level2">
 <h2 class="anchored" data-anchor-id="the-task">1.2 The Task</h2>
@@ -295,9 +295,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="breaking-down-the-question" class="level2">
 <h2 class="anchored" data-anchor-id="breaking-down-the-question">1.3 Breaking down the question</h2>
-<p>Based on these information, i plan to answer the following questions:</p>
+<p>Based on these information, I plan to answer the following questions:</p>
 <ul>
-<li>What is the proportion of male and females in Singapore and are there different proportions in different Regions in Singapore</li>
+<li>What is the proportion of males and females in Singapore and is gender balance consistent across Singapore</li>
 <li>What is the age distribution of Singapore’s population in 2024 and is there a decrease in birth rates over the years</li>
 <li>Is the current number of working adults enough to support the number of retirees in Singapore</li>
 </ul>
@@ -365,10 +365,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><strong>Pop</strong> - Resident Count (Has been rounded to the nearest 10)</p></li>
 <li><p><strong>Time</strong> - Year (We will only be looking at 2024 data)</p></li>
 </ul>
-<p>Create a new object called <strong>resident_data_clean</strong> where we will rename <strong>PA, SZ</strong> and <strong>Pop</strong> for easy reading by using the <code style="color: blue;">rename()</code> function.</p>
+<p>I create a new object called <strong>resident_data_clean</strong> where I will rename <strong>PA, SZ</strong> and <strong>Pop</strong> for easy reading by using the <code style="color: blue;">rename()</code> function.</p>
 <p>Rename those labelled as “90_and_Over” in the Age Column as “90” using the <code style="color: blue;">ifelse()</code> function for easier data plots.</p>
 <p>Ensuring population and age is categorised as numerical data by using the <code style="color: blue;">as.numeric</code> function.</p>
-<p>For the Age column, it is slightly special as I used <code style="color: blue;">levels = as.character</code> function as R sorts alphabetically by default and “10” will come before “2” instead. But by using this function, i am forcing R to treat the ages in true numeric order when i plot or tabulate them. A new column, <strong>Age_numeric</strong>, is also created in the new object.</p>
+<p>For the Age column, it is slightly special as I used <code style="color: blue;">levels = as.character</code> function as R sorts alphabetically by default and “10” will come before “2” instead. But by using this function, I am forcing R to treat the ages in true numeric order when i plot or tabulate them. A new column, <strong>Age_numeric</strong>, is also created in the new object.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>resident_data_clean <span class="ot">&lt;-</span> resident_data <span class="sc">%&gt;%</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
@@ -549,7 +549,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p><strong><em>Observation</em></strong>: From the pie chart, it can be seen that the <strong>proportion of males and females in each area is quite similar</strong>, only differing by 1-2%. However, it can be seen from the pie chart that the proportion of <strong>males are consistently lesser</strong> that the proportion of females in each area. We can then conclude that there are <strong>slightly less males that females in Singapore</strong>.</p>
+<p><strong><em>Observation</em></strong>: From the pie chart, it can be seen that the <strong>proportion of males and females in each area is quite similar</strong>, only differing by 1-2%. However, it can be seen from the pie chart that the proportion of <strong>males are consistently lesser</strong> that the proportion of females in each area. We can then conclude that there are <strong>slightly less males that females in Singapore</strong>. Overall, gender balance in consistent across Singapore.</p>
 <p>Additionally, the <strong>West and North-East Areas each made up 25%</strong> of the total population, accounting for half the population in Singapore while the <strong>North, Central and and East made up of the other half</strong> of Singapore’s population.</p>
 </section>
 <section id="age-sex-pyramid-by-regions" class="level2">
@@ -581,7 +581,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>In this section, I will be plotting individual plots and putting them together with <code style="color: blue;">patchwork</code>.</p>
-<p>First, i created a reusable function called <code style="color: blue;">plot_region_pyramid</code> so that i am able to call it by its region name.</p>
+<p>First, I created a reusable function called <code style="color: blue;">plot_region_pyramid</code> so that I am able to call it by its region name.</p>
 <p><code style="color: blue;">ggplot</code> is then used next to plot the graph. <code style="color: blue;">aes( x = Value, y = Age_bin, fill = Sex)</code> uses x-axis as Values so that Males are negative and Females are positive, y-axis is using the <code style="color: blue;">Age_bin</code> which was created previously ranging from “0-9”, “10-19” etc and fill is coloured by the different Sex.</p>
 <p><code style="color: blue;">geom_col(width = 0.8)</code> makes the width slightly smaller than 1 so that they do not touch.</p>
 <p><code style="color: blue;">geom_text(aes(label = Label, hjust = hjust), size = 2.8, color = “black”)</code> is an aesthetic label that uses the pre-formatted functions in the code chunk before this.</p>
@@ -649,11 +649,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p><strong><em>Observation:</em></strong> From the graphs, it can be seen that the population of <strong>Ages</strong> <strong>30 to 69</strong> are consistently larger than the population in the <strong>Age Range</strong> <strong>0 to 29</strong> and <strong>Ages 70 and above</strong> in most areas, resulting in a bulge in the middle of all the graphs in the five areas. This also shows that birth rates has decreased in the recent years.</p>
-<p>Additionally, the population in the <strong>Age range of 0 to 29</strong> has consistently <strong>more males that females</strong> in all areas <strong>except in the Central Area.</strong> However, those in the <strong>Age range 30 and above</strong> has <strong>more females than males</strong> in all areas with those aged 60 to 69 in the North area being the exception. However, the pie chart in the previous visualisation shows an equal proportion of males and females in Sing</p>
+<p>Additionally, the population in the <strong>Age range of 0 to 29</strong> has consistently <strong>more males that females</strong> in all areas <strong>except in the Central Area.</strong> However, those in the <strong>Age range 30 and above</strong> has <strong>more females than males</strong> in all areas with those aged 60 to 69 in the North area being the exception.</p>
 </section>
-<section id="bar-graph-of-retirees-to-working-adults" class="level2">
-<h2 class="anchored" data-anchor-id="bar-graph-of-retirees-to-working-adults">3.3 Bar Graph of Retirees to Working Adults</h2>
-<p>As the current retirement age is at 68 years old and Singaporeans usually start work around 23 to 25 years old at graduation, we will use the population of those <strong>above 68 years old</strong> over the population of those <strong>Aged 24 to 67</strong> to find the <strong>Dependency Ratio</strong>(ratio of Retirees to working adults).</p>
+<section id="bar-graph-of-dependency-ratio" class="level2">
+<h2 class="anchored" data-anchor-id="bar-graph-of-dependency-ratio">3.3 Bar Graph of Dependency Ratio</h2>
+<p>The <strong>dependency ratio</strong> is a demographic measure that indicates the <strong>ratio of dependents</strong> (those typically not in the labour force) t<strong>o the working-age population</strong>. <strong>Dependents</strong> are usually defined as those u<strong>nder 15 and above 65 years old</strong>.</p>
+<p>With these information, I will be calculating the dependency ratio of the population in Singapore in the different regions. This information will reflect the proportion of individuals who are likely to be economically dependent on others.</p>
 <p><code style="color: blue;">adjusted_ageing_ratio_by_region</code> is the new object created to add new custom age groups.</p>
 <p><code style="color: blue;">mutate()</code> is used to change the item to numeric so that i am able to use &lt;= and &gt;= to create the new custom <strong>Age_Group of 24 to 67</strong> and <strong>68 and above.</strong></p>
 <p><code style="color: blue;">pivot_wider()</code> is used to transform data from long format to wide format so that the ageing ratio can be calculated correctly.</p>
@@ -680,22 +681,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Age_numeric =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(Age))) <span class="sc">%&gt;%</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Age_numeric)) <span class="sc">%&gt;%</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Age_Group =</span> <span class="fu">case_when</span>(</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    Age_numeric <span class="sc">&gt;=</span> <span class="dv">68</span> <span class="sc">~</span> <span class="st">"68+"</span>,</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    Age_numeric <span class="sc">&gt;=</span> <span class="dv">24</span> <span class="sc">&amp;</span> Age_numeric <span class="sc">&lt;=</span> <span class="dv">67</span> <span class="sc">~</span> <span class="st">"24-67"</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    Age_numeric <span class="sc">&lt;</span> <span class="dv">15</span> <span class="sc">|</span> Age_numeric <span class="sc">&gt;=</span> <span class="dv">65</span> <span class="sc">~</span> <span class="st">"&lt; 15 or &gt;=65"</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    Age_numeric <span class="sc">&gt;=</span> <span class="dv">15</span> <span class="sc">&amp;</span> Age_numeric <span class="sc">&lt;=</span> <span class="dv">64</span> <span class="sc">~</span> <span class="st">"15-64"</span>,</span>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Other"</span></span>
 <span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Age_Group <span class="sc">!=</span> <span class="st">"Other"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Region, Age_Group) <span class="sc">%&gt;%</span></span>
 <span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Population =</span> <span class="fu">sum</span>(Population), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Age_Group, <span class="at">values_from =</span> Population) <span class="sc">%&gt;%</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Adjusted_Ageing_Ratio =</span> <span class="st">`</span><span class="at">68+</span><span class="st">`</span> <span class="sc">/</span> <span class="st">`</span><span class="at">24-67</span><span class="st">`</span>)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Adjusted_Ageing_Ratio =</span> <span class="st">`</span><span class="at">&lt; 15 or &gt;=65</span><span class="st">`</span> <span class="sc">/</span> <span class="st">`</span><span class="at">15-64</span><span class="st">`</span>)</span>
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(adjusted_ageing_ratio_by_region, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Region, Adjusted_Ageing_Ratio), <span class="at">y =</span> Adjusted_Ageing_Ratio)) <span class="sc">+</span></span>
 <span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#80CBC4"</span>) <span class="sc">+</span></span>
 <span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(Adjusted_Ageing_Ratio, <span class="dv">3</span>)), <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>) <span class="sc">+</span></span>
 <span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(<span class="at">y =</span> <span class="fu">max</span>(adjusted_ageing_ratio_by_region<span class="sc">$</span>Adjusted_Ageing_Ratio) <span class="sc">*</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
 <span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Ratio of Retirees(68YO+) to Working Adults(24-67YO)"</span>,</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Ratio of Dependents(&lt;=14YO &amp; &gt;=65YO) to Working Adults(15-65YO)"</span>,</span>
 <span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Region"</span>,</span>
 <span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Dependency Ratio"</span></span>
 <span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
@@ -705,20 +706,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p><strong><em>Observation:</em></strong> From the bar graphs above, it can be seen that the ratio of retirees to working adults is the <strong>largest in the Central</strong> and the <strong>smallest in the North,</strong> meaning that there are <strong>more retirees to working adults</strong> living <strong>in Central compared to the North</strong>. Additionally, the ratio hovers <strong>around 0.2+</strong> for most areas, meaning that there are about <strong>1 retiree to 4 working adults</strong> in Singapore, which is a healthy dependency ratio.</p>
+<p><strong><em>Observation:</em></strong> From the bar graphs above, it can be seen that the <strong>dependency ratio</strong> (Population aged&lt;15 and &gt;65 / Population aged 15-65) <strong>ranges from 0.402 to 0.528</strong>. A ratio of 0.4 means that for every 2.5 working adults, there is 1 dependent, and a ratio of 0.528 means that for every 1.9 working adult, there is 1 dependent.</p>
+<p>This average out to about 1 dependent to 2 working adults in Singapore, showing a healthy demographic structure.</p>
 </section>
 </section>
 <section id="conclusion" class="level1">
 <h1>4. Conclusion</h1>
 <p>In this exercise, we performed data cleaning and visualisation of data to examine the relationship between Age, Gender, Region and Population in Singapore. The key findings are:</p>
 <ul>
-<li><p>The <strong>Male and Female population in Singapore are similar</strong> with <strong>slightly less males</strong> than females <strong>in all Regions</strong> of Singapore</p></li>
+<li><p>There is <strong>gender balance consistency across Singapore</strong> with <strong>slightly less males</strong> than females <strong>in all Regions</strong> of Singapore</p></li>
 <li><p>There are <strong>more males than females</strong> in the <strong>Age Range 0 to 29</strong>, except in the Central Area</p></li>
 <li><p>There is consistently <strong>more population in the Age Range 30-69</strong> as compared to <strong>Age Range 0 to 29</strong>, showing a decrease in birth rate in Singapore</p></li>
-<li><p>There is a good ratio of <strong>1 retiree to 4 working adults</strong> in Singapore, showing a healthy demographic</p></li>
+<li><p>There is a good average ratio of <strong>1 dependent to 2 working adults</strong> in Singapore, showing a healthy demographic</p></li>
 </ul>
-<p>To conclude, <strong>ggplot2</strong> is a powerful package for exploratory data analysis when paired with <strong>dplyr</strong> which allows mutation of the data to usable formats. The original dataset consists of many areas which is complex to analyse every single one of them, which made me decide to group them into further subgroups for easy reference.</p>
-<p>Overall, this exercise was helpful to practice how to present data effectively and to convey a clear message.</p>
+<p>To conclude, <strong>ggplot2</strong> is a powerful package for exploratory data analysis when paired with <strong>dplyr</strong> which allows mutation of the data to usable formats. The original dataset consists of many areas which is complex to analyse every single one of them, which made me decide to group them into further subgroups for easy reference and display.</p>
+<p>Overall, this task was helpful to practice how to use R to mutate data and to present data effectively, conveying a clear message for the results obtained.</p>
 </section>
 <section id="key-references" class="level1">
 <h1>5. Key References</h1>
