@@ -1,5 +1,5 @@
 ---
-title: "Take-Home Exercise 1: Creating Data Visualisation that is enlightening and truthful"
+title: "Take-Home Exercise 1: Creating Data Visualization that is enlightening and truthful"
 date: 1 May 2025
 date-modified: "last-modified"
 author: "Liaw Ying Ting, Celin"
@@ -18,7 +18,7 @@ A local online media company that publishes daily content on digital platforms i
 
 ## 1.2 The Task
 
-Assuming the role of the graphical editor of the media company, you are tasked to prepare at most three data visualisation for the article.
+Assuming the role of the graphical editor of the media company, you are tasked to prepare at most three data visualization for the article.
 
 To accomplish the task, the data: *Singapore Residents by Planning Area/Subzone, Single Year of Age and Sex, June 2024* dataset shared by [Department of Statistics, Singapore(DOS)](https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data) is used.
 
@@ -127,15 +127,9 @@ resident_data_clean <- resident_data %>%
 
 ```
 
-### 2.3.4 Preview processed data
+### 2.3.4 Grouping them into Regions for Easy Visualization
 
-```{r}
-head(resident_data_clean)
-```
-
-### 2.3.5 Grouping them into Regions for Easy Visualisation
-
-As there are too many planning areas, to make things easier to visualise, the planning areas have been further categorised into 5 areas: North, North-East, East, West and Central. This was done by using the categories on the [Urban Redevelopment Authority(URA)](https://eservice.ura.gov.sg/maps/?service=MP) website:
+As there are too many planning areas, to make things easier to visualize, the planning areas have been further categorised into 5 areas: North, North-East, East, West and Central. This was done by using the categories on the [Urban Redevelopment Authority(URA)](https://eservice.ura.gov.sg/maps/?service=MP) website:
 
 -   **North**: Central Water Catchment, Lim Chu Kang, Mandai, Sembawang, Simpang, Sungei Kadut, Woodlands, Yishun
 
@@ -201,6 +195,12 @@ resident_regioned <- resident_data_clean %>%
 ```
 
 The data will then be grouped into their respective regions for the analysis.
+
+### 2.3.5 Preview Processed Data
+
+```{r}
+head(resident_regioned)
+```
 
 Now that data wrangling is complete, 3 key visualizations will be performed on this data set.
 
@@ -504,13 +504,13 @@ Additionally, the population in the **Age range of 0 to 29** has consistently **
 
 ## 3.3 Bar Graph of Dependency Ratio
 
-The **dependency ratio** is a demographic measure that indicates the **ratio of dependents** (those typically not in the labour force) t**o the working-age population**. **Dependents** are usually defined as those u**nder 15 and above 65 years old**.
+The **dependency ratio** is a demographic measure that indicates the **ratio of dependents** (those typically not in the labour force) **to the working-age population**. **Dependents** are usually defined as those **under 15 and above 65 years old**.
 
 With these information, the dependency ratio of the population in Singapore in the different regions will be calculated. This information will reflect the proportion of individuals who are likely to be economically dependent on others.
 
 <code style="color: blue;">adjusted_ageing_ratio_by_region</code> is the new object created to add new custom age groups.
 
-<code style="color: blue;">mutate()</code> is used to change the item to numeric so that i am able to use \<= and \>= to create the new custom **Age_Group of 24 to 67** and **68 and above.**
+<code style="color: blue;">mutate()</code> is used to change the item to numeric so that \<= and \>= can be utilized to create the new custom **Age_Group of 24 to 67** and **68 and above.**
 
 <code style="color: blue;">pivot_wider()</code> is used to transform data from long format to wide format so that the ageing ratio can be calculated correctly.
 
@@ -544,7 +544,7 @@ ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_
   geom_text(aes(label = round(Adjusted_Ageing_Ratio, 3)), hjust = -0.1) +
   expand_limits(y = max(adjusted_ageing_ratio_by_region$Adjusted_Ageing_Ratio) * 1.1) +
   labs(
-    title = "Ratio of Dependents(<=14YO & >=65YO) to Working Adults(15-65YO)",
+    title = "Ratio of Dependents to Working Adults",
     x = "Region",
     y = "Dependency Ratio"
   ) +
@@ -591,19 +591,19 @@ This **average** out to about **1 dependent to 2 working adults** in Singapore, 
 
 # 4. Conclusion
 
-In this exercise, data cleaning and visualisation of data was performed to examine the relationship between Age, Gender, Region and Population in Singapore. The key findings are:
+In this exercise, data cleaning and visualization of data was performed to examine the relationship between Age, Gender, Region and Population in Singapore. The key findings are:
 
--   There is **gender balance consistency across Singapore** with **slightly less males** than females **in all Regions** of Singapore
+-   There is **gender-balance consistency across Singapore** with **slightly less males** than females **in all Regions** of Singapore
 
 -   There are **more males than females** in the **Age Range 0 to 29**, except in the Central Area
 
--   There is consistently **more population in the Age Range 30-69** as compared to **Age Range 0 to 29**, showing a decrease in birth rate in Singapore
+-   There is consistently **more population in the Age Range 30 to 69** as compared to **Age Range 0 to 29**, showing a decrease in birth rate in Singapore
 
 -   There is a good average ratio of **1 dependent to 2 working adults** in Singapore, showing a healthy demographic
 
 To conclude, Singapore has a balanced gender ratio with healthy dependency structure across the regions. However, a smaller proportion of young residents means a declining birth rate. If this trend continues, it may lead to a rising dependency in the future and policies should be adjusted for ageing related needs. Overall, current demographics reflect stability but call for forward looking strategies.
 
-With relation to the codes used for analysis, **ggplot2** is a powerful package for exploratory data analysis when paired with **dplyr** which allows mutation of the data to usable formats. The original dataset consists of many areas which makes it difficult to find a direction and thus was further categorised into subgroups using the dplyr functions. Additional functions like **geom_col, geom_text, coord_flip, coord_cartesian and coor_polar** were further utilised to create the visualisations for visual analysis.
+With relation to the codes used for analysis, **ggplot2** is a powerful package for exploratory data analysis when paired with **dplyr** which allows mutation of the data to usable formats. The original dataset consists of many areas which makes it difficult to find a direction and thus was further categorised into subgroups using the dplyr functions. Additional functions like **geom_col, geom_text, coord_flip, coord_cartesian and coor_polar** were further utilised to create the visualizations for visual analysis.
 
 Overall, this task was helpful to practice how to use R to mutate data and to present data effectively, conveying a clear message for the results obtained.
 
