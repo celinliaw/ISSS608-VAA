@@ -26,9 +26,9 @@ To accomplish the task, the data: *Singapore Residents by Planning Area/Subzone,
 
 Based on these information, the following questions will be answered:
 
--   What is the proportion of males and females in Singapore and is gender balance consistent across Singapore
--   What is the age distribution of Singapore's population in 2024 and is there a decrease in birth rates over the years
--   Is the current number of working adults enough to support the number of retirees in Singapore
+-   What is the proportion of males and females in Singapore and is gender-balance consistent across Singapore?
+-   What is the age distribution of Singapore's population in 2024 and is there a decrease in birth rates over the years?
+-   Is the current number of working adults enough to support the number of dependencies in Singapore?
 
 # 2. Getting Started
 
@@ -346,7 +346,7 @@ ggplot(pie_all_regions, aes(x = "", y = Population, fill = RegionSex)) +
 ```
 :::
 
-***Observation***: From the pie chart, it can be seen that the **proportion of males and females in each area is quite similar**, only differing by 1-2%. However, it can be seen from the pie chart that the proportion of **males are consistently lesser** that the proportion of females in each area. We can then conclude that there are **slightly less males that females in Singapore**. Overall, gender balance in consistent across Singapore.
+***Observation***: From the pie chart, it can be seen that the **proportion of males and females in each area is quite similar**, only differing by 1-2%. However, it can be seen from the pie chart that the proportion of **males are consistently lesser** that the proportion of females in each area. We can then conclude that there are **slightly less males than females in Singapore**. Overall, gender balance is consistent across Singapore.
 
 Additionally, the **West and North-East Areas each made up 25%** of the total population, accounting for half the population in Singapore while the **North, Central and and East made up of the other half** of Singapore's population.
 
@@ -395,7 +395,7 @@ A reusable function called <code style="color: blue;">plot_region_pyramid</code>
 
 <code style="color: blue;">geom_text(aes(label = Label, hjust = hjust), size = 2.8, color = "black")</code> is an aesthetic label that uses the pre-formatted functions in the code chunk before this.
 
-<code style="color: blue;">scale_x_continuous()</code> helps to adjust the labels of the axis to follow pre-defined values that i mentioned in the code.
+<code style="color: blue;">scale_x_continuous()</code> helps to adjust the labels of the axis to follow pre-defined values mentioned in the code.
 
 <code style="color: blue;">coord_cartesian()</code> adjusts the actual values of the axis.
 
@@ -500,7 +500,7 @@ p5 <- plot_region_pyramid("West")
 
 ***Observation:*** From the graphs, it can be seen that the population of **Ages** **30 to 69** are consistently larger than the population in the **Age Range** **0 to 29** and **Ages 70 and above** in most areas, resulting in a bulge in the middle of all the graphs in the five areas. This also shows that birth rates has decreased in the recent years.
 
-Additionally, the population in the **Age range of 0 to 29** has consistently **more males that females** in all areas **except in the Central Area.** However, those in the **Age range 30 and above** has **more females than males** in all areas with those aged 60 to 69 in the North area being the exception.
+Additionally, the population in the **Age range of 0 to 29** has consistently **more males than females** in all areas **except in the Central Area.** However, those in the **Age range 30 and above** has **more females than males** in all areas with those aged 60 to 69 in the North area being the exception.
 
 ## 3.3 Bar Graph of Dependency Ratio
 
