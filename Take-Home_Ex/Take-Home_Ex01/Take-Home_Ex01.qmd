@@ -591,7 +591,7 @@ This **average** out to about **1 dependent to 2 working adults** in Singapore, 
 
 # 4. Conclusion
 
-In this exercise, we performed data cleaning and visualisation of data to examine the relationship between Age, Gender, Region and Population in Singapore. The key findings are:
+In this exercise, data cleaning and visualisation of data was performed to examine the relationship between Age, Gender, Region and Population in Singapore. The key findings are:
 
 -   There is **gender balance consistency across Singapore** with **slightly less males** than females **in all Regions** of Singapore
 
