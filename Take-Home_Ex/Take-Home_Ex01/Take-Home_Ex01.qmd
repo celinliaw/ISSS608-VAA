@@ -545,11 +545,12 @@ ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_
   expand_limits(y = max(adjusted_ageing_ratio_by_region$Adjusted_Ageing_Ratio) * 1.1) +
   labs(
     title = "Ratio of Dependents to Working Adults",
-    x = "Region",
+    x = "Regions",
     y = "Dependency Ratio"
   ) +
   coord_flip() +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 ```
 
@@ -577,11 +578,12 @@ ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_
   expand_limits(y = max(adjusted_ageing_ratio_by_region$Adjusted_Ageing_Ratio) * 1.1) +
   labs(
     title = "Ratio of Dependents to Working Adults",
-    x = "Region",
+    x = "Regions",
     y = "Dependency Ratio"
   ) +
   coord_flip() +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 ```
 :::
 
