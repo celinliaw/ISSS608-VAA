@@ -549,7 +549,7 @@ ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_
     y = "Dependency Ratio"
   ) +
   coord_flip() +
-  theme_minimal() +
+  theme_minimal(base_size = 11) +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 
 ```
@@ -582,7 +582,7 @@ ggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_
     y = "Dependency Ratio"
   ) +
   coord_flip() +
-  theme_minimal() +
+  theme_minimal(base_size = 11) +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 ```
 :::
