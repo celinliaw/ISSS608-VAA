@@ -375,7 +375,7 @@
     "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html",
     "title": "Take-Home Exercise 1: Creating Data Visualisation that is enlightening and truthful",
     "section": "",
-    "text": "A local online media company that publishes daily content on digital platforms is planning to release an article on demographic structures and distribution of Singapore in 2024.\n\n\n\nAssuming the role of the graphical editor of the media company, you are tasked to prepare at most three data visualisation for the article.\nTo accomplish the task, the data: Singapore Residents by Planning Area/Subzone, Single Year of Age and Sex, June 2024 dataset shared by Department of Statistics, Singapore(DOS) is used.\n\n\n\nBased on these information, the following questions will be answered:\n\nWhat is the proportion of males and females in Singapore and is gender-balance consistent across Singapore?\nWhat is the age distribution of Singapore’s population in 2024 and is there a decrease in birth rates over the years?\nIs the current number of working adults enough to support the number of dependencies in Singapore?"
+    "text": "A local online media company that publishes daily content on digital platforms is planning to release an article on demographic structures and distribution of Singapore in 2024.\n\n\n\nAssuming the role of the graphical editor of the media company, you are tasked to prepare at most three data visualisation for the article.\nTo accomplish the task, the data: Singapore Residents by Planning Area/Subzone, Single Year of Age and Sex, June 2024 dataset shared by Department of Statistics, Singapore(DOS) is used.\n\n\n\nBased on these information, the following questions will be answered:\n\nWhat is the proportion of males and females in Singapore and is gender-balance consistent across Singapore?\nWhat is the age distribution of Singapore’s population in 2024 and is there a decrease in birth rates over the years?\nIs the current number of working adults enough to support the number of dependents in Singapore?"
   },
   {
     "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#setting-the-scene",
@@ -396,7 +396,7 @@
     "href": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#breaking-down-the-question",
     "title": "Take-Home Exercise 1: Creating Data Visualisation that is enlightening and truthful",
     "section": "",
-    "text": "Based on these information, the following questions will be answered:\n\nWhat is the proportion of males and females in Singapore and is gender-balance consistent across Singapore?\nWhat is the age distribution of Singapore’s population in 2024 and is there a decrease in birth rates over the years?\nIs the current number of working adults enough to support the number of dependencies in Singapore?"
+    "text": "Based on these information, the following questions will be answered:\n\nWhat is the proportion of males and females in Singapore and is gender-balance consistent across Singapore?\nWhat is the age distribution of Singapore’s population in 2024 and is there a decrease in birth rates over the years?\nIs the current number of working adults enough to support the number of dependents in Singapore?"
   },
   {
     "objectID": "Take-Home_Ex/Take-Home_Ex01/Take-Home_Ex01.html#load-packages",
