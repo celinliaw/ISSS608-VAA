@@ -263,7 +263,7 @@ ggplot(pie_all_regions, aes(x = "", y = Population, fill = RegionSex)) +
     color = "black"
   ) +
   coord_polar(theta = "y") +
-  theme_void() +
+  theme_void(base_size = 11) +
   labs(
     title = "Population Composition by Region and Gender (2024)",
     fill = "Region & Sex"
@@ -322,7 +322,7 @@ ggplot(pie_all_regions, aes(x = "", y = Population, fill = RegionSex)) +
     color = "black"
   ) +
   coord_polar(theta = "y") +
-  theme_void() +
+  theme_void(base_size = 11) +
   labs(
     title = "Population Composition by Region and Gender (2024)",
     fill = "Region & Sex"
