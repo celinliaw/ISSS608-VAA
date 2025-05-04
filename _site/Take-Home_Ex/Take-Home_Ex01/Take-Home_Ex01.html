@@ -297,9 +297,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="breaking-down-the-question">1.3 Breaking down the question</h2>
 <p>Based on these information, the following questions will be answered:</p>
 <ul>
-<li>What is the proportion of males and females in Singapore and is gender balance consistent across Singapore</li>
-<li>What is the age distribution of Singapore’s population in 2024 and is there a decrease in birth rates over the years</li>
-<li>Is the current number of working adults enough to support the number of retirees in Singapore</li>
+<li>What is the proportion of males and females in Singapore and is gender-balance consistent across Singapore?</li>
+<li>What is the age distribution of Singapore’s population in 2024 and is there a decrease in birth rates over the years?</li>
+<li>Is the current number of working adults enough to support the number of dependencies in Singapore?</li>
 </ul>
 </section>
 </section>
@@ -549,7 +549,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p><strong><em>Observation</em></strong>: From the pie chart, it can be seen that the <strong>proportion of males and females in each area is quite similar</strong>, only differing by 1-2%. However, it can be seen from the pie chart that the proportion of <strong>males are consistently lesser</strong> that the proportion of females in each area. We can then conclude that there are <strong>slightly less males that females in Singapore</strong>. Overall, gender balance in consistent across Singapore.</p>
+<p><strong><em>Observation</em></strong>: From the pie chart, it can be seen that the <strong>proportion of males and females in each area is quite similar</strong>, only differing by 1-2%. However, it can be seen from the pie chart that the proportion of <strong>males are consistently lesser</strong> that the proportion of females in each area. We can then conclude that there are <strong>slightly less males than females in Singapore</strong>. Overall, gender balance is consistent across Singapore.</p>
 <p>Additionally, the <strong>West and North-East Areas each made up 25%</strong> of the total population, accounting for half the population in Singapore while the <strong>North, Central and and East made up of the other half</strong> of Singapore’s population.</p>
 </section>
 <section id="age-sex-pyramid-by-regions" class="level2">
@@ -585,7 +585,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><code style="color: blue;">ggplot</code> is then used next to plot the graph. <code style="color: blue;">aes( x = Value, y = Age_bin, fill = Sex)</code> uses x-axis as Values so that Males are negative and Females are positive, y-axis is using the <code style="color: blue;">Age_bin</code> which was created previously ranging from “0-9”, “10-19” etc and fill is coloured by the different Sex.</p>
 <p><code style="color: blue;">geom_col(width = 0.8)</code> makes the width slightly smaller than 1 so that they do not touch.</p>
 <p><code style="color: blue;">geom_text(aes(label = Label, hjust = hjust), size = 2.8, color = “black”)</code> is an aesthetic label that uses the pre-formatted functions in the code chunk before this.</p>
-<p><code style="color: blue;">scale_x_continuous()</code> helps to adjust the labels of the axis to follow pre-defined values that i mentioned in the code.</p>
+<p><code style="color: blue;">scale_x_continuous()</code> helps to adjust the labels of the axis to follow pre-defined values mentioned in the code.</p>
 <p><code style="color: blue;">coord_cartesian()</code> adjusts the actual values of the axis.</p>
 <p><code style="color: blue;">scale_fill_manual</code> sets the fill colour for males and females.</p>
 <p><code style="color: blue;">labs()</code> add a title for each pane with the region name.</p>
@@ -649,7 +649,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p><strong><em>Observation:</em></strong> From the graphs, it can be seen that the population of <strong>Ages</strong> <strong>30 to 69</strong> are consistently larger than the population in the <strong>Age Range</strong> <strong>0 to 29</strong> and <strong>Ages 70 and above</strong> in most areas, resulting in a bulge in the middle of all the graphs in the five areas. This also shows that birth rates has decreased in the recent years.</p>
-<p>Additionally, the population in the <strong>Age range of 0 to 29</strong> has consistently <strong>more males that females</strong> in all areas <strong>except in the Central Area.</strong> However, those in the <strong>Age range 30 and above</strong> has <strong>more females than males</strong> in all areas with those aged 60 to 69 in the North area being the exception.</p>
+<p>Additionally, the population in the <strong>Age range of 0 to 29</strong> has consistently <strong>more males than females</strong> in all areas <strong>except in the Central Area.</strong> However, those in the <strong>Age range 30 and above</strong> has <strong>more females than males</strong> in all areas with those aged 60 to 69 in the North area being the exception.</p>
 </section>
 <section id="bar-graph-of-dependency-ratio" class="level2">
 <h2 class="anchored" data-anchor-id="bar-graph-of-dependency-ratio">3.3 Bar Graph of Dependency Ratio</h2>
@@ -696,7 +696,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(Adjusted_Ageing_Ratio, <span class="dv">3</span>)), <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>) <span class="sc">+</span></span>
 <span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_limits</span>(<span class="at">y =</span> <span class="fu">max</span>(adjusted_ageing_ratio_by_region<span class="sc">$</span>Adjusted_Ageing_Ratio) <span class="sc">*</span> <span class="fl">1.1</span>) <span class="sc">+</span></span>
 <span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Ratio of Dependents(&lt;=14YO &amp; &gt;=65YO) to Working Adults(15-65YO)"</span>,</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Ratio of Dependents to Working Adults"</span>,</span>
 <span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Region"</span>,</span>
 <span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Dependency Ratio"</span></span>
 <span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
