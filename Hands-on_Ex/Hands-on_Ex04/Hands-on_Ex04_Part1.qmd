@@ -1,5 +1,5 @@
 ---
-title: "Hands-on Exercise 4 Part 1"
+title: "Hands-on Exercise 4 Part 1: Visualising Distribution"
 author: "Liaw Ying Ting, Celin"
 date: 7 May 2025
 date-modified: "last-modified"
@@ -163,6 +163,7 @@ The figure below is plotted by mapping the probabilities calculated by using <co
 ### The Plot
 
 ```{r}
+#| echo: false 
 ggplot(exam,
        aes(x = ENGLISH, 
            y = CLASS, 
@@ -177,6 +178,7 @@ ggplot(exam,
 ### The Code
 
 ```{r}
+#| eval: false 
 ggplot(exam,
        aes(x = ENGLISH, 
            y = CLASS, 
@@ -190,3 +192,263 @@ ggplot(exam,
 :::
 
 The argument <code style="color: purple;">calc_ecdf = TRUE</code> has to be added in <code style="color: purple;">stat_density_ridges()</code>.
+
+## 4.3.4 Ridgeline plots with quantile lines
+
+By using [geom_density_ridges_gradient()](https://wilkelab.org/ggridges/reference/geom_ridgeline_gradient.html) the ridgeline plot can be colored by quantile, using calculated <code style="color: purple;">stat(quantile\_</code> aesthetic as shown in the figure below.
+
+::: panel-tabset
+### The Plot
+
+```{r}
+#| echo: false 
+ggplot(exam,
+       aes(x = ENGLISH, 
+           y = CLASS, 
+           fill = factor(stat(quantile))
+           )) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient",
+    calc_ecdf = TRUE, 
+    quantiles = 4,
+    quantile_lines = TRUE) +
+  scale_fill_viridis_d(name = "Quartiles") +
+  theme_ridges()
+```
+
+### The Code
+
+```{r}
+#| eval: false 
+ggplot(exam,
+       aes(x = ENGLISH, 
+           y = CLASS, 
+           fill = factor(stat(quantile))
+           )) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient",
+    calc_ecdf = TRUE, 
+    quantiles = 4,
+    quantile_lines = TRUE) +
+  scale_fill_viridis_d(name = "Quartiles") +
+  theme_ridges()
+```
+:::
+
+Instead of using number to define the quantiles, we can also specify quantiles by cut points such as 2.5% and 97.5% tails to colour the ridgeline plot as shown in the figure below.
+
+::: panel-tabset
+### The Plot
+
+```{r}
+#| echo: false 
+ggplot(exam,
+       aes(x = ENGLISH, 
+           y = CLASS, 
+           fill = factor(stat(quantile))
+           )) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient",
+    calc_ecdf = TRUE, 
+    quantiles = c(0.025, 0.975)
+    ) +
+  scale_fill_manual(
+    name = "Probability",
+    values = c("#FF0000A0", "#A0A0A0A0", "#0000FFA0"),
+    labels = c("(0, 0.025]", "(0.025, 0.975]", "(0.975, 1]")
+  ) +
+  theme_ridges()
+```
+
+### The Code
+
+```{r}
+#| eval: false 
+ggplot(exam,
+       aes(x = ENGLISH, 
+           y = CLASS, 
+           fill = factor(stat(quantile))
+           )) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient",
+    calc_ecdf = TRUE, 
+    quantiles = c(0.025, 0.975)
+    ) +
+  scale_fill_manual(
+    name = "Probability",
+    values = c("#FF0000A0", "#A0A0A0A0", "#0000FFA0"),
+    labels = c("(0, 0.025]", "(0.025, 0.975]", "(0.975, 1]")
+  ) +
+  theme_ridges()
+```
+:::
+
+# 4.4 Visualising Distribution with Raincloud Plot
+
+Raincloud plot is a data visualisation techniques that produces a half-density to a distribution plot. The raincloud plot enhances the traditional box-plot by highlighting multiple modalities (an indivator that groups may exist). The boxplot does not show where densities are clustered, but raincloud plot does.
+
+The raincloud plot will be created by using functions provided by **ggdist** and **ggplot2** packages.
+
+## 4.4.1 Plotting a Half Eye Graph
+
+A half-eye graph is plotted using **stat_halfeye()** of ggdist package.
+
+::: panel-tabset
+### The Plot
+
+```{r}
+#| echo: false 
+ggplot(exam, 
+       aes(x = RACE, 
+           y = ENGLISH)) +
+  stat_halfeye(adjust = 0.5,
+               justification = -0.2,
+               .width = 0,
+               point_colour = NA)
+
+```
+
+### The Code
+
+```{r}
+#| eval: false
+ggplot(exam, 
+       aes(x = RACE, 
+           y = ENGLISH)) +
+  stat_halfeye(adjust = 0.5,
+               justification = -0.2,
+               .width = 0,
+               point_colour = NA)
+
+```
+:::
+
+> \[!TIP\] **Things to learn from the code chunk above**
+>
+> We remove the slab interval by setting `.width = 0` and `point_colour = NA`.
+
+## 4.4.2 Adding the boxplot with <code style="color: purple;">geom_boxplot()</code>
+
+::: panel-tabset
+### The Plot
+
+```{r}
+#| echo: false
+ggplot(exam, 
+       aes(x = RACE, 
+           y = ENGLISH)) +
+  stat_halfeye(adjust = 0.5,
+               justification = -0.2,
+               .width = 0,
+               point_colour = NA) +
+  geom_boxplot(width = .20,
+               outlier.shape = NA)
+```
+
+### The Code
+
+```{r}
+#| eval: false
+ggplot(exam, 
+       aes(x = RACE, 
+           y = ENGLISH)) +
+  stat_halfeye(adjust = 0.5,
+               justification = -0.2,
+               .width = 0,
+               point_colour = NA) +
+  geom_boxplot(width = .20,
+               outlier.shape = NA)
+```
+:::
+
+## 4.4.3 Adding the Dot Plots with <code style="color: purple;">stat_dots()</code>
+
+::: panel-tabset
+### The Plot
+
+```{r}
+#| echo: false
+ggplot(exam, 
+       aes(x = RACE, 
+           y = ENGLISH)) +
+  stat_halfeye(adjust = 0.5,
+               justification = -0.2,
+               .width = 0,
+               point_colour = NA) +
+  geom_boxplot(width = .20,
+               outlier.shape = NA) +
+  stat_dots(side = "left", 
+            justification = 1.2, 
+            binwidth = .5,
+            dotsize = 2)
+```
+
+### The Code
+
+```{r}
+#| eval: false
+ggplot(exam, 
+       aes(x = RACE, 
+           y = ENGLISH)) +
+  stat_halfeye(adjust = 0.5,
+               justification = -0.2,
+               .width = 0,
+               point_colour = NA) +
+  geom_boxplot(width = .20,
+               outlier.shape = NA) +
+  stat_dots(side = "left", 
+            justification = 1.2, 
+            binwidth = .5,
+            dotsize = 2)
+```
+:::
+
+## 4.4.4 Finishing Touch
+
+Lastly, <code style="color: purple;">coord_flip()</code> of ggplot2 will be used to flip the raincloud chart horizontally to give the raincloud appearance.
+
+The theme economist of ggthemes package is used to give the raincloud chart a professional publishing standard look.
+
+::: panel-tabset
+### The Plot
+
+```{r}
+#| echo: false
+ggplot(exam, 
+       aes(x = RACE, 
+           y = ENGLISH)) +
+  stat_halfeye(adjust = 0.5,
+               justification = -0.2,
+               .width = 0,
+               point_colour = NA) +
+  geom_boxplot(width = .20,
+               outlier.shape = NA) +
+  stat_dots(side = "left", 
+            justification = 1.2, 
+            binwidth = .5,
+            dotsize = 1.5) +
+  coord_flip() +
+  theme_economist()
+```
+
+### The Code
+
+```{r}
+#| eval: false
+ggplot(exam, 
+       aes(x = RACE, 
+           y = ENGLISH)) +
+  stat_halfeye(adjust = 0.5,
+               justification = -0.2,
+               .width = 0,
+               point_colour = NA) +
+  geom_boxplot(width = .20,
+               outlier.shape = NA) +
+  stat_dots(side = "left", 
+            justification = 1.2, 
+            binwidth = .5,
+            dotsize = 1.5) +
+  coord_flip() +
+  theme_economist()
+```
+:::
