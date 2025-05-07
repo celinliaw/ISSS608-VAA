@@ -29,7 +29,7 @@ Gain hands on experience using:
 ## 6.3.1 Installing and Launching R Packages
 
 ```{r}
-pacman::p_load(ggstatsplot, tidyverse)
+pacman::p_load(tidyverse, ggstatsplot)
 ```
 
 ## 6.3.2 Importing Data
@@ -48,30 +48,12 @@ In the code chunk below, gghistostats() is used to build an visual of one-sample
 ### The Plot
 
 ```{r}
-#| echo: false
-set.seed(1234)
 
-gghistostats(
-  data = exam,
-  x = ENGLISH,
-  type = "bayes",
-  test.value = 60,
-  xlab = "English scores"
-)
 ```
 
 ### The Code
 
 ```{r}
-#| eval: false
-set.seed(1234)
 
-gghistostats(
-  data = exam,
-  x = ENGLISH,
-  type = "bayes",
-  test.value = 60,
-  xlab = "English scores"
-)
 ```
 :::

@@ -323,9 +323,9 @@ ggplot(exam,
 ```
 :::
 
-> \[!TIP\] **Things to learn from the code chunk above**
->
-> We remove the slab interval by setting `.width = 0` and `point_colour = NA`.
+::: {.callout-tip title="Things to learn from the code chunk above"}
+-   We remove the slab interval by setting `.width = 0` and `point_colour = NA`.
+:::
 
 ## 5.4.2 Adding the boxplot with <code style="color: purple;">geom_boxplot()</code>
 

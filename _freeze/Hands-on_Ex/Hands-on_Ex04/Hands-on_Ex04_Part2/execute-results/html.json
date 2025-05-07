@@ -1,0 +1,15 @@
+{
+  "hash": "49149b70e75a8b57c1f9c96b70a5c099",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Hands on Exercise 4 Part 2: Visual Statistical Analysis\"\nauthor: \"Liaw Ying Ting, Celin\"\ndate: 7 May 2025\ndate-modified: \"last-modified\"\nexecute: \n  eval: true\n  echo: true\n  warning: false\n  freeze: true\n---\n\n\n\n\n\n# 6.1 Learning Outcome\n\nGain hands on experience using:\n\n-   ggstatsplot: to create visual graphics with rich statistical information\n\n-   performance package to visualise model diagnostics\n\n-   parameters package to visualise model parameters\n\n# 6.2 Visual Statistical Analysis with ggstatsplot\n\n[**ggstatsplot**]{.underline} is an extension of ggplot 2 package for creating graphics with details from statistical tests\n\n# 6.3 Getting Started\n\n## 6.3.1 Installing and Launching R Packages\n\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(tidyverse, ggstatsplot)\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\npackage 'ggstatsplot' successfully unpacked and MD5 sums checked\n\nThe downloaded binary packages are in\n\tC:\\Users\\celin\\AppData\\Local\\Temp\\RtmpCiNUn0\\downloaded_packages\n```\n\n\n:::\n:::\n\n\n\n\n\n## 6.3.2 Importing Data\n\nImporting Exam.csv data using tidyverse packages\n\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nexam <- read_csv(\"Exam_data.csv\")\n```\n:::\n\n\n\n\n\n## 6.3.3 One-sample test: gghistostats() method\n\nIn the code chunk below, gghistostats() is used to build an visual of one-sample test on English scores.\n\n::: panel-tabset\n### The Plot\n\n\n\n\n\n::: {.cell}\n\n:::\n\n\n\n\n\n### The Code\n\n\n\n\n\n::: {.cell}\n\n:::\n\n\n\n\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
