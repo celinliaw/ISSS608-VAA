@@ -390,15 +390,15 @@ exam %>%
     subtitle = "Gradient + interval plot")
 ```
 
-# 11.5 Visualizing Uncertainty with Hypothetical Outcome Plots (HOPs)
+# 7.5 Visualizing Uncertainty with Hypothetical Outcome Plots (HOPs)
 
-## 11.5.1 Installing ungeviz package
+## 7.5.1 Installing ungeviz package
 
 ```{r}
 devtools::install_github("wilkelab/ungeviz")
 ```
 
-## 11.5.2 Launch the Application in R
+## 7.5.2 Launch the Application in R
 
 ## 11.5.3 Visualizing Uncertainty with Hypothetical Outcome Plots (HOPs)
 
