@@ -1,0 +1,11 @@
+---
+title: "Hands on Exercise 4 Part 4"
+author: "Liaw Ying Ting, Celin"
+date: 7 May 2025
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---

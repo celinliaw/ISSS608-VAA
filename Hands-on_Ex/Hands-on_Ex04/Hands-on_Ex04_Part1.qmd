@@ -1,0 +1,192 @@
+---
+title: "Hands-on Exercise 4 Part 1"
+author: "Liaw Ying Ting, Celin"
+date: 7 May 2025
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# 4.1 Learning Outcome
+
+In this chapter, we will be learning ridgeline plot and raincloud plot using ggplot2 and its extensions.
+
+# 4.2 Getting Started
+
+## 4.2.1 Installing and loading the packages
+
+The following R Packages will be used:
+
+-   ggridges - a ggplot2 extension designed for plotting ridgeline plots
+
+-   ggdist - a ggplot2 extension designed for visualising distribution and uncertainty
+
+-   tidyverse - a family of R packages to meet the modern data science and visual communication needs
+
+-   ggthemes - a ggplot extension that provides the user additional themes, scales and geoms for the ggplots package
+
+-   colorspace - an R package that provides a broad toolbox for selecting individual color or color palettes
+
+```{r}
+pacman::p_load(ggdist, ggridges, ggthemes,
+               colorspace, tidyverse)
+```
+
+## 4.2.2 Importing Data
+
+For the purpose of this exercise, Exam_data.csv will be used.
+
+```{r}
+exam <- read_csv("Exam_data.csv")
+```
+
+# 4.3 Visualising Distribution with Ridgeline Plot
+
+Ridgeline plot is a data visualisation technique for revealing the distribution of a numeric value for several groups. Distribution can be represented using histograms or density plots, all aligned to the same horizontal scale and presented with a slight overlap.
+
+Ridgeline plots make sense when:
+
+-   number of groups to represent is medium to high
+
+-   Classic window separation would take too much space
+
+-   there is a clear pattern in the result
+
+## 4.3.1 Plotting ridgeline graph: ggridges method
+
+Ggridges provides two main geom to plot gridgeline plots: [geom_ridgeline()](https://wilkelab.org/ggridges/reference/geom_ridgeline.html) and [geom_density_ridges()](https://wilkelab.org/ggridges/reference/geom_density_ridges.html). The first one uses height values directly to draw the ridgelines and the second one estimates data densities and draw them using ridgelines.
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false 
+ggplot(exam, 
+       aes(x = ENGLISH, 
+           y = CLASS)) +
+  geom_density_ridges(
+    scale = 3,
+    rel_min_height = 0.01,
+    bandwidth = 3.4,
+    fill = lighten("#7097BB", .3),
+    color = "white"
+  ) +
+  scale_x_continuous(
+    name = "English grades",
+    expand = c(0, 0)
+    ) +
+  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
+  theme_ridges()
+```
+
+### The Code
+
+```{r}
+#| eval: false 
+ggplot(exam, 
+       aes(x = ENGLISH, 
+           y = CLASS)) +
+  geom_density_ridges(
+    scale = 3,
+    rel_min_height = 0.01,
+    bandwidth = 3.4,
+    fill = lighten("#7097BB", .3),
+    color = "white"
+  ) +
+  scale_x_continuous(
+    name = "English grades",
+    expand = c(0, 0)
+    ) +
+  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
+  theme_ridges()
+```
+:::
+
+## 4.3.2 Varying fill colors along the x axis
+
+To fill the area under a ridgeline with colors that vary along the x axis, we can use [geom_ridgeline_gradient()](https://wilkelab.org/ggridges/reference/geom_density_ridges.html) or [geom_density_ridges()](https://wilkelab.org/ggridges/reference/geom_ridgeline_gradient.html). Both geoms work just like <code style="color: purple;">geom_ridgeline()</code> and <code style="color: purple;">geom_density_ridgeline()</code> except that they allow for varying fill colors. It does not allow for alpha transparency in the fill. Only can have changing fill colors or transparency, but not both.
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false 
+ggplot(exam, 
+       aes(x = ENGLISH, 
+           y = CLASS,
+           fill = stat(x))) +
+  geom_density_ridges_gradient(
+    scale = 3,
+    rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Temp. [F]",
+                       option = "C") +
+  scale_x_continuous(
+    name = "English grades",
+    expand = c(0, 0)
+  ) +
+  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
+  theme_ridges()
+```
+
+### The Code
+
+```{r}
+#| eval: false 
+ggplot(exam, 
+       aes(x = ENGLISH, 
+           y = CLASS,
+           fill = stat(x))) +
+  geom_density_ridges_gradient(
+    scale = 3,
+    rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Temp. [F]",
+                       option = "C") +
+  scale_x_continuous(
+    name = "English grades",
+    expand = c(0, 0)
+  ) +
+  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
+  theme_ridges()
+```
+:::
+
+## 4.3.3 Mapping the probabilities directly onto colour
+
+The ggridges package has a stat function called [stat_density_ridges()](https://wilkelab.org/ggridges/reference/stat_density_ridges.html) and is used to replace [stat_density()](https://ggplot2.tidyverse.org/reference/geom_density.html) of ggplot2.
+
+The figure below is plotted by mapping the probabilities calculated by using <code style="color: purple;">stat(ecdf)</code> which represent the empirical cumulative density function for the distribution of English score.
+
+::: panel-tabset
+### The Plot
+
+```{r}
+ggplot(exam,
+       aes(x = ENGLISH, 
+           y = CLASS, 
+           fill = 0.5 - abs(0.5-stat(ecdf)))) +
+  stat_density_ridges(geom = "density_ridges_gradient", 
+                      calc_ecdf = TRUE) +
+  scale_fill_viridis_c(name = "Tail probability",
+                       direction = -1) +
+  theme_ridges()
+```
+
+### The Code
+
+```{r}
+ggplot(exam,
+       aes(x = ENGLISH, 
+           y = CLASS, 
+           fill = 0.5 - abs(0.5-stat(ecdf)))) +
+  stat_density_ridges(geom = "density_ridges_gradient", 
+                      calc_ecdf = TRUE) +
+  scale_fill_viridis_c(name = "Tail probability",
+                       direction = -1) +
+  theme_ridges()
+```
+:::
+
+The argument <code style="color: purple;">calc_ecdf = TRUE</code> has to be added in <code style="color: purple;">stat_density_ridges()</code>.

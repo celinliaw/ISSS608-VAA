@@ -474,5 +474,47 @@
     "title": "Take-Home Exercise 1: Creating Data Visualization that is enlightening and truthful",
     "section": "3.3 Bar Graph of Dependency Ratio",
     "text": "3.3 Bar Graph of Dependency Ratio\nThe dependency ratio is a demographic measure that indicates the ratio of dependents (those typically not in the labour force) to the working-age population. Dependents are usually defined as those under 15 and above 65 years old.\nWith these information, the dependency ratio of the population in Singapore in the different regions will be calculated. This information will reflect the proportion of individuals who are likely to be economically dependent on others.\nadjusted_ageing_ratio_by_region is the new object created to add new custom age groups.\nmutate() is used to change the item to numeric so that &lt;= and &gt;= can be utilized to create the new custom Age_Group of 24 to 67 and 68 and above.\npivot_wider() is used to transform data from long format to wide format so that the ageing ratio can be calculated correctly.\nggplot() is used to plot the horizontal bar chart, using reorder() to reorder the x-axis so that the bars are sorted by ratio.\ngeom_col() is used to adjust the colour of the bars and geom_text() is used to add labels to the bars, using hjust to push the labels to the right of each bar.\ncoord_flip() is used to flip x and y axes and make it a horizontal bar chart.\n\nThe PlotThe Code\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nadjusted_ageing_ratio_by_region &lt;- resident_regioned %&gt;%\n  mutate(Age_numeric = as.numeric(as.character(Age))) %&gt;%\n  filter(!is.na(Age_numeric)) %&gt;%\n  mutate(Age_Group = case_when(\n    Age_numeric &lt; 15 | Age_numeric &gt;= 65 ~ \"&lt; 15 or &gt;=65\",\n    Age_numeric &gt;= 15 & Age_numeric &lt;= 64 ~ \"15-64\",\n    TRUE ~ \"Other\"\n  )) %&gt;%\n  filter(Age_Group != \"Other\") %&gt;%\n  group_by(Region, Age_Group) %&gt;%\n  summarise(Population = sum(Population), .groups = \"drop\") %&gt;%\n  pivot_wider(names_from = Age_Group, values_from = Population) %&gt;%\n  mutate(Adjusted_Ageing_Ratio = `&lt; 15 or &gt;=65` / `15-64`)\n\nggplot(adjusted_ageing_ratio_by_region, aes(x = reorder(Region, Adjusted_Ageing_Ratio), y = Adjusted_Ageing_Ratio)) +\n  geom_col(fill = \"#80CBC4\") +\n  geom_text(aes(label = round(Adjusted_Ageing_Ratio, 3)), hjust = -0.1) +\n  expand_limits(y = max(adjusted_ageing_ratio_by_region$Adjusted_Ageing_Ratio) * 1.1) +\n  labs(\n    title = \"Ratio of Dependents to Working Adults\",\n    x = \"Regions\",\n    y = \"Dependency Ratio\"\n  ) +\n  coord_flip() +\n  theme_minimal(base_size = 11) +\n  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))\n\n\n\n\nObservations: From the bar graphs above, it can be seen that the dependency ratio (Population aged&lt;15 and &gt;65 / Population aged 15-65) ranges from 0.402 to 0.528. A ratio of 0.4 means that for every 2.5 working adults, there is 1 dependent, and a ratio of 0.528 means that for every 1.9 working adult, there is 1 dependent.\nThis average out to about 1 dependent to 2 working adults in Singapore, showing a healthy demographic structure."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html",
+    "title": "Hands-on Exercise 4 Part 1",
+    "section": "",
+    "text": "In this chapter, we will be learning ridgeline plot and raincloud plot using ggplot2 and its extensions."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html#installing-and-loading-the-packages",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html#installing-and-loading-the-packages",
+    "title": "Hands-on Exercise 4 Part 1",
+    "section": "4.2.1 Installing and loading the packages",
+    "text": "4.2.1 Installing and loading the packages\nThe following R Packages will be used:\n\nggridges - a ggplot2 extension designed for plotting ridgeline plots\nggdist - a ggplot2 extension designed for visualising distribution and uncertainty\ntidyverse - a family of R packages to meet the modern data science and visual communication needs\nggthemes - a ggplot extension that provides the user additional themes, scales and geoms for the ggplots package\ncolorspace - an R package that provides a broad toolbox for selecting individual color or color palettes\n\n\npacman::p_load(ggdist, ggridges, ggthemes,\n               colorspace, tidyverse)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html#importing-data",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html#importing-data",
+    "title": "Hands-on Exercise 4 Part 1",
+    "section": "4.2.2 Importing Data",
+    "text": "4.2.2 Importing Data\nFor the purpose of this exercise, Exam_data.csv will be used.\n\nexam &lt;- read_csv(\"Exam_data.csv\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html#plotting-ridgeline-graph-ggridges-method",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html#plotting-ridgeline-graph-ggridges-method",
+    "title": "Hands-on Exercise 4 Part 1",
+    "section": "4.3.1 Plotting ridgeline graph: ggridges method",
+    "text": "4.3.1 Plotting ridgeline graph: ggridges method\nGgridges provides two main geom to plot gridgeline plots: geom_ridgeline() and geom_density_ridges(). The first one uses height values directly to draw the ridgelines and the second one estimates data densities and draw them using ridgelines.\n\nThe plotThe Code\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(exam, \n       aes(x = ENGLISH, \n           y = CLASS)) +\n  geom_density_ridges(\n    scale = 3,\n    rel_min_height = 0.01,\n    bandwidth = 3.4,\n    fill = lighten(\"#7097BB\", .3),\n    color = \"white\"\n  ) +\n  scale_x_continuous(\n    name = \"English grades\",\n    expand = c(0, 0)\n    ) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html#varying-fill-colors-along-the-x-axis",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html#varying-fill-colors-along-the-x-axis",
+    "title": "Hands-on Exercise 4 Part 1",
+    "section": "4.3.2 Varying fill colors along the x axis",
+    "text": "4.3.2 Varying fill colors along the x axis\nTo fill the area under a ridgeline with colors that vary along the x axis, we can use geom_ridgeline_gradient() or geom_density_ridges(). Both geoms work just like geom_ridgeline() and geom_density_ridgeline() except that they allow for varying fill colors. It does not allow for alpha transparency in the fill. Only can have changing fill colors or transparency, but not both.\n\nThe plotThe Code\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nggplot(exam, \n       aes(x = ENGLISH, \n           y = CLASS,\n           fill = stat(x))) +\n  geom_density_ridges_gradient(\n    scale = 3,\n    rel_min_height = 0.01) +\n  scale_fill_viridis_c(name = \"Temp. [F]\",\n                       option = \"C\") +\n  scale_x_continuous(\n    name = \"English grades\",\n    expand = c(0, 0)\n  ) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html#mapping-the-probabilities-directly-onto-colour",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part1.html#mapping-the-probabilities-directly-onto-colour",
+    "title": "Hands-on Exercise 4 Part 1",
+    "section": "4.3.3 Mapping the probabilities directly onto colour",
+    "text": "4.3.3 Mapping the probabilities directly onto colour\nThe ggridges package has a stat function called stat_density_ridges() and is used to replace stat_density() of ggplot2.\nThe figure below is plotted by mapping the probabilities calculated by using stat(ecdf) which represent the empirical cumulative density function for the distribution of English score.\n\nThe PlotThe Code\n\n\n\nggplot(exam,\n       aes(x = ENGLISH, \n           y = CLASS, \n           fill = 0.5 - abs(0.5-stat(ecdf)))) +\n  stat_density_ridges(geom = \"density_ridges_gradient\", \n                      calc_ecdf = TRUE) +\n  scale_fill_viridis_c(name = \"Tail probability\",\n                       direction = -1) +\n  theme_ridges()\n\n\n\n\n\n\n\n\n\n\n\nggplot(exam,\n       aes(x = ENGLISH, \n           y = CLASS, \n           fill = 0.5 - abs(0.5-stat(ecdf)))) +\n  stat_density_ridges(geom = \"density_ridges_gradient\", \n                      calc_ecdf = TRUE) +\n  scale_fill_viridis_c(name = \"Tail probability\",\n                       direction = -1) +\n  theme_ridges()\n\n\n\n\n\n\n\n\n\n\n\nThe argument calc_ecdf = TRUE has to be added in stat_density_ridges()."
   }
 ]
