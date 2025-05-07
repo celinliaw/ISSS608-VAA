@@ -10,13 +10,13 @@ execute:
   freeze: true
 ---
 
-# 4.1 Learning Outcome
+# 5.1 Learning Outcome
 
 In this chapter, we will be learning ridgeline plot and raincloud plot using ggplot2 and its extensions.
 
-# 4.2 Getting Started
+# 5.2 Getting Started
 
-## 4.2.1 Installing and loading the packages
+## 5.2.1 Installing and loading the packages
 
 The following R Packages will be used:
 
@@ -35,7 +35,7 @@ pacman::p_load(ggdist, ggridges, ggthemes,
                colorspace, tidyverse)
 ```
 
-## 4.2.2 Importing Data
+## 5.2.2 Importing Data
 
 For the purpose of this exercise, Exam_data.csv will be used.
 
@@ -43,7 +43,7 @@ For the purpose of this exercise, Exam_data.csv will be used.
 exam <- read_csv("Exam_data.csv")
 ```
 
-# 4.3 Visualising Distribution with Ridgeline Plot
+# 5.3 Visualising Distribution with Ridgeline Plot
 
 Ridgeline plot is a data visualisation technique for revealing the distribution of a numeric value for several groups. Distribution can be represented using histograms or density plots, all aligned to the same horizontal scale and presented with a slight overlap.
 
@@ -55,7 +55,7 @@ Ridgeline plots make sense when:
 
 -   there is a clear pattern in the result
 
-## 4.3.1 Plotting ridgeline graph: ggridges method
+## 5.3.1 Plotting ridgeline graph: ggridges method
 
 Ggridges provides two main geom to plot gridgeline plots: [geom_ridgeline()](https://wilkelab.org/ggridges/reference/geom_ridgeline.html) and [geom_density_ridges()](https://wilkelab.org/ggridges/reference/geom_density_ridges.html). The first one uses height values directly to draw the ridgelines and the second one estimates data densities and draw them using ridgelines.
 
@@ -105,7 +105,7 @@ ggplot(exam,
 ```
 :::
 
-## 4.3.2 Varying fill colors along the x axis
+## 5.3.2 Varying fill colors along the x axis
 
 To fill the area under a ridgeline with colors that vary along the x axis, we can use [geom_ridgeline_gradient()](https://wilkelab.org/ggridges/reference/geom_density_ridges.html) or [geom_density_ridges()](https://wilkelab.org/ggridges/reference/geom_ridgeline_gradient.html). Both geoms work just like <code style="color: purple;">geom_ridgeline()</code> and <code style="color: purple;">geom_density_ridgeline()</code> except that they allow for varying fill colors. It does not allow for alpha transparency in the fill. Only can have changing fill colors or transparency, but not both.
 
@@ -153,7 +153,7 @@ ggplot(exam,
 ```
 :::
 
-## 4.3.3 Mapping the probabilities directly onto colour
+## 5.3.3 Mapping the probabilities directly onto colour
 
 The ggridges package has a stat function called [stat_density_ridges()](https://wilkelab.org/ggridges/reference/stat_density_ridges.html) and is used to replace [stat_density()](https://ggplot2.tidyverse.org/reference/geom_density.html) of ggplot2.
 
@@ -193,7 +193,7 @@ ggplot(exam,
 
 The argument <code style="color: purple;">calc_ecdf = TRUE</code> has to be added in <code style="color: purple;">stat_density_ridges()</code>.
 
-## 4.3.4 Ridgeline plots with quantile lines
+## 5.3.4 Ridgeline plots with quantile lines
 
 By using [geom_density_ridges_gradient()](https://wilkelab.org/ggridges/reference/geom_ridgeline_gradient.html) the ridgeline plot can be colored by quantile, using calculated <code style="color: purple;">stat(quantile\_</code> aesthetic as shown in the figure below.
 
@@ -283,13 +283,13 @@ ggplot(exam,
 ```
 :::
 
-# 4.4 Visualising Distribution with Raincloud Plot
+# 5.4 Visualising Distribution with Raincloud Plot
 
 Raincloud plot is a data visualisation techniques that produces a half-density to a distribution plot. The raincloud plot enhances the traditional box-plot by highlighting multiple modalities (an indivator that groups may exist). The boxplot does not show where densities are clustered, but raincloud plot does.
 
 The raincloud plot will be created by using functions provided by **ggdist** and **ggplot2** packages.
 
-## 4.4.1 Plotting a Half Eye Graph
+## 5.4.1 Plotting a Half Eye Graph
 
 A half-eye graph is plotted using **stat_halfeye()** of ggdist package.
 
@@ -327,7 +327,7 @@ ggplot(exam,
 >
 > We remove the slab interval by setting `.width = 0` and `point_colour = NA`.
 
-## 4.4.2 Adding the boxplot with <code style="color: purple;">geom_boxplot()</code>
+## 5.4.2 Adding the boxplot with <code style="color: purple;">geom_boxplot()</code>
 
 ::: panel-tabset
 ### The Plot
@@ -361,7 +361,7 @@ ggplot(exam,
 ```
 :::
 
-## 4.4.3 Adding the Dot Plots with <code style="color: purple;">stat_dots()</code>
+## 5.4.3 Adding the Dot Plots with <code style="color: purple;">stat_dots()</code>
 
 ::: panel-tabset
 ### The Plot
@@ -403,7 +403,7 @@ ggplot(exam,
 ```
 :::
 
-## 4.4.4 Finishing Touch
+## 5.4.4 Finishing Touch
 
 Lastly, <code style="color: purple;">coord_flip()</code> of ggplot2 will be used to flip the raincloud chart horizontally to give the raincloud appearance.
 
