@@ -1,5 +1,5 @@
 ---
-title: "Hands on Exercise 4 Part 4"
+title: "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons"
 author: "Liaw Ying Ting, Celin"
 date: 7 May 2025
 date-modified: "last-modified"
@@ -9,3 +9,201 @@ execute:
   warning: false
   freeze: true
 ---
+
+# 8.1 Overview
+
+# 8.2 Installing and Launching R Packages
+
+```{r}
+pacman::p_load(tidyverse, FunnelPlotR, plotly, knitr)
+```
+
+# 8.3 Importing Data
+
+```{r}
+covid19 <- read_csv("COVID-19_DKI_Jakarta.csv") %>%
+  mutate_if(is.character, as.factor)
+```
+
+# 8.4 FunnelPlotR Methods
+
+## 8.4.1 FunnelPlotR Methods: The Basic Plot
+
+```{r}
+funnel_plot(
+  .data = covid19,
+  numerator = Positive,
+  denominator = Death,
+  group = `Sub-district`
+)
+```
+
+## 8.4.2 FunnelPlotR Methods: Makeover 1
+
+```{r}
+funnel_plot(
+  .data = covid19,
+  numerator = Death,
+  denominator = Positive,
+  group = `Sub-district`,
+  data_type = "PR",     #<<
+  xrange = c(0, 6500),  #<<
+  yrange = c(0, 0.05)   #<<
+)
+```
+
+## 8.4.3 FunnelPlotR Methods: Makeover 2
+
+```{r}
+funnel_plot(
+  .data = covid19,
+  numerator = Death,
+  denominator = Positive,
+  group = `Sub-district`,
+  data_type = "PR",   
+  x_range = c(0, 6500),  
+  y_range = c(0, 0.05),
+  label = NA,
+  title = "Cumulative COVID-19 Fatality Rate by Cumulative \n Total Number of COVID-19 Positive Cases", #<<           
+  x_label = "Cumulative COVID-19 Positive Cases", #<<
+  y_label = "Cumulative Fatality Rate"  #<<
+) 
+```
+
+# 8.5 Funnel Plot for Fair Visual Comparison: ggplot2 methods
+
+## 8.5.1 Computing the basic derived fields
+
+```{r}
+df <- covid19 %>%
+  mutate(rate = Death / Positive) %>%
+  mutate(rate.se = sqrt((rate*(1-rate)) / (Positive))) %>%
+  filter(rate > 0)
+```
+
+```{r}
+fit.mean <- weighted.mean(df$rate, 1/df$rate.se^2)
+```
+
+## 8.5.2 Calculate lower and upper limits for 95% and 99.9% CI
+
+```{r}
+number.seq <- seq(1, max(df$Positive), 1)
+number.ll95 <- fit.mean - 1.96 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) 
+number.ul95 <- fit.mean + 1.96 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) 
+number.ll999 <- fit.mean - 3.29 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) 
+number.ul999 <- fit.mean + 3.29 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) 
+dfCI <- data.frame(number.ll95, number.ul95, number.ll999, 
+                   number.ul999, number.seq, fit.mean)
+```
+
+## 8.5.3 Plotting a static funnel plot
+
+```{r}
+p <- ggplot(df, aes(x = Positive, y = rate)) +
+  geom_point(aes(label=`Sub-district`), 
+             alpha=0.4) +
+  geom_line(data = dfCI, 
+            aes(x = number.seq, 
+                y = number.ll95), 
+            size = 0.4, 
+            colour = "grey40", 
+            linetype = "dashed") +
+  geom_line(data = dfCI, 
+            aes(x = number.seq, 
+                y = number.ul95), 
+            size = 0.4, 
+            colour = "grey40", 
+            linetype = "dashed") +
+  geom_line(data = dfCI, 
+            aes(x = number.seq, 
+                y = number.ll999), 
+            size = 0.4, 
+            colour = "grey40") +
+  geom_line(data = dfCI, 
+            aes(x = number.seq, 
+                y = number.ul999), 
+            size = 0.4, 
+            colour = "grey40") +
+  geom_hline(data = dfCI, 
+             aes(yintercept = fit.mean), 
+             size = 0.4, 
+             colour = "grey40") +
+  coord_cartesian(ylim=c(0,0.05)) +
+  annotate("text", x = 1, y = -0.13, label = "95%", size = 3, colour = "grey40") + 
+  annotate("text", x = 4.5, y = -0.18, label = "99%", size = 3, colour = "grey40") + 
+  ggtitle("Cumulative Fatality Rate by Cumulative Number of COVID-19 Cases") +
+  xlab("Cumulative Number of COVID-19 Cases") + 
+  ylab("Cumulative Fatality Rate") +
+  theme_light() +
+  theme(plot.title = element_text(size=12),
+        legend.position = c(0.91,0.85), 
+        legend.title = element_text(size=7),
+        legend.text = element_text(size=7),
+        legend.background = element_rect(colour = "grey60", linetype = "dotted"),
+        legend.key.height = unit(0.3, "cm"))
+p
+```
+
+## 8.5.4 Interactive Funnel Plot: plotly + ggplot2
+
+```{r}
+fp_ggplotly <- ggplotly(p,
+  tooltip = c("label", 
+              "x", 
+              "y"))
+fp_ggplotly
+```
+
+# 8.6 Additional Plots
+
+## 8.6.1 Error Bars
+
+```{r}
+top20_data <- summary_data %>%
+  arrange(desc(FatalityRate)) %>%
+  slice_head(n = 20)
+
+ggplot(top20_data, aes(x = reorder(`Sub-district`, FatalityRate), y = FatalityRate)) +
+  geom_col(fill = "#80CBC4", width = 0.7) +
+  geom_errorbar(aes(ymin = CI_lower, ymax = CI_upper), width = 0.25, color = "red") +
+  coord_flip() +
+  labs(
+    title = "Top 20 Sub-districts by COVID-19 Fatality Rate\nWith 95% Confidence Intervals",
+    x = "Sub-district",
+    y = "Fatality Rate"
+  ) +
+  theme_minimal(base_size = 12)
+
+
+```
+
+Additional plots will be created using dataset from kaggle. The data was downloaded from [Student Performance in Exams](https://www.kaggle.com/datasets/spscientist/students-performance-in-exams?resource=download) . To understand parent's background and test prep with relation to scores.
+
+```{r}
+pacman::p_load(ggdist, ggridges, ggthemes,
+               colorspace, tidyverse)
+```
+
+```{r}
+parent_exam_data <- read_csv("StudentsPerformance.csv")
+```
+
+```{r}
+ggplot(parent_exam_data, 
+       aes(x = math_score, 
+           y = parental_level_of_education,
+           fill = stat(x))) +
+  geom_density_ridges_gradient(
+    scale = 3,
+    rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Temp. [F]",
+                       option = "C") +
+  scale_x_continuous(
+    name = "Math grades",
+    expand = c(0, 0)
+  ) +
+  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
+  theme_ridges()
+
+```

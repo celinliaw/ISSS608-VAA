@@ -364,7 +364,7 @@ exam %>%
     show.legend = TRUE
   ) +
   labs(
-    title = "Visualising 95% and 99% Confidence Intervals of Median Math Score",
+    title = "Visualising 95% and 99% Confidence Intervals\n of Median Math Score",
     subtitle = "Median Point + Multiple-Interval Plot",
     x = "Race",
     y = "Math Score"
@@ -400,7 +400,7 @@ devtools::install_github("wilkelab/ungeviz")
 
 ## 7.5.2 Launch the Application in R
 
-## 11.5.3 Visualizing Uncertainty with Hypothetical Outcome Plots (HOPs)
+## 7.5.3 Visualizing Uncertainty with Hypothetical Outcome Plots (HOPs)
 
 ```{r}
 ggplot(data = exam, 
