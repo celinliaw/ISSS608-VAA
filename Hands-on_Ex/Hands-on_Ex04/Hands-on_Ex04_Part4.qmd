@@ -12,6 +12,14 @@ execute:
 
 # 8.1 Overview
 
+Funnel Plot is specially designed data visualisation for conducting unbiased comparison between outlets, stores or business entities. This hands-on exercise will help to practice on:
+
+-   plotting funnel plots using **funnelPlotR package**
+
+-   plottiing static funnel plot by using ggplot2 package
+
+-   plotting interactive funnel plot by using both **plotly R and ggplot2** packages
+
 # 8.2 Installing and Launching R Packages
 
 ```{r}
@@ -20,12 +28,28 @@ pacman::p_load(tidyverse, FunnelPlotR, plotly, knitr)
 
 # 8.3 Importing Data
 
+In this exercise, the cumulative COVID-19 cases and death by sub-district as at 31st July 2021, DKI Jakarta.
+
+The code chunk below imports the data into R and save it into a tibble data frame object called *covid19.*
+
 ```{r}
 covid19 <- read_csv("COVID-19_DKI_Jakarta.csv") %>%
   mutate_if(is.character, as.factor)
 ```
 
 # 8.4 FunnelPlotR Methods
+
+**FunnelPlotR** uses ggplot to generate funnel plots. It requires a numerator (events of interest), denominator (population to be considered) and group. The key arguments selected for customisation are:
+
+-   limit - plot limits (95 or 99)
+
+-   label_outliers - to label outliers (true or false)
+
+-   Poisson_limits - to add poisson limits to the plot
+
+-   OD_adjust - to add overdispersed limits to the plot
+
+-   xrange and yrange - to specify the range to display for the axes
 
 ## 8.4.1 FunnelPlotR Methods: The Basic Plot
 
@@ -146,6 +170,8 @@ p
 ```
 
 ## 8.5.4 Interactive Funnel Plot: plotly + ggplot2
+
+The funnel plot created using ggplot2 functions can be made interactive with **ggplotly()** of plotly r package.
 
 ```{r}
 fp_ggplotly <- ggplotly(p,

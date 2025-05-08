@@ -355,21 +355,58 @@ exam %>%
 Makeover the previous plot on the previous slide by showing 95% and 99% confidence intervals
 
 ```{r}
-exam %>%
-  ggplot(aes(x = RACE, y = MATHS)) +
-  stat_pointinterval(
-    .width = c(0.95, 0.99),
-    .point = median,
-    .interval = qi,
-    show.legend = TRUE
+library(ggdist)
+library(tidyverse)
+
+# Precompute median and multiple intervals (95% and 99%)
+exam_summary <- exam %>%
+  group_by(RACE) %>%
+  median_qi(MATHS, .width = c(0.95, 0.99))
+
+# Plot with transparent intervals
+ggplot(exam_summary, aes(x = RACE, y = MATHS, ymin = .lower, ymax = .upper)) +
+  geom_pointrange(aes(color = factor(.width)), 
+                  position = position_dodge(width = 0.5),
+                  linewidth = 1.2,
+                  alpha = 0.6) +
+  scale_color_manual(
+    values = c("0.95" = "#1f77b4",  # Blue
+               "0.99" = "#d62728")  # Red
   ) +
   labs(
-    title = "Visualising 95% and 99% Confidence Intervals\n of Median Math Score",
-    subtitle = "Median Point + Multiple-Interval Plot",
-    x = "Race",
+    title = "Visualising Confidence Intervals of Median Math Score",
+    subtitle = "95% (blue) and 99% (red) intervals",
+    color = "Interval Width",
     y = "Math Score"
   ) +
   theme_minimal()
+
+
+
+
+```
+
+```{r}
+exam %>%
+  ggplot(aes(x = RACE, y = MATHS)) +
+  stat_pointinterval(
+    aes(color = factor(.width), linewidth = factor(.width)),
+    .width = c(0.95, 0.99),
+    method = "qi",
+    point_interval = median_qi,
+    position = position_dodge(width = 0.5)
+  ) +
+  scale_color_manual(values = c("0.95" = "black", "0.99" = "gray50")) +
+  scale_linewidth_manual(values = c("0.95" = 1.5, "0.99" = 0.8)) +
+  labs(
+    title = "Visualising Confidence Intervals of Median Math Score",
+    subtitle = "Median point with 95% and 99% credible intervals",
+    color = "Interval Width",
+    linewidth = "Interval Width"
+  ) +
+  theme_minimal()
+
+
 
 ```
 
