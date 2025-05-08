@@ -157,53 +157,209 @@ fp_ggplotly
 
 # 8.6 Additional Plots
 
-## 8.6.1 Error Bars
+## 8.6.1 Using Infer R Package
+
+This package is to perform statistical inference using an expressive statistical grammar that coheres with the tidyverse design framework. There are 4 main verbs that can be used to utilizes to visualize and extract value from their outputs.
 
 ```{r}
-top20_data <- summary_data %>%
-  arrange(desc(FatalityRate)) %>%
-  slice_head(n = 20)
+str(covid19)
+```
 
-ggplot(top20_data, aes(x = reorder(`Sub-district`, FatalityRate), y = FatalityRate)) +
-  geom_col(fill = "#80CBC4", width = 0.7) +
-  geom_errorbar(aes(ymin = CI_lower, ymax = CI_upper), width = 0.25, color = "red") +
-  coord_flip() +
-  labs(
-    title = "Top 20 Sub-districts by COVID-19 Fatality Rate\nWith 95% Confidence Intervals",
-    x = "Sub-district",
-    y = "Fatality Rate"
-  ) +
-  theme_minimal(base_size = 12)
+## 8.6.2 One numerical Variable (Standardised mean t-test)
+
+A hypothesis test is created for whether the **mean fatality rate differs from fixed value,** say 0.01(1%) using a **one sample t-test approach**.
+
+```{r}
+# Load required packages
+pacman::p_load(tidyverse, infer)
+
+# Load and clean data
+covid19 <- read_csv("COVID-19_DKI_Jakarta.csv") %>%
+  filter(!is.na(Positive), Positive > 0,
+         !is.na(Death), Death >= 0) %>%
+  mutate(fatality_rate = Death / Positive)
+
+# Step 1: Specify the variable of interest
+spec_data <- covid19 %>%
+  specify(response = fatality_rate)
+
+# Step 2: State the null hypothesis (mean fatality rate is 0.01)
+hyp_data <- spec_data %>%
+  hypothesize(null = "point", mu = 0.01)
+
+# Step 3: Generate 1000 samples under the null
+gen_data <- hyp_data %>%
+  generate(reps = 1000, type = "bootstrap")
+
+# Step 4: Calculate the test statistic (mean)
+null_dist <- gen_data %>%
+  calculate(stat = "mean")
+
+# Step 5: Calculate the observed statistic
+obs_stat <- spec_data %>%
+  calculate(stat = "mean")
+
+# Step 6: Visualize with p-value shaded
+visualize(null_dist) +
+  shade_p_value(obs_stat = obs_stat, direction = "two-sided")
+
+```
+
+```{r}
+null_dist %>%
+  get_p_value(obs_stat = obs_stat, direction = "greater")
+
+```
+
+-   The **observed mean (1.6%)** is **far outside** the distribution you'd expect **if the true mean were 1%**.
+
+-   Since the red line lies **way in the right tail**, this suggests that your observed result is **very unlikely under the null hypothesis**.
+
+-   Therefore, this provides **strong evidence against the null hypothesis**.
+
+-   Since p = 0, we will reject the null hypothesis and that mean fatality rate is significantly greater than 1%
+
+## 8.6.3 Alternative: Theorey-Based Null Distribution
+
+Alternatively, we can visualise it using the observed statistic using the theory-based null distribution: **Is the mean fatality rate significantly different from 1% using a theoretical t-distribution?**
+
+```{r}
+# Load required packages
+pacman::p_load(tidyverse, infer)
+
+# Load and clean data
+covid19 <- read_csv("COVID-19_DKI_Jakarta.csv") %>%
+  filter(!is.na(Positive) & Positive > 0,
+         !is.na(Death) & Death >= 0) %>%
+  mutate(fatality_rate = Death / Positive)
+
+# 1. Specify variable
+spec_data <- covid19 %>%
+  specify(response = fatality_rate)
+
+# 2. Hypothesize that the population mean = 0.01
+hyp_data <- spec_data %>%
+  hypothesize(null = "point", mu = 0.01)
+
+# 3. Calculate the t-statistic under the theory-based null
+obs_t_stat <- hyp_data %>%
+  calculate(stat = "t")
+
+# 4. Visualize with theoretical distribution
+visualize(hyp_data, method = "theoretical") +
+  shade_p_value(obs_stat = obs_t_stat, direction = "two-sided")
 
 
 ```
 
-Additional plots will be created using dataset from kaggle. The data was downloaded from [Student Performance in Exams](https://www.kaggle.com/datasets/spscientist/students-performance-in-exams?resource=download) . To understand parent's background and test prep with relation to scores.
+**Observations from plot:**
+
+-   Your observed t-statistic is **far outside the expected range** under the null hypothesis.
+
+-   The **probability of getting a t-stat this extreme by chance is effectively zero**.
+
+-   This provides **overwhelming evidence against the null hypothesis**.
+
+## 8.6.4 Two Categorical Chi Square test of independence
+
+**Is there a relationship between City and Number of Deaths?**
+
+Ho: There is no association between City and Number of Deaths
+
+H1: There is an association between City and Number of Deaths
 
 ```{r}
-pacman::p_load(ggdist, ggridges, ggthemes,
-               colorspace, tidyverse)
+# Load required packages
+pacman::p_load(tidyverse, infer)
+
+# Load and prepare the dataset
+covid19 <- read_csv("COVID-19_DKI_Jakarta.csv") %>%
+  filter(!is.na(City), !is.na(Death)) %>%
+  mutate(City = as.factor(City),
+         death_bin = cut(Death,
+                         breaks = c(-1, 10, 50, 150, Inf),
+                         labels = c("Very Low", "Low", "Medium", "High")))
+
+# Observed Chi-squared statistic
+Chisq_hat <- covid19 %>%
+  specify(City ~ death_bin) %>%
+  hypothesize(null = "independence") %>%
+  calculate(stat = "Chisq")
+
+# Null distribution via permutation
+null_dist <- covid19 %>%
+  specify(City ~ death_bin) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "Chisq")
+
+# Plot 1: Simulation-based null distribution
+visualize(null_dist) +
+  shade_p_value(obs_stat = Chisq_hat, direction = "greater")
+
 ```
+
+Alternatively, visualising the observed statistic using the theory-based null distribution
 
 ```{r}
-parent_exam_data <- read_csv("StudentsPerformance.csv")
+# Theoretical null distribution
+null_dist_theory <- covid19 %>%
+  specify(City ~ death_bin) %>%
+  assume(distribution = "Chisq")
+
+# Plot 2: Theoretical chi-square distribution
+visualize(null_dist_theory) +
+  shade_p_value(obs_stat = Chisq_hat, direction = "greater")
+
 ```
+
+The observed statistic using both the null distributions
 
 ```{r}
-ggplot(parent_exam_data, 
-       aes(x = math_score, 
-           y = parental_level_of_education,
-           fill = stat(x))) +
-  geom_density_ridges_gradient(
-    scale = 3,
-    rel_min_height = 0.01) +
-  scale_fill_viridis_c(name = "Temp. [F]",
-                       option = "C") +
-  scale_x_continuous(
-    name = "Math grades",
-    expand = c(0, 0)
-  ) +
-  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +
-  theme_ridges()
+# Load packages
+pacman::p_load(tidyverse, infer)
+
+# Load and prepare data
+covid19 <- read_csv("COVID-19_DKI_Jakarta.csv") %>%
+  filter(!is.na(City), !is.na(Death)) %>%
+  mutate(City = as.factor(City),
+         death_bin = cut(Death,
+                         breaks = c(-1, 10, 50, 150, Inf),
+                         labels = c("Very Low", "Low", "Medium", "High")))
+
+# 1. Observed Chi-squared statistic
+Chisq_hat <- covid19 %>%
+  specify(City ~ death_bin) %>%
+  hypothesize(null = "independence") %>%
+  calculate(stat = "Chisq")
+
+# 2. Null distribution via permutation
+null_dist <- covid19 %>%
+  specify(City ~ death_bin) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "Chisq")
+
+# 3. Combined simulation + theory plot
+visualize(null_dist, method = "both") +
+  shade_p_value(obs_stat = Chisq_hat, direction = "greater")
 
 ```
+
+Calculate the P-Value
+
+```{r}
+# 4. Calculate the p-value
+null_dist %>%
+  get_p_value(obs_stat = Chisq_hat, direction = "greater")
+```
+
+Observations from plots:
+
+-   Your observed Chi-square value is **far beyond** what is expected under the null hypothesis of independence
+
+-   The **simulation and theory both agree**: this is **extremely unlikely** to happen by chance.
+
+-   This means there **is a statistically significant relationship** between **City** and **Death level**.
+
+-   Since p-value = 0, we will reject the null hypothesis.

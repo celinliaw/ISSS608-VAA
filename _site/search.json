@@ -599,7 +599,7 @@
     "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#installing-and-launching-r-packages",
     "title": "Hands on Exercise 4 Part 2: Visual Statistical Analysis",
     "section": "6.3.1 Installing and Launching R Packages",
-    "text": "6.3.1 Installing and Launching R Packages\n\npacman::p_load(tidyverse, ggstatsplot)\n\npackage 'ggstatsplot' successfully unpacked and MD5 sums checked\n\nThe downloaded binary packages are in\n    C:\\Users\\celin\\AppData\\Local\\Temp\\RtmpCiNUn0\\downloaded_packages"
+    "text": "6.3.1 Installing and Launching R Packages\n\npacman::p_load(tidyverse, ggstatsplot)"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#importing-data",
@@ -613,6 +613,181 @@
     "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#one-sample-test-gghistostats-method",
     "title": "Hands on Exercise 4 Part 2: Visual Statistical Analysis",
     "section": "6.3.3 One-sample test: gghistostats() method",
-    "text": "6.3.3 One-sample test: gghistostats() method\nIn the code chunk below, gghistostats() is used to build an visual of one-sample test on English scores.\n\nThe PlotThe Code"
+    "text": "6.3.3 One-sample test: gghistostats() method\nIn the code chunk below, gghistostats() is used to build an visual of one-sample test on English scores.\n\nThe PlotThe Code\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nset.seed(1234)\n\ngghistostats(\n  data = exam,\n  x = ENGLISH,\n  type = \"bayes\",\n  test.value = 60,\n  xlab = \"English scores\"\n)\n\n\n\n\nExplanation of the Results:\nHo: The mean english score is 60\nH1: The mean english score is not equals to 60\n\nlog₁₀(BF₀₁) = -31.45\nThis is the logarithm of the Bayes Factor in favor of the alternative hypothesis over the null:\nThis is extreme evidence in favor of the alternative hypothesis.\nposterior difference = 7.16\nThe estimated mean difference between the observed group and a comparison value (likely a hypothesized mean like 0 or 50), with the observed average English score being significantly higher.\nCI⁹⁵% [5.54, 8.75] (ETI)\nThis is the 95% credible interval (Equal-Tail Interval), suggesting that the true mean difference is very likely between 5.54 and 8.75.\nJZS Cauchy = 0.71\nThis is the scale parameter for the Cauchy prior distribution used in the Bayesian t-test (Jeffreys–Zellner–Siow prior), controlling the expected effect size.\nDashed Blue Line (x = 74.74)\nThis shows the sample mean of the English scores. The peak at this point suggests most scores cluster around here."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#visualizing-the-uncertainty-of-point-estimates-with-interactive-error-bars",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#visualizing-the-uncertainty-of-point-estimates-with-interactive-error-bars",
+    "title": "Hands on Exercise 4 Part 3",
+    "section": "7.3.3 Visualizing the uncertainty of point estimates with interactive error bars",
+    "text": "7.3.3 Visualizing the uncertainty of point estimates with interactive error bars\nIn this section, interactive error bars for the 99% confidence interval of mean math scores by race are plotted.\n\nThe PlotThe Code\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nshared_df = SharedData$new(my_sum)\n\nbscols(widths = c(4,8),\n       ggplotly((ggplot(shared_df) +\n                   geom_errorbar(aes(\n                     x=reorder(RACE, -mean),\n                     ymin=mean-2.58*se, \n                     ymax=mean+2.58*se), \n                     width=0.2, \n                     colour=\"black\", \n                     alpha=0.9, \n                     size=0.5) +\n                   geom_point(aes(\n                     x=RACE, \n                     y=mean, \n                     text = paste(\"Race:\", `RACE`, \n                                  \"&lt;br&gt;N:\", `n`,\n                                  \"&lt;br&gt;Avg. Scores:\", round(mean, digits = 2),\n                                  \"&lt;br&gt;95% CI:[\", \n                                  round((mean-2.58*se), digits = 2), \",\",\n                                  round((mean+2.58*se), digits = 2),\"]\")),\n                     stat=\"identity\", \n                     color=\"red\", \n                     size = 1.5, \n                     alpha=1) + \n                   xlab(\"Race\") + \n                   ylab(\"Average Scores\") + \n                   theme_minimal() + \n                   theme(axis.text.x = element_text(\n                     angle = 45, vjust = 0.5, hjust=1)) +\n                   ggtitle(\"99% Confidence interval of average /&lt;br&gt;maths scores by race\")), \n                tooltip = \"text\"), \n       DT::datatable(shared_df, \n                     rownames = FALSE, \n                     class=\"compact\", \n                     width=\"100%\", \n                     options = list(pageLength = 10,\n                                    scrollX=T), \n                     colnames = c(\"No. of pupils\", \n                                  \"Avg Scores\",\n                                  \"Std Dev\",\n                                  \"Std Error\")) %&gt;%\n         formatRound(columns=c('mean', 'sd', 'se'),\n                     digits=2))"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#visualizing-the-uncertainty-of-point-estimates-ggdist-methods",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#visualizing-the-uncertainty-of-point-estimates-ggdist-methods",
+    "title": "Hands on Exercise 4 Part 3",
+    "section": "7.4.1 Visualizing the uncertainty of point estimates: ggdist methods",
+    "text": "7.4.1 Visualizing the uncertainty of point estimates: ggdist methods\nIn the code chunk below, stat_pointinterval() of ggdist is used to build a visual for displaying distribution of math scores by race\n\nexam %&gt;%\n  ggplot(aes(x = RACE, \n             y = MATHS)) +\n  stat_pointinterval() +\n  labs(\n    title = \"Visualising confidence intervals of mean math score\",\n    subtitle = \"Mean Point + Multiple-interval plot\")\n\n\n\n\n\n\n\n\nFor example, in the code chunk the following arguments are added:\n\nwidth = 0.95\n.point = median\n.interval = qi\n\n\nexam %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_pointinterval(.width = 0.95,\n  .point = median,\n  .interval = qi) +\n  labs(\n    title = \"Visualising confidence intervals of median math score\",\n    subtitle = \"Median Point + Multiple-interval plot\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#visualizing-the-uncertainty-of-point-estimates-ggdist-methods-1",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#visualizing-the-uncertainty-of-point-estimates-ggdist-methods-1",
+    "title": "Hands on Exercise 4 Part 3",
+    "section": "7.4.2 Visualizing the uncertainty of point estimates: ggdist methods",
+    "text": "7.4.2 Visualizing the uncertainty of point estimates: ggdist methods\nMakeover the previous plot on the previous slide by showing 95% and 99% confidence intervals\n\nexam %&gt;%\n  ggplot(aes(x = RACE, y = MATHS)) +\n  stat_pointinterval(\n    .width = c(0.95, 0.99),\n    .point = median,\n    .interval = qi,\n    show.legend = TRUE\n  ) +\n  labs(\n    title = \"Visualising 95% and 99% Confidence Intervals\\n of Median Math Score\",\n    subtitle = \"Median Point + Multiple-Interval Plot\",\n    x = \"Race\",\n    y = \"Math Score\"\n  ) +\n  theme_minimal()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#visualizing-the-uncertainty-of-point-estimates-ggdist-methods-2",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#visualizing-the-uncertainty-of-point-estimates-ggdist-methods-2",
+    "title": "Hands on Exercise 4 Part 3",
+    "section": "7.4.3 Visualizing the uncertainty of point estimates: ggdist methods",
+    "text": "7.4.3 Visualizing the uncertainty of point estimates: ggdist methods\n\nIn the code below, stat_gradientinterval() of ggdist is used to build a visual for displaying distribution of math scores by race\n\n\nexam %&gt;%\n  ggplot(aes(x = RACE, \n             y = MATHS)) +\n  stat_gradientinterval(   \n    fill = \"skyblue\",      \n    show.legend = TRUE     \n  ) +                        \n  labs(\n    title = \"Visualising confidence intervals of mean math score\",\n    subtitle = \"Gradient + interval plot\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#installing-ungeviz-package",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#installing-ungeviz-package",
+    "title": "Hands on Exercise 4 Part 3",
+    "section": "7.5.1 Installing ungeviz package",
+    "text": "7.5.1 Installing ungeviz package\n\ndevtools::install_github(\"wilkelab/ungeviz\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#launch-the-application-in-r",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#launch-the-application-in-r",
+    "title": "Hands on Exercise 4 Part 3",
+    "section": "7.5.2 Launch the Application in R",
+    "text": "7.5.2 Launch the Application in R"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#visualizing-uncertainty-with-hypothetical-outcome-plots-hops-1",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part3.html#visualizing-uncertainty-with-hypothetical-outcome-plots-hops-1",
+    "title": "Hands on Exercise 4 Part 3",
+    "section": "7.5.3 Visualizing Uncertainty with Hypothetical Outcome Plots (HOPs)",
+    "text": "7.5.3 Visualizing Uncertainty with Hypothetical Outcome Plots (HOPs)\n\nlibrary(ungeviz)\nlibrary(ggplot2)\n\nggplot(data = exam, \n       (aes(x = factor(RACE), \n            y = MATHS))) +\n  geom_point(position = position_jitter(\n    height = 0.3,\n    width = 0.05), \n    size = 0.4, \n    color = \"#0072B2\", \n    alpha = 1/2) +\n  geom_hpline(data = sampler(25, \n                             group = RACE), \n              height = 0.6, \n              color = \"#D55E00\") +\n  theme_bw() + \n  transition_states(.draw, 1, 3)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#funnelplotr-methods-the-basic-plot",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#funnelplotr-methods-the-basic-plot",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.4.1 FunnelPlotR Methods: The Basic Plot",
+    "text": "8.4.1 FunnelPlotR Methods: The Basic Plot\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Positive,\n  denominator = Death,\n  group = `Sub-district`\n)\n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 0 are outliers. \nPlot is adjusted for overdispersion."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#funnelplotr-methods-makeover-1",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#funnelplotr-methods-makeover-1",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.4.2 FunnelPlotR Methods: Makeover 1",
+    "text": "8.4.2 FunnelPlotR Methods: Makeover 1\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Death,\n  denominator = Positive,\n  group = `Sub-district`,\n  data_type = \"PR\",     #&lt;&lt;\n  xrange = c(0, 6500),  #&lt;&lt;\n  yrange = c(0, 0.05)   #&lt;&lt;\n)\n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 7 are outliers. \nPlot is adjusted for overdispersion."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#funnelplotr-methods-makeover-2",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#funnelplotr-methods-makeover-2",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.4.3 FunnelPlotR Methods: Makeover 2",
+    "text": "8.4.3 FunnelPlotR Methods: Makeover 2\n\nfunnel_plot(\n  .data = covid19,\n  numerator = Death,\n  denominator = Positive,\n  group = `Sub-district`,\n  data_type = \"PR\",   \n  x_range = c(0, 6500),  \n  y_range = c(0, 0.05),\n  label = NA,\n  title = \"Cumulative COVID-19 Fatality Rate by Cumulative \\n Total Number of COVID-19 Positive Cases\", #&lt;&lt;           \n  x_label = \"Cumulative COVID-19 Positive Cases\", #&lt;&lt;\n  y_label = \"Cumulative Fatality Rate\"  #&lt;&lt;\n) \n\n\n\n\n\n\n\n\nA funnel plot object with 267 points of which 7 are outliers. \nPlot is adjusted for overdispersion."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#computing-the-basic-derived-fields",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#computing-the-basic-derived-fields",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.5.1 Computing the basic derived fields",
+    "text": "8.5.1 Computing the basic derived fields\n\ndf &lt;- covid19 %&gt;%\n  mutate(rate = Death / Positive) %&gt;%\n  mutate(rate.se = sqrt((rate*(1-rate)) / (Positive))) %&gt;%\n  filter(rate &gt; 0)\n\n\nfit.mean &lt;- weighted.mean(df$rate, 1/df$rate.se^2)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#calculate-lower-and-upper-limits-for-95-and-99.9-ci",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#calculate-lower-and-upper-limits-for-95-and-99.9-ci",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.5.2 Calculate lower and upper limits for 95% and 99.9% CI",
+    "text": "8.5.2 Calculate lower and upper limits for 95% and 99.9% CI\n\nnumber.seq &lt;- seq(1, max(df$Positive), 1)\nnumber.ll95 &lt;- fit.mean - 1.96 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \nnumber.ul95 &lt;- fit.mean + 1.96 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \nnumber.ll999 &lt;- fit.mean - 3.29 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \nnumber.ul999 &lt;- fit.mean + 3.29 * sqrt((fit.mean*(1-fit.mean)) / (number.seq)) \ndfCI &lt;- data.frame(number.ll95, number.ul95, number.ll999, \n                   number.ul999, number.seq, fit.mean)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#plotting-a-static-funnel-plot",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#plotting-a-static-funnel-plot",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.5.3 Plotting a static funnel plot",
+    "text": "8.5.3 Plotting a static funnel plot\n\np &lt;- ggplot(df, aes(x = Positive, y = rate)) +\n  geom_point(aes(label=`Sub-district`), \n             alpha=0.4) +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ll95), \n            size = 0.4, \n            colour = \"grey40\", \n            linetype = \"dashed\") +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ul95), \n            size = 0.4, \n            colour = \"grey40\", \n            linetype = \"dashed\") +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ll999), \n            size = 0.4, \n            colour = \"grey40\") +\n  geom_line(data = dfCI, \n            aes(x = number.seq, \n                y = number.ul999), \n            size = 0.4, \n            colour = \"grey40\") +\n  geom_hline(data = dfCI, \n             aes(yintercept = fit.mean), \n             size = 0.4, \n             colour = \"grey40\") +\n  coord_cartesian(ylim=c(0,0.05)) +\n  annotate(\"text\", x = 1, y = -0.13, label = \"95%\", size = 3, colour = \"grey40\") + \n  annotate(\"text\", x = 4.5, y = -0.18, label = \"99%\", size = 3, colour = \"grey40\") + \n  ggtitle(\"Cumulative Fatality Rate by Cumulative Number of COVID-19 Cases\") +\n  xlab(\"Cumulative Number of COVID-19 Cases\") + \n  ylab(\"Cumulative Fatality Rate\") +\n  theme_light() +\n  theme(plot.title = element_text(size=12),\n        legend.position = c(0.91,0.85), \n        legend.title = element_text(size=7),\n        legend.text = element_text(size=7),\n        legend.background = element_rect(colour = \"grey60\", linetype = \"dotted\"),\n        legend.key.height = unit(0.3, \"cm\"))\np"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#interactive-funnel-plot-plotly-ggplot2",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#interactive-funnel-plot-plotly-ggplot2",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.5.4 Interactive Funnel Plot: plotly + ggplot2",
+    "text": "8.5.4 Interactive Funnel Plot: plotly + ggplot2\n\nfp_ggplotly &lt;- ggplotly(p,\n  tooltip = c(\"label\", \n              \"x\", \n              \"y\"))\nfp_ggplotly"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#error-bars",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#error-bars",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.6.1 Error Bars",
+    "text": "8.6.1 Error Bars\n# top20_data &lt;- summary_data %&gt;%\n#   arrange(desc(FatalityRate)) %&gt;%\n#   slice_head(n = 20)\n# \n# ggplot(top20_data, aes(x = reorder(`Sub-district`, FatalityRate), y = FatalityRate)) +\n#   geom_col(fill = \"#80CBC4\", width = 0.7) +\n#   geom_errorbar(aes(ymin = CI_lower, ymax = CI_upper), width = 0.25, color = \"red\") +\n#   coord_flip() +\n#   labs(\n#     title = \"Top 20 Sub-districts by COVID-19 Fatality Rate\\nWith 95% Confidence Intervals\",\n#     x = \"Sub-district\",\n#     y = \"Fatality Rate\"\n#   ) +\n#   theme_minimal(base_size = 12)\n\n\nAdditional plots will be created using dataset from kaggle. The data was downloaded from Student Performance in Exams . To understand parent’s background and test prep with relation to scores.\n\npacman::p_load(ggdist, ggridges, ggthemes,\n               colorspace, tidyverse)\n\npackage 'ggthemes' successfully unpacked and MD5 sums checked\n\nThe downloaded binary packages are in\n    C:\\Users\\celin\\AppData\\Local\\Temp\\RtmpOQM5oq\\downloaded_packages\n\n\n\nparent_exam_data &lt;- read_csv(\"StudentsPerformance.csv\")\n\n\nggplot(parent_exam_data, \n       aes(x = math_score, \n           y = parental_level_of_education,\n           fill = stat(x))) +\n  geom_density_ridges_gradient(\n    scale = 3,\n    rel_min_height = 0.01) +\n  scale_fill_viridis_c(name = \"Temp. [F]\",\n                       option = \"C\") +\n  scale_x_continuous(\n    name = \"Math grades\",\n    expand = c(0, 0)\n  ) +\n  scale_y_discrete(name = NULL, expand = expansion(add = c(0.2, 2.6))) +\n  theme_ridges()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#unpacking-the-bayes-factor",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#unpacking-the-bayes-factor",
+    "title": "Hands on Exercise 4 Part 2: Visual Statistical Analysis",
+    "section": "6.3.4 Unpacking the Bayes Factor",
+    "text": "6.3.4 Unpacking the Bayes Factor\n\nBayes Factor is the ratio of the likelihood of one particular hypothesis to the likelihood of another. It is a measure of strength of evidence in favor of one theory among 2 competing theories\nIt gives us a way to evaluate the data in favor of a null hypothesis based on external information and tells us the weight of evidence is in favor of the hypothesis\nBayes factor is often written as B10 and can be defined mathematically as”\n\n\n\nThe Schwarz criterion is one of the easiest ways to calculate rough approximation of the Bayes Factor"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#how-to-interpret-bayes-factor",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#how-to-interpret-bayes-factor",
+    "title": "Hands on Exercise 4 Part 2: Visual Statistical Analysis",
+    "section": "6.3.5 How to interpret Bayes Factor",
+    "text": "6.3.5 How to interpret Bayes Factor\nIt can be any positive number and can be interpreted in the table below:"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#two-sample-mean-test-ggbetweenstats",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#two-sample-mean-test-ggbetweenstats",
+    "title": "Hands on Exercise 4 Part 2: Visual Statistical Analysis",
+    "section": "6.3.6 Two-sample mean test: ggbetweenstats()",
+    "text": "6.3.6 Two-sample mean test: ggbetweenstats()\nThe code ggbetweenstats() is used to build a visual for two-sample mean test of Math scores by gender.\n\nggbetweenstats(\n  data = exam,\n  x = GENDER, \n  y = MATHS,\n  type = \"np\",\n  messages = FALSE\n)\n\n\n\n\n\n\n\n\nSummary of results from plot:\n\nTest used: W_Mann–Whitney = 13011.00\nThis is a non-parametric alternative to the t-test (used when data may not be normally distributed).\np-value = 0.91\n➤ This is not statistically significant. A high p-value (much greater than 0.05) suggests no evidence to reject the null hypothesis.\nIn other words, there is no significant difference in Maths scores between males and females.\nMedian (Female) = 74, Median (Male) = 75\n➤ Scores are nearly identical in central tendency.\nRank biserial correlation = 0.007\n➤ This is a very small effect size, indicating negligible practical difference.\n95% CI = [−0.12, 0.13]\n➤ The confidence interval for the effect size includes 0, further confirming that there’s no meaningful difference\nn = 322\n➤ Total number of observations (170 females, 152 males)."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#oneway-anova-test-ggbetweenstats-method",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#oneway-anova-test-ggbetweenstats-method",
+    "title": "Hands on Exercise 4 Part 2: Visual Statistical Analysis",
+    "section": "6.3.7 Oneway ANOVA Test: ggbetweenstats() method",
+    "text": "6.3.7 Oneway ANOVA Test: ggbetweenstats() method\nThe code ggbetweenstats() is used to build a visual for one-way ANOVA test on English score by race.\n\n“ns” - only non-significant\n“s” - only significant\n“all” - everything\n\n\nggbetweenstats(\n  data = exam,\n  x = RACE, \n  y = ENGLISH,\n  type = \"p\",\n  mean.ci = TRUE, \n  pairwise.comparisons = TRUE, \n  pairwise.display = \"s\",\n  p.adjust.method = \"fdr\",\n  messages = FALSE\n)\n\n\n\n\n\n\n\n\nSummary of results from plot:\n\nWelch’s ANOVA:\n\nF(3,23.8)=10.15,p=1.71×10−4F(3, 23.8) = 10.15,p = 1.71 ^{-4}F(3,23.8)=10.15,p=1.71×10−4\n➤ The p-value is very small, indicating a statistically significant difference in English scores among the racial groups.\n\nEffect size (ω²) = 0.50\n➤ This is a very large effect, suggesting race explains a substantial proportion of variance in English scores.\nCI₉₅% [0.21, 1.00] for ω²\n➤ Confirms the effect size is meaningful.\nn = 322\n➤ Sample size (with group sizes shown under each violin).\np (FDR-adjusted) = 5.19e-06\n➤ Adjusted p-value from Games–Howell pairwise comparisons — confirms at least one pairwise difference is significant.\n\n\n6.3.7.1 ggbetweenstats - Summary of tests\nFollowing (between-subjects) tests are carried out for each type of analyses"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#significant-test-of-correlation-ggscatterstats",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#significant-test-of-correlation-ggscatterstats",
+    "title": "Hands on Exercise 4 Part 2: Visual Statistical Analysis",
+    "section": "6.3.8 Significant Test of Correlation: ggscatterstats()",
+    "text": "6.3.8 Significant Test of Correlation: ggscatterstats()\nIn the code chunk below, ggscatterstats() is used to build a visual for Significant Test of Correlation between Maths scores and English scores.\n\nggscatterstats(\n  data = exam,\n  x = MATHS,\n  y = ENGLISH,\n  marginal = FALSE,\n  )\n\n\n\n\n\n\n\n\nSummary of results from plot:\n\nPearson correlation ​=0.83:\n➤ This indicates a very strong positive correlation — students who score well in Maths tend to also score well in English.\np-value = 1.70e-83\n➤ This is an extremely small p-value, so the correlation is highly statistically significant.\n95% CI for r: [0.79, 0.86]\n➤ The confidence interval confirms the correlation is both strong and precise.\nt(320) = 26.72\n➤ The test statistic for evaluating correlation; much larger than typical critical values.\nn = 322 pairs\n➤ Total number of students with both scores available."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#significant-test-of-association-dependence-ggbarstats-methods",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part2.html#significant-test-of-association-dependence-ggbarstats-methods",
+    "title": "Hands on Exercise 4 Part 2: Visual Statistical Analysis",
+    "section": "6.3.9 Significant Test of Association (Dependence): ggbarstats() methods",
+    "text": "6.3.9 Significant Test of Association (Dependence): ggbarstats() methods\nIn the code chunk below, the Maths scores is binned into a 4-class variable by using cut().\n\nexam1 &lt;- exam %&gt;% \n  mutate(MATHS_bins = \n           cut(MATHS, \n               breaks = c(0,60,75,85,100))\n)\n\nIn this code chunk below ggbarstats is used to build a visual for Significant Test of Association.\n\nggbarstats(exam1, \n           x = MATHS_bins, \n           y = GENDER)\n\n\n\n\n\n\n\n\nSummary of results from plot:\n\nChi-squared test χPearson2(3)=1.04, p=0.79^2_{}(3) = 1.04, p = 0.79χPearson2​(3)=1.04, p=0.79\n➤ Not statistically significant, meaning there’s no evidence of an association between gender and Maths score bins.\nCramér’s V = 0.00, with 95% CI [0.00, 0.08]\n➤ Effect size is negligible. There is no practical difference between the two gender groups in how their Maths scores are distributed.\nSample size n=322n = 322n=322:\n170 females and 152 males"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#using-infer-r-package",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#using-infer-r-package",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.6.1 Using Infer R Package",
+    "text": "8.6.1 Using Infer R Package\nThis package is to perform statistical inference using an expressive statistical grammar that coheres with the tidyverse design framework. There are 4 main verbs that can be used to utilizes to visualize and extract value from their outputs.\n\nstr(covid19)\n\ntibble [267 × 7] (S3: tbl_df/tbl/data.frame)\n $ Sub-district ID: num [1:267] 3.17e+09 3.17e+09 3.18e+09 3.18e+09 3.18e+09 ...\n $ City           : Factor w/ 6 levels \"JAKARTA BARAT\",..: 5 1 4 4 4 3 4 4 2 4 ...\n $ District       : Factor w/ 44 levels \"CAKUNG\",\"CEMPAKA PUTIH\",..: 29 41 24 12 6 26 33 24 42 12 ...\n $ Sub-district   : Factor w/ 267 levels \"ANCOL\",\"ANGKE\",..: 1 2 3 4 5 6 7 8 9 10 ...\n $ Positive       : num [1:267] 1776 1783 2049 827 2866 ...\n $ Recovered      : num [1:267] 1691 1720 1964 797 2792 ...\n $ Death          : num [1:267] 26 29 31 13 27 26 37 68 38 52 ..."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#one-numerical-variable-standardised-mean-t-test",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#one-numerical-variable-standardised-mean-t-test",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.6.2 One numerical Variable (Standardised mean t-test)",
+    "text": "8.6.2 One numerical Variable (Standardised mean t-test)\nA hypothesis test is created for whether the mean fatality rate differs from fixed value, say 0.01(1%) using a one sample t-test approach.\n\n# Load required packages\npacman::p_load(tidyverse, infer)\n\n# Load and clean data\ncovid19 &lt;- read_csv(\"COVID-19_DKI_Jakarta.csv\") %&gt;%\n  filter(!is.na(Positive), Positive &gt; 0,\n         !is.na(Death), Death &gt;= 0) %&gt;%\n  mutate(fatality_rate = Death / Positive)\n\n# Step 1: Specify the variable of interest\nspec_data &lt;- covid19 %&gt;%\n  specify(response = fatality_rate)\n\n# Step 2: State the null hypothesis (mean fatality rate is 0.01)\nhyp_data &lt;- spec_data %&gt;%\n  hypothesize(null = \"point\", mu = 0.01)\n\n# Step 3: Generate 1000 samples under the null\ngen_data &lt;- hyp_data %&gt;%\n  generate(reps = 1000, type = \"bootstrap\")\n\n# Step 4: Calculate the test statistic (mean)\nnull_dist &lt;- gen_data %&gt;%\n  calculate(stat = \"mean\")\n\n# Step 5: Calculate the observed statistic\nobs_stat &lt;- spec_data %&gt;%\n  calculate(stat = \"mean\")\n\n# Step 6: Visualize with p-value shaded\nvisualize(null_dist) +\n  shade_p_value(obs_stat = obs_stat, direction = \"two-sided\")\n\n\n\n\n\n\n\n\n\nnull_dist %&gt;%\n  get_p_value(obs_stat = obs_stat, direction = \"greater\")\n\n# A tibble: 1 × 1\n  p_value\n    &lt;dbl&gt;\n1       0\n\n\n\nThe observed mean (1.6%) is far outside the distribution you’d expect if the true mean were 1%.\nSince the red line lies way in the right tail, this suggests that your observed result is very unlikely under the null hypothesis.\nTherefore, this provides strong evidence against the null hypothesis.\nSince p = 0, we will reject the null hypothesis and that mean fatality rate is significantly greater than 1%"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#two-categorical-chi-square-test-of-independence",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#two-categorical-chi-square-test-of-independence",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.6.4 Two Categorical Chi Square test of independence",
+    "text": "8.6.4 Two Categorical Chi Square test of independence\nIs there a relationship between City and Number of Deaths?\nHo: There is no association between City and Number of Deaths\nH1: There is an association between City and Number of Deaths\n\n# Load required packages\npacman::p_load(tidyverse, infer)\n\n# Load and prepare the dataset\ncovid19 &lt;- read_csv(\"COVID-19_DKI_Jakarta.csv\") %&gt;%\n  filter(!is.na(City), !is.na(Death)) %&gt;%\n  mutate(City = as.factor(City),\n         death_bin = cut(Death,\n                         breaks = c(-1, 10, 50, 150, Inf),\n                         labels = c(\"Very Low\", \"Low\", \"Medium\", \"High\")))\n\n# Observed Chi-squared statistic\nChisq_hat &lt;- covid19 %&gt;%\n  specify(City ~ death_bin) %&gt;%\n  hypothesize(null = \"independence\") %&gt;%\n  calculate(stat = \"Chisq\")\n\n# Null distribution via permutation\nnull_dist &lt;- covid19 %&gt;%\n  specify(City ~ death_bin) %&gt;%\n  hypothesize(null = \"independence\") %&gt;%\n  generate(reps = 1000, type = \"permute\") %&gt;%\n  calculate(stat = \"Chisq\")\n\n# Plot 1: Simulation-based null distribution\nvisualize(null_dist) +\n  shade_p_value(obs_stat = Chisq_hat, direction = \"greater\")\n\n\n\n\n\n\n\n\nAlternatively, visualising the observed statistic using the theory-based null distribution\n\n# Theoretical null distribution\nnull_dist_theory &lt;- covid19 %&gt;%\n  specify(City ~ death_bin) %&gt;%\n  assume(distribution = \"Chisq\")\n\n# Plot 2: Theoretical chi-square distribution\nvisualize(null_dist_theory) +\n  shade_p_value(obs_stat = Chisq_hat, direction = \"greater\")\n\n\n\n\n\n\n\n\nThe observed statistic using both the null distributions\n\n# Load packages\npacman::p_load(tidyverse, infer)\n\n# Load and prepare data\ncovid19 &lt;- read_csv(\"COVID-19_DKI_Jakarta.csv\") %&gt;%\n  filter(!is.na(City), !is.na(Death)) %&gt;%\n  mutate(City = as.factor(City),\n         death_bin = cut(Death,\n                         breaks = c(-1, 10, 50, 150, Inf),\n                         labels = c(\"Very Low\", \"Low\", \"Medium\", \"High\")))\n\n# 1. Observed Chi-squared statistic\nChisq_hat &lt;- covid19 %&gt;%\n  specify(City ~ death_bin) %&gt;%\n  hypothesize(null = \"independence\") %&gt;%\n  calculate(stat = \"Chisq\")\n\n# 2. Null distribution via permutation\nnull_dist &lt;- covid19 %&gt;%\n  specify(City ~ death_bin) %&gt;%\n  hypothesize(null = \"independence\") %&gt;%\n  generate(reps = 1000, type = \"permute\") %&gt;%\n  calculate(stat = \"Chisq\")\n\n# 3. Combined simulation + theory plot\nvisualize(null_dist, method = \"both\") +\n  shade_p_value(obs_stat = Chisq_hat, direction = \"greater\")\n\n\n\n\n\n\n\n\nCalculate the P-Value\n\n# 4. Calculate the p-value\nnull_dist %&gt;%\n  get_p_value(obs_stat = Chisq_hat, direction = \"greater\")\n\n# A tibble: 1 × 1\n  p_value\n    &lt;dbl&gt;\n1       0\n\n\nObservations from plots:\n\nYour observed Chi-square value is far beyond what is expected under the null hypothesis of independence\nThe simulation and theory both agree: this is extremely unlikely to happen by chance.\nThis means there is a statistically significant relationship between City and Death level.\nSince p-value = 0, we will reject the null hypothesis."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#alternative-theorey-based-null-distribution",
+    "href": "Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04_Part4.html#alternative-theorey-based-null-distribution",
+    "title": "Hands on Exercise 4 Part 4: Funnel Plots for Fair Comparisons",
+    "section": "8.6.3 Alternative: Theorey-Based Null Distribution",
+    "text": "8.6.3 Alternative: Theorey-Based Null Distribution\nAlternatively, we can visualise it using the observed statistic using the theory-based null distribution: Is the mean fatality rate significantly different from 1% using a theoretical t-distribution?\n\n# Load required packages\npacman::p_load(tidyverse, infer)\n\n# Load and clean data\ncovid19 &lt;- read_csv(\"COVID-19_DKI_Jakarta.csv\") %&gt;%\n  filter(!is.na(Positive) & Positive &gt; 0,\n         !is.na(Death) & Death &gt;= 0) %&gt;%\n  mutate(fatality_rate = Death / Positive)\n\n# 1. Specify variable\nspec_data &lt;- covid19 %&gt;%\n  specify(response = fatality_rate)\n\n# 2. Hypothesize that the population mean = 0.01\nhyp_data &lt;- spec_data %&gt;%\n  hypothesize(null = \"point\", mu = 0.01)\n\n# 3. Calculate the t-statistic under the theory-based null\nobs_t_stat &lt;- hyp_data %&gt;%\n  calculate(stat = \"t\")\n\n# 4. Visualize with theoretical distribution\nvisualize(hyp_data, method = \"theoretical\") +\n  shade_p_value(obs_stat = obs_t_stat, direction = \"two-sided\")\n\n\n\n\n\n\n\n\nObservations from plot:\n\nYour observed t-statistic is far outside the expected range under the null hypothesis.\nThe probability of getting a t-stat this extreme by chance is effectively zero.\nThis provides overwhelming evidence against the null hypothesis."
   }
 ]

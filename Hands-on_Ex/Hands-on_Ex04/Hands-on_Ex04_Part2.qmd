@@ -48,12 +48,220 @@ In the code chunk below, gghistostats() is used to build an visual of one-sample
 ### The Plot
 
 ```{r}
+#| echo: false
+set.seed(1234)
+
+gghistostats(
+  data = exam,
+  x = ENGLISH,
+  type = "bayes",
+  test.value = 60,
+  xlab = "English scores"
+)
 
 ```
 
 ### The Code
 
 ```{r}
+#| eval: false
+set.seed(1234)
 
+gghistostats(
+  data = exam,
+  x = ENGLISH,
+  type = "bayes",
+  test.value = 60,
+  xlab = "English scores"
+)
 ```
 :::
+
+**Explanation of the Results:**
+
+Ho: The mean english score is 60
+
+H1: The mean english score is not equals to 60
+
+-   **log₁₀(BF₀₁) = -31.45**\
+    This is the logarithm of the Bayes Factor **in favor of the alternative hypothesis** over the null:
+
+    This is **extreme evidence** in favor of the **alternative hypothesis**.
+
+-   **posterior difference = 7.16**\
+    The estimated mean difference between the observed group and a comparison value (likely a hypothesized mean like 0 or 50), with the observed average English score being significantly higher.
+
+-   **CI⁹⁵% \[5.54, 8.75\] (ETI)**\
+    This is the **95% credible interval** (Equal-Tail Interval), suggesting that the true mean difference is very likely between 5.54 and 8.75.
+
+-   **JZS Cauchy = 0.71**\
+    This is the **scale parameter** for the Cauchy prior distribution used in the Bayesian t-test (Jeffreys–Zellner–Siow prior), controlling the expected effect size.
+
+-   **Dashed Blue Line (x = 74.74)**\
+    This shows the **sample mean** of the English scores. The peak at this point suggests most scores cluster around here.
+
+## 6.3.4 Unpacking the Bayes Factor
+
+-   Bayes Factor is the ratio of the likelihood of one particular hypothesis to the likelihood of another. It is a measure of strength of evidence in favor of one theory among 2 competing theories
+
+-   It gives us a way to evaluate the data in favor of a null hypothesis based on external information and tells us the weight of evidence is in favor of the hypothesis
+
+-   Bayes factor is often written as B10 and can be defined mathematically as"
+
+![](images/clipboard-4142434025.png)
+
+-   The [Schwarz criterion](https://www.statisticshowto.com/bayesian-information-criterion/) is one of the easiest ways to calculate rough approximation of the Bayes Factor
+
+## 6.3.5 How to interpret Bayes Factor
+
+It can be any positive number and can be interpreted in the table below:
+
+![](images/clipboard-116261035.png)
+
+## 6.3.6 Two-sample mean test: ggbetweenstats()
+
+The code <code style="color: purple;">ggbetweenstats()</code> is used to build a visual for two-sample mean test of Math scores by gender.
+
+```{R}
+ggbetweenstats(
+  data = exam,
+  x = GENDER, 
+  y = MATHS,
+  type = "np",
+  messages = FALSE
+)
+```
+
+**Summary of results from plot:**
+
+-   **Test used:** `W_Mann–Whitney = 13011.00`\
+    This is a non-parametric alternative to the t-test (used when data may not be normally distributed).
+
+-   **p-value = 0.91**\
+    ➤ This is **not statistically significant**. A high p-value (much greater than 0.05) suggests **no evidence** to reject the null hypothesis.\
+    In other words, **there is no significant difference in Maths scores between males and females**.
+
+-   **Median (Female) = 74**, **Median (Male) = 75**\
+    ➤ Scores are nearly identical in central tendency.
+
+-   **Rank biserial correlation = 0.007**\
+    ➤ This is a **very small effect size**, indicating negligible practical difference.
+
+-   **95% CI = \[−0.12, 0.13\]**\
+    ➤ The confidence interval for the effect size includes 0, further confirming that **there's no meaningful difference**
+
+-   **n = 322**\
+    ➤ Total number of observations (170 females, 152 males).
+
+## 6.3.7 Oneway ANOVA Test: ggbetweenstats() method
+
+The code <code style="color: purple;">ggbetweenstats()</code> is used to build a visual for one-way ANOVA test on English score by race.
+
+-   "ns" - only non-significant
+
+-   "s" - only significant
+
+-   "all" - everything
+
+```{R}
+ggbetweenstats(
+  data = exam,
+  x = RACE, 
+  y = ENGLISH,
+  type = "p",
+  mean.ci = TRUE, 
+  pairwise.comparisons = TRUE, 
+  pairwise.display = "s",
+  p.adjust.method = "fdr",
+  messages = FALSE
+)
+```
+
+**Summary of results from plot:**
+
+-   **Welch’s ANOVA**:
+
+F(3,23.8)=10.15,p=1.71×10−4F(3, 23.8) = 10.15,\quad p = 1.71 \times 10^{-4}F(3,23.8)=10.15,p=1.71×10−4
+
+➤ The **p-value is very small**, indicating a **statistically significant difference** in English scores among the racial groups.
+
+-   **Effect size (ω²) = 0.50**\
+    ➤ This is a **very large effect**, suggesting race explains a substantial proportion of variance in English scores.
+
+-   **CI₉₅% \[0.21, 1.00\]** for ω²\
+    ➤ Confirms the effect size is meaningful.
+
+-   **n = 322**\
+    ➤ Sample size (with group sizes shown under each violin).
+
+-   **p (FDR-adjusted) = 5.19e-06**\
+    ➤ Adjusted p-value from Games–Howell pairwise comparisons — confirms at least one pairwise difference is significant.
+
+### 6.3.7.1 ggbetweenstats - Summary of tests
+
+Following (between-subjects) tests are carried out for each type of analyses
+
+![](images/clipboard-3963458938.png)
+
+![![](images/clipboard-142720698.png)](images/clipboard-1013962986.png)
+
+## 6.3.8 Significant Test of Correlation: ggscatterstats()
+
+In the code chunk below, [ggscatterstats()](https://indrajeetpatil.github.io/ggstatsplot/reference/ggscatterstats.html) is used to build a visual for Significant Test of Correlation between Maths scores and English scores.
+
+```{r}
+ggscatterstats(
+  data = exam,
+  x = MATHS,
+  y = ENGLISH,
+  marginal = FALSE,
+  )
+```
+
+**Summary of results from plot:**
+
+-   **Pearson correlation** ​=0.83:\
+    ➤ This indicates a **very strong positive correlation** — students who score well in Maths tend to also score well in English.
+
+-   **p-value = 1.70e-83**\
+    ➤ This is an extremely small p-value, so the correlation is **highly statistically significant**.
+
+-   **95% CI for** r: \[0.79, 0.86\]\
+    ➤ The confidence interval confirms the correlation is both strong and precise.
+
+-   **t(320) = 26.72**\
+    ➤ The test statistic for evaluating correlation; much larger than typical critical values.
+
+-   **n = 322 pairs**\
+    ➤ Total number of students with both scores available.
+
+## 6.3.9 Significant Test of Association (Dependence): ggbarstats() methods
+
+In the code chunk below, the Maths scores is binned into a 4-class variable by using [cut()](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/cut).
+
+```{r}
+exam1 <- exam %>% 
+  mutate(MATHS_bins = 
+           cut(MATHS, 
+               breaks = c(0,60,75,85,100))
+)
+```
+
+In this code chunk below [ggbarstats](https://indrajeetpatil.github.io/ggstatsplot/reference/ggbarstats.html) is used to build a visual for Significant Test of Association.
+
+```{r}
+ggbarstats(exam1, 
+           x = MATHS_bins, 
+           y = GENDER)
+```
+
+**Summary of results from plot:**
+
+-   **Chi-squared test** χPearson2(3)=1.04, p=0.79\chi^2_{\text{Pearson}}(3) = 1.04,\ p = 0.79χPearson2​(3)=1.04, p=0.79\
+    ➤ **Not statistically significant**, meaning there's **no evidence** of an association between gender and Maths score bins.
+
+-   **Cramér's V = 0.00**, with **95% CI \[0.00, 0.08\]**\
+    ➤ **Effect size is negligible**. There is no practical difference between the two gender groups in how their Maths scores are distributed.
+
+-   **Sample size** n = 322:\
+    170 females and 152 males
