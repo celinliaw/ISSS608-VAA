@@ -26,17 +26,17 @@ For part 2 of the Take-Home Exercise 1, I will be evaluating one of my peer's [N
 
 **3 Good Design Principles:**
 
--   Analysis is split into the different population age groups which makes it easier to make analysis based on the age groups
+-   Analysis is split into the different population age groups which makes it easier to analyse the graphs based on the age groups
 
 -   The analysis identifies the top 10 subzones for each age group and makes it easier to identify the facilities that are required for each subzone based on age group
 
--   The graphs are ordered in descending order according to their population (from the largest population to the 10th largest population), making it easier for viewing based on the rank
+-   The graphs are ordered in descending order according to their population (from the largest population to the 10th largest population), making it easier for viewing based on the position of the bar graph, making it easy to identify which subzone has the largest population
 
 **3 Areas for Further Improvements:**
 
 -   The colours for the bar charts are in shades of grey which makes it hard to differentiate the different subzones. It would be better if specific colours are used for each area
 
--   There is only 1 tab for comparison between 2 groups (young and youth dependents). It would be better if more side-by side comparisons can be made
+-   There is only 1 tab for comparison between 2 groups (young and youth dependents). It would be better if more comparisons can be made
 
 -   The chart also only shows the top 10 subzones but the other subzones were not shown. It would be better if the lowest 10 subzones or all subzones can be shown.
 
@@ -104,7 +104,7 @@ head(popdata_cleaned)
 
 In this code, i have added colours to the different Subzones and also put the top 10 and bottom 10 subzones side-by-side to make it more easier to compare.
 
-The code <code style="color: blue;">#\| code-fold: true</code> is also added at the top of the codes to make sure the codes are collapsible and the other graphs can be seen easily side by side. They have also been displayed from the youngest to the oldest.
+The code <code style="color: blue;">#\| code-fold: true</code> is also added at the top of the codes to make sure the codes are collapsible and the other graphs can be easily comparable after collapsing the codes. They have also been displayed from the youngest to the oldest.
 
 **Top 10 vs Bottom 10 Subzones of Young Population (0-4 Years Old)**
 
