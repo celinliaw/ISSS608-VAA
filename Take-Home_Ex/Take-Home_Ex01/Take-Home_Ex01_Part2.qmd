@@ -1,0 +1,624 @@
+---
+title: "Take-Home Exercise 1 Part 2"
+author: "Liaw Ying Ting, Celin"
+date: 7 May 2025
+date-modified: "last-modified"
+
+format:
+  html:
+    code-fold: true
+    code-tools: true
+
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# 1 Overview
+
+For part 2 of the Take-Home Exercise 1, I will be evaluating one of my peer's [Ng Wee Tinn Shermainn's](https://isss608-sherm.netlify.app/take-home_ex/take-home_ex01/take-home_ex01) website for her Take-Home Exercise 1. I will be providing 3 good design principles and 3 areas for further improvements for the data visualisation plots done by Shermainn
+
+# 2 Critique of Plots
+
+## 2.1 Top 10 subzones of each age group
+
+**3 Good Design Principles:**
+
+-   Analysis is split into the different population age groups which makes it easier to make analysis based on the age groups
+
+-   The analysis identifies the top 10 subzones for each age group and makes it easier to identify the facilities that are required for each subzone based on age group
+
+-   The graphs are ordered in descending order according to their population (from the largest population to the 10th largest population), making it easier for viewing based on the rank
+
+**3 Areas for Further Improvements:**
+
+-   The colours for the bar charts are in shades of grey which makes it hard to differentiate the different subzones. It would be better if specific colours are used for each area
+
+-   There is only 1 tab for comparison between 2 groups (young and youth dependents). It would be better if more side-by side comparisons can be made
+
+-   The chart also only shows the top 10 subzones but the other subzones were not shown. It would be better if the lowest 10 subzones or all subzones can be shown.
+
+**I have added screenshots of her graphs below:**
+
+![](images/clipboard-3643626400.png)
+
+![](images/clipboard-113017287.png)
+
+![![](images/clipboard-3905315391.png)](images/clipboard-3870114261.png)
+
+![](images/clipboard-3918813645.png)
+
+![![](images/clipboard-1500488551.png)](images/clipboard-1048234095.png)
+
+## 2.2 Data Wrangling
+
+### 2.2.1 Load Packages
+
+```{r}
+pacman::p_load(tidyverse,patchwork, ggthemes, dplyr)
+```
+
+### 2.2.2 Import Data
+
+```{r}
+popdata <- read_csv("respopagesex2024.csv")
+
+```
+
+### 2.2.3 Categorizing into Main zones and Subzones
+
+```{r}
+#| code-fold: true
+# Clean and process the data
+popdata_cleaned <- popdata %>%
+  rename(
+    Planning_Area = PA,
+    Subzone = SZ,
+    Population = Pop
+  ) %>%
+  filter(Sex != "Total", Age != "Total", Subzone != "Total") %>%
+  mutate(
+    Population = as.numeric(Population),
+    Age = as.numeric(Age),
+    Age_Group = case_when(
+      Age >= 0 & Age <= 4 ~ "Young (0-4)",
+      Age >= 5 & Age <= 12 ~ "Youth (5-12)",
+      Age >= 13 & Age <= 17 ~ "Teens (13-17)",
+      Age >= 18 & Age <= 64 ~ "Working Adults (18-64)",
+      Age >= 65 ~ "Elderly (65+)",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(Age_Group)) %>%
+  group_by(Planning_Area, Subzone, Age_Group) %>%
+  summarise(Total_Population = sum(Population, na.rm = TRUE), .groups = "drop")
+
+# View results
+head(popdata_cleaned)
+
+```
+
+### 2.2.4 Top 10 and Bottom 10 Subzones of each age group
+
+In this code, i have added colours to the different Subzones and also put the top 10 and bottom 10 subzones side-by-side to make it more easier to compare.
+
+The code <code style="color: blue;">#\| code-fold: true</code> is also added at the top of the codes to make sure the codes are collapsible and the other graphs can be seen easily side by side. They have also been displayed from the youngest to the oldest.
+
+**Top 10 vs Bottom 10 Subzones of Young Population (0-4 Years Old)**
+
+```{r}
+#| code-fold: true
+# Load necessary libraries
+pacman::p_load(tidyverse, patchwork, RColorBrewer)
+
+# Get top 10 and bottom 10 subzones of young population
+top_young_subzones <- popdata_cleaned %>%
+  filter(Age_Group == "Young (0-4)") %>%
+  arrange(desc(Total_Population)) %>%
+  slice_head(n = 10)
+
+bottom_young_subzones <- popdata_cleaned %>%
+  filter(Age_Group == "Young (0-4)", Total_Population > 0) %>%
+  arrange(Total_Population) %>%
+  slice_head(n = 10)
+
+# SAFE color assignment for top and bottom (brewer.pal only works up to 12 for Set3 and 8 for Pastel2)
+top_n <- nrow(top_young_subzones)
+bottom_n <- nrow(bottom_young_subzones)
+
+top_palette <- brewer.pal(max(3, min(top_n, 12)), "Set3")
+bottom_palette <- brewer.pal(max(3, min(bottom_n, 8)), "Pastel2")
+
+top_colors <- setNames(top_palette[1:top_n], top_young_subzones$Subzone)
+bottom_colors <- setNames(bottom_palette[1:bottom_n], bottom_young_subzones$Subzone)
+
+# Plot: Top 10
+y1 <- ggplot(top_young_subzones, 
+             aes(x = reorder(Subzone, Total_Population), 
+                 y = Total_Population, 
+                 fill = Subzone)) +
+  geom_col() +
+  geom_text(aes(label = Total_Population), 
+            hjust = 1.05, size = 3.5, color = "black") +
+  coord_flip() +
+  labs(
+    title = "Top 10 Subzones\n of Young Population",
+    x = "Subzone",
+    y = "Number of Young Residents"
+  ) +
+  scale_fill_manual(values = top_colors) +
+  scale_y_continuous(
+    breaks = seq(0, max(top_young_subzones$Total_Population), by = 1000),
+    labels = function(x) paste0(x / 1000, "K"),
+    limits = c(0, max(top_young_subzones$Total_Population) + 1000),
+    expand = c(0, 0)
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text = element_text(size = 10)
+  )
+
+# Plot: Bottom 10
+y2 <- ggplot(bottom_young_subzones, 
+             aes(x = reorder(Subzone, Total_Population), 
+                 y = Total_Population, 
+                 fill = Subzone)) +
+  geom_col() +
+  geom_text(aes(label = Total_Population), 
+            hjust = 1.05, size = 3.5, color = "black") +
+  coord_flip() +
+  labs(
+    title = "Bottom 10 Subzones\n of Young Population",
+    x = "Subzone",
+    y = "Number of Young Residents"
+  ) +
+  scale_fill_manual(values = bottom_colors) +
+  scale_y_continuous(
+    limits = c(0, max(bottom_young_subzones$Total_Population) + 50),
+    labels = function(x) ifelse(x >= 1000, paste0(x / 1000, "K"), x),
+    expand = c(0, 0)
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text = element_text(size = 10)
+  )
+
+# Combine the plots side by side
+y1 + y2 +
+  plot_layout(ncol = 2) +
+  plot_annotation(
+    title = "Comparison of Young Population (0–4YO)\n Across Singapore Subzones",
+    subtitle = "Top 10 vs Bottom 10 Subzones of Youngest Residents",
+    theme = theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+      plot.subtitle = element_text(hjust = 0.5, size = 12)
+    )
+  )
+
+
+
+```
+
+**Top 10 vs Bottom 10 Subzones of Youths (5-12 Years Old)**
+
+```{r}
+#| code-fold: true
+# Load required packages
+pacman::p_load(tidyverse, patchwork, RColorBrewer)
+
+# Get top 10 and bottom 10 subzones of youth population
+top_youth_subzones <- popdata_cleaned %>%
+  filter(Age_Group == "Youth (5-12)") %>%
+  arrange(desc(Total_Population)) %>%
+  slice_head(n = 10)
+
+bottom_youth_subzones <- popdata_cleaned %>%
+  filter(Age_Group == "Youth (5-12)", Total_Population > 0) %>%
+  arrange(Total_Population) %>%
+  slice_head(n = 10)
+
+# Safely assign palette colors
+top_n <- nrow(top_youth_subzones)
+bottom_n <- nrow(bottom_youth_subzones)
+
+top_palette <- brewer.pal(max(3, min(top_n, 12)), "Set3")
+bottom_palette <- brewer.pal(max(3, min(bottom_n, 8)), "Pastel2")
+
+top_colors <- setNames(top_palette[1:top_n], top_youth_subzones$Subzone)
+bottom_colors <- setNames(bottom_palette[1:bottom_n], bottom_youth_subzones$Subzone)
+
+# Plot: Top 10
+y_top <- ggplot(top_youth_subzones, 
+                aes(x = reorder(Subzone, Total_Population), 
+                    y = Total_Population, 
+                    fill = Subzone)) +
+  geom_col() +
+  geom_text(aes(label = Total_Population), 
+            hjust = 1.05, size = 3.5, color = "black") +
+  coord_flip() +
+  labs(
+    title = "Top 10 Subzones of\n Youth Population",
+    x = "Subzone",
+    y = "Number of Youth Residents"
+  ) +
+  scale_fill_manual(values = top_colors) +
+  scale_y_continuous(
+    breaks = seq(0, 10000, by = 2000),
+    labels = function(x) paste0(x / 1000, "K"),
+    limits = c(0, max(top_youth_subzones$Total_Population) + 2000),
+    expand = c(0, 0)
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text = element_text(size = 10)
+  )
+
+# Plot: Bottom 10
+y_bottom <- ggplot(bottom_youth_subzones, 
+                   aes(x = reorder(Subzone, Total_Population), 
+                       y = Total_Population, 
+                       fill = Subzone)) +
+  geom_col() +
+  geom_text(aes(label = Total_Population), 
+            hjust = 1.05, size = 3.5, color = "black") +
+  coord_flip() +
+  labs(
+    title = "Bottom 10 Subzones of\n Youth Population",
+    x = "Subzone",
+    y = "Number of Youth Residents"
+  ) +
+  scale_fill_manual(values = bottom_colors) +
+  scale_y_continuous(
+    limits = c(0, max(bottom_youth_subzones$Total_Population) + 50),
+    labels = function(x) ifelse(x >= 1000, paste0(x / 1000, "K"), x),
+    expand = c(0, 0)
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text = element_text(size = 10)
+  )
+
+# Combine both plots side by side
+y_top + y_bottom +
+  plot_layout(ncol = 2) +
+  plot_annotation(
+    title = "Comparison of Youth Population (5–12YO)\n Across Singapore Subzones",
+    subtitle = "Top 10 vs Bottom 10 Subzones of Youth Residents",
+    theme = theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+      plot.subtitle = element_text(hjust = 0.5, size = 12)
+    )
+  )
+
+```
+
+**Top 10 vs Bottom 10 Subzones of Teens (13-17 Years Old)**
+
+```{r}
+#| code-fold: true
+# Load required packages
+pacman::p_load(tidyverse, patchwork, RColorBrewer)
+
+# Get top 10 and bottom 10 subzones by teen population
+top_teen_subzones <- popdata_cleaned %>%
+  filter(Age_Group == "Teens (13-17)") %>%
+  arrange(desc(Total_Population)) %>%
+  slice_head(n = 10)
+
+bottom_teen_subzones <- popdata_cleaned %>%
+  filter(Age_Group == "Teens (13-17)", Total_Population > 0) %>%
+  arrange(Total_Population) %>%
+  slice_head(n = 10)
+
+# Color-safe assignment
+top_n <- nrow(top_teen_subzones)
+bottom_n <- nrow(bottom_teen_subzones)
+
+top_palette <- brewer.pal(max(3, min(top_n, 12)), "Set3")
+bottom_palette <- brewer.pal(max(3, min(bottom_n, 8)), "Pastel2")
+
+top_colors <- setNames(top_palette[1:top_n], top_teen_subzones$Subzone)
+bottom_colors <- setNames(bottom_palette[1:bottom_n], bottom_teen_subzones$Subzone)
+
+# Plot: Top 10
+t_top <- ggplot(top_teen_subzones, 
+                aes(x = reorder(Subzone, Total_Population), 
+                    y = Total_Population, 
+                    fill = Subzone)) +
+  geom_col() +
+  geom_text(aes(label = Total_Population), 
+            hjust = 1.05, size = 3.5, color = "black") +
+  coord_flip() +
+  labs(
+    title = "Top 10 Subzones of\n Teen Population",
+    x = "Subzone",
+    y = "Number of Teen Residents"
+  ) +
+  scale_fill_manual(values = top_colors) +
+  scale_y_continuous(
+    breaks = seq(0, 6000, by = 1000),
+    labels = function(x) paste0(x / 1000, "K"),
+    limits = c(0, max(top_teen_subzones$Total_Population) + 1000),
+    expand = c(0, 0)
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text = element_text(size = 10)
+  )
+
+# Plot: Bottom 10
+t_bottom <- ggplot(bottom_teen_subzones, 
+                   aes(x = reorder(Subzone, Total_Population), 
+                       y = Total_Population, 
+                       fill = Subzone)) +
+  geom_col() +
+  geom_text(aes(label = Total_Population), 
+            hjust = 1.05, size = 3.5, color = "black") +
+  coord_flip() +
+  labs(
+    title = "Bottom 10 Subzones of\n Teen Population",
+    x = "Subzone",
+    y = "Number of Teen Residents"
+  ) +
+  scale_fill_manual(values = bottom_colors) +
+  scale_y_continuous(
+    limits = c(0, max(bottom_teen_subzones$Total_Population) + 50),
+    labels = function(x) ifelse(x >= 1000, paste0(x / 1000, "K"), x),
+    expand = c(0, 0)
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text = element_text(size = 10)
+  )
+
+# Combine both plots side by side
+t_top + t_bottom +
+  plot_layout(ncol = 2) +
+  plot_annotation(
+    title = "Comparison of Teen Population (13–17YO)\n Across Singapore Subzones",
+    subtitle = "Top 10 vs Bottom 10 Subzones of Teen Residents",
+    theme = theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+      plot.subtitle = element_text(hjust = 0.5, size = 12)
+    )
+  )
+
+```
+
+**Top 10 vs Bottom 10 Subzones of Working Adults (18-64 Years Old)**
+
+```{r}
+#| code-fold: true
+# Load required packages
+pacman::p_load(tidyverse, patchwork, RColorBrewer, scales)
+
+# Get top 10 and bottom 10 subzones by working adults population
+top_working_subzones <- popdata_cleaned %>%
+  filter(Age_Group == "Working Adults (18-64)") %>%
+  arrange(desc(Total_Population)) %>%
+  slice_head(n = 10)
+
+bottom_working_subzones <- popdata_cleaned %>%
+  filter(Age_Group == "Working Adults (18-64)", Total_Population > 0) %>%
+  arrange(Total_Population) %>%
+  slice_head(n = 10)
+
+# Safely assign colors based on count
+top_n <- nrow(top_working_subzones)
+bottom_n <- nrow(bottom_working_subzones)
+
+top_palette <- brewer.pal(max(3, min(top_n, 12)), "Set3")
+bottom_palette <- brewer.pal(max(3, min(bottom_n, 8)), "Pastel2")
+
+top_colors <- setNames(top_palette[1:top_n], top_working_subzones$Subzone)
+bottom_colors <- setNames(bottom_palette[1:bottom_n], bottom_working_subzones$Subzone)
+
+# Plot: Top 10
+a_top <- ggplot(top_working_subzones, 
+                aes(x = reorder(Subzone, Total_Population), 
+                    y = Total_Population, 
+                    fill = Subzone)) +
+  geom_col() +
+  geom_text(aes(label = comma(Total_Population)), 
+            hjust = 1.05, size = 3.5, color = "black") +
+  coord_flip() +
+  labs(
+    title = "Top 10 Subzones of\nWorking Adult Population",
+    x = "Subzone",
+    y = "Number of Working Adults"
+  ) +
+  scale_fill_manual(values = top_colors) +
+  scale_y_continuous(
+  breaks = seq(0, 100000, by = 20000),
+  limits = c(0, 110000 + 5000),
+  expand = c(0, 0),
+  labels = function(x) paste0(x / 1000, "K")
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text = element_text(size = 10)
+  )
+
+# Plot: Bottom 10
+a_bottom <- ggplot(bottom_working_subzones, 
+                   aes(x = reorder(Subzone, Total_Population), 
+                       y = Total_Population, 
+                       fill = Subzone)) +
+  geom_col() +
+  geom_text(aes(label = comma(Total_Population)), 
+            hjust = -0.1, size = 3.5, color = "black") +  # adjusted label position
+  coord_flip() +
+  labs(
+    title = "Bottom 10 Subzones of\nWorking Adult Population",
+    x = "Subzone",
+    y = "Number of Working Adults"
+  ) +
+  scale_fill_manual(values = bottom_colors) +
+  scale_y_continuous(
+    limits = c(0, max(bottom_working_subzones$Total_Population) + 500),
+    expand = c(0, 0),
+    labels = comma
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text = element_text(size = 10)
+  )
+
+# Combine both plots side by side
+a_top + a_bottom +
+  plot_layout(ncol = 2) +
+  plot_annotation(
+    title = "Comparison of Working Adult Population (18–64YO)\nAcross Singapore Subzones",
+    subtitle = "Top 10 vs Bottom 10 Subzones of Working Adults Residents",
+    theme = theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+      plot.subtitle = element_text(hjust = 0.5, size = 12)
+    )
+  )
+
+```
+
+**Top 10 vs Bottom 10 Subzones of Elderly Population (65+ Years Old)**
+
+```{r}
+#| code-fold: true
+top_elderly_subzones <- popdata_cleaned %>%
+  filter(Age_Group == "Elderly (65+)") %>%
+  arrange(desc(Total_Population)) %>%
+  slice_head(n = 10)
+
+# Load required libraries
+pacman::p_load(tidyverse, patchwork, ggthemes, RColorBrewer)
+
+# Load the data
+popdata <- read_csv("respopagesex2024.csv")
+
+# Clean and process the data
+popdata_cleaned <- popdata %>%
+  rename(
+    Planning_Area = PA,
+    Subzone = SZ,
+    Population = Pop
+  ) %>%
+  filter(Sex != "Total", Age != "Total", Subzone != "Total") %>%
+  mutate(
+    Population = as.numeric(Population),
+    Age = as.numeric(Age),
+    Age_Group = case_when(
+      Age >= 0 & Age <= 4 ~ "Young (0-4)",
+      Age >= 5 & Age <= 12 ~ "Youth (5-12)",
+      Age >= 13 & Age <= 17 ~ "Teens (13-17)",
+      Age >= 18 & Age <= 64 ~ "Working Adults (18-64)",
+      Age >= 65 ~ "Elderly (65+)",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(Age_Group)) %>%
+  group_by(Planning_Area, Subzone, Age_Group) %>%
+  summarise(Total_Population = sum(Population, na.rm = TRUE), .groups = "drop")
+
+# Top 10 subzones by elderly population
+top_elderly_subzones <- popdata_cleaned %>%
+  filter(Age_Group == "Elderly (65+)") %>%
+  arrange(desc(Total_Population)) %>%
+  slice_head(n = 10)
+
+# Bottom 10 subzones (filter out 0s)
+bottom_elderly_subzones <- popdata_cleaned %>%
+  filter(Age_Group == "Elderly (65+)", Total_Population > 0) %>%
+  arrange(Total_Population) %>%
+  slice_head(n = 10)
+
+# Plot: Top 10
+e1 <- ggplot(top_elderly_subzones, 
+             aes(x = reorder(Subzone, Total_Population), 
+                 y = Total_Population, 
+                 fill = Subzone)) +
+  geom_col() +
+  coord_flip() +
+  geom_text(aes(label = Total_Population), 
+            hjust = 1.05, size = 3.5, color = "black") +  # Move label inside
+  labs(
+    title = "Top 10 Subzones\n by Elderly Population",
+    x = "Subzone",
+    y = "Elderly Population"
+  ) +
+  scale_fill_brewer(palette = "Set3") +
+  scale_x_discrete(expand = expansion(mult = c(0.05, 0.05))) +
+  # scale_y_continuous(
+  #   breaks = seq(0, 25000, by = 5000),  # Cleaner axis ticks
+  #   limits = c(0, max(top_elderly_subzones$Total_Population) + 2000),  
+  #   expand = c(0, 0)  
+  # ) +
+  scale_y_continuous(
+  breaks = seq(0, 25000, by = 5000),  # Tick marks at 5K intervals
+  limits = c(0, max(top_elderly_subzones$Total_Population) + 2000),
+  labels = function(x) paste0(x / 1000, "K"),
+  expand = c(0, 0)
+  ) +
+
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text = element_text(size = 10)
+  )
+
+# Plot: Bottom 10
+e2 <- ggplot(bottom_elderly_subzones, 
+             aes(x = reorder(Subzone, Total_Population), 
+                 y = Total_Population, 
+                 fill = Subzone)) +
+  geom_col() +
+  coord_flip() +
+  geom_text(aes(label = Total_Population), 
+            hjust = 1.05, size = 3.5, color = "black") +
+  labs(
+    title = "Bottom 10 Subzones\n by Elderly Population",
+    x = "Subzone",
+    y = "Elderly Population"
+  ) +
+  scale_fill_brewer(palette = "Set3") +
+  scale_x_discrete(expand = expansion(mult = c(0.05, 0.05))) +
+  scale_y_continuous(
+    limits = c(0, max(bottom_elderly_subzones$Total_Population) + 20),  
+    expand = c(0, 0)  
+  ) +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    axis.text = element_text(size = 10)
+  )
+
+# Combine plots side by side
+e1 + e2 + 
+  plot_layout(ncol = 2) + 
+  plot_annotation(
+    title = "Comparison of Elderly Population(65+ YO)\n Across Singapore Subzones",
+    subtitle = "Top 10 vs Bottom 10 Subzones of Elderly Residents (Age 65+)",
+    theme = theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+      plot.subtitle = element_text(hjust = 0.5, size = 12)
+    )
+  )
+
+```

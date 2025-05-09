@@ -181,7 +181,7 @@ ggbetweenstats(
 
 -   **Welch’s ANOVA**:
 
-F(3,23.8)=10.15,p=1.71×10−4F(3, 23.8) = 10.15,\quad p = 1.71 \times 10^{-4}F(3,23.8)=10.15,p=1.71×10−4
+F(3,23.8)=10.15,p=1.71×10−4F(3, 23.8) = 10.15,\quad p = 1.71 \times 10\^{-4}F(3,23.8)=10.15,p=1.71×10−4
 
 ➤ The **p-value is very small**, indicating a **statistically significant difference** in English scores among the racial groups.
 
@@ -257,7 +257,7 @@ ggbarstats(exam1,
 
 **Summary of results from plot:**
 
--   **Chi-squared test** χPearson2(3)=1.04, p=0.79\chi^2_{\text{Pearson}}(3) = 1.04,\ p = 0.79χPearson2​(3)=1.04, p=0.79\
+-   **Chi-squared test** χPearson2(3)=1.04, p=0.79\chi\^2\_{\text{Pearson}}(3) = 1.04, p = 0.79χPearson2​(3)=1.04, p=0.79\
     ➤ **Not statistically significant**, meaning there's **no evidence** of an association between gender and Maths score bins.
 
 -   **Cramér's V = 0.00**, with **95% CI \[0.00, 0.08\]**\
