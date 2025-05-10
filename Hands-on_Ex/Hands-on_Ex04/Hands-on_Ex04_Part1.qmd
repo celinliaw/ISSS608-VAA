@@ -301,7 +301,7 @@ A half-eye graph is plotted using **stat_halfeye()** of ggdist package.
 ggplot(exam, 
        aes(x = RACE, 
            y = ENGLISH)) +
-  stat_halfeye(adjust = 0.5,
+  stat_halfeye(adjust = 0.5,  # Used to show only half of violin plot
                justification = -0.2,
                .width = 0,
                point_colour = NA)
@@ -341,7 +341,7 @@ ggplot(exam,
                justification = -0.2,
                .width = 0,
                point_colour = NA) +
-  geom_boxplot(width = .20,
+  geom_boxplot(width = .20,    # boxplot is added here
                outlier.shape = NA)
 ```
 
@@ -377,7 +377,7 @@ ggplot(exam,
                point_colour = NA) +
   geom_boxplot(width = .20,
                outlier.shape = NA) +
-  stat_dots(side = "left", 
+  stat_dots(side = "left",    # dots are added
             justification = 1.2, 
             binwidth = .5,
             dotsize = 2)
@@ -438,11 +438,12 @@ ggplot(exam,
 ggplot(exam, 
        aes(x = RACE, 
            y = ENGLISH)) +
-  stat_halfeye(adjust = 0.5,
-               justification = -0.2,
-               .width = 0,
-               point_colour = NA) +
-  geom_boxplot(width = .20,
+  stat_halfeye(adjust = 0.5,   #smooths the density curve
+               justification = -0.2,  #nudges the half-eye plot slightly to the left so it doesn't overlap the boxplot
+               .width = 0,   # removes the interval, only density remains
+               point_colour = NA) # removes the point layer that would normally show the median 
++
+  geom_boxplot(width = .20,   
                outlier.shape = NA) +
   stat_dots(side = "left", 
             justification = 1.2, 

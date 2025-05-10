@@ -134,10 +134,14 @@ ggbetweenstats(
 
 **Summary of results from plot:**
 
+**Ho: The distribution of the math scores is the same for male and female students**
+
+**H1: The distribution of the math scores is not the same for male and female students**
+
 -   **Test used:** `W_Mann–Whitney = 13011.00`\
     This is a non-parametric alternative to the t-test (used when data may not be normally distributed).
 
--   **p-value = 0.91**\
+-   **p-value = 0.91 (\> 0.05)**\
     ➤ This is **not statistically significant**. A high p-value (much greater than 0.05) suggests **no evidence** to reject the null hypothesis.\
     In other words, **there is no significant difference in Maths scores between males and females**.
 
@@ -214,7 +218,7 @@ ggscatterstats(
   data = exam,
   x = MATHS,
   y = ENGLISH,
-  marginal = FALSE,
+  marginal = TRUE, #Change this to FALSE to turn off bar charts
   )
 ```
 
