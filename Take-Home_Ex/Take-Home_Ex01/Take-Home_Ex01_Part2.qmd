@@ -36,7 +36,7 @@ For part 2 of the Take-Home Exercise 1, I will be evaluating one of my peer's [N
 
 -   The colours for the bar charts are in shades of grey which makes it hard to differentiate the different subzones. It would be better if specific colours are used for each area. In the code below, I will be adding colours to the graphs to make it easy to differentiate between the different subzones.
 
--   There are many tabs in one page and it may be hard to do comparisons. It would be better to make them all in 1 page so that comparisons can be done easily. The code <code style="color: blue;">#\| code-fold: true</code> is added so that the codes can be hidden and only the graphs are shown for easier comparisons.
+-   There are many tabs in one page, which are not arranged in ascending order of age and it may be hard to do comparisons. It would be better to make them all in 1 page and in ascending order so that comparisons can be done easily. The code <code style="color: blue;">#\| code-fold: true</code> is added so that the codes can be hidden and only the graphs are shown for easier comparisons.
 
 -   The chart also only shows the top 10 subzones but the other subzones were not shown. It would be better if the lowest 10 subzones or all subzones can be shown. In the makeover below, I will be adding the top and bottom 10 subzones for easy reference.
 

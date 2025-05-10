@@ -1,7 +1,7 @@
 ---
-title: "Hands-On_Ex05"
+title: "Hands-on Exercise 7"
 author: "Liaw Ying Ting, Celin"
-date: 13 May 2025
+date: 27 May 2025
 date-modified: "last-modified"
 
 format:
