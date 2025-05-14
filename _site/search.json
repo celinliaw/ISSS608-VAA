@@ -991,6 +991,41 @@
     "href": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#data-preparation",
     "title": "Hands-On_Ex05 - Modelling, Visualising and Analysing Network Data with R",
     "section": "9.8.1 Data Preparation",
-    "text": "9.8.1 Data Preparation\nBefore we can plot the interactive network graph, we need to prepare the data model by using the code chunk below:\n\n\nCode\nGAStech_edges_aggregated &lt;- GAStech_edges %&gt;%\n  left_join(GAStech_nodes, by = c(\"sourceLabel\" = \"label\")) %&gt;%\n  rename(from = id) %&gt;%\n  left_join(GAStech_nodes, by = c(\"targetLabel\" = \"label\")) %&gt;%\n  rename(to = id) %&gt;%\n  filter(MainSubject == \"Work related\") %&gt;%\n  group_by(from, to) %&gt;%\n    summarise(weight = n()) %&gt;%\n  filter(from!=to) %&gt;%\n  filter(weight &gt; 1) %&gt;%\n  ungroup()\n\n\n\n9.8.2 Plotting the first interactive network graph\nThe code chunk below will be used to plot an interactive network graph by using the data prepared.\n\n\nCode\nvisNetwork(GAStech_nodes, \n           GAStech_edges_aggregated)\n\n\n\n\n\n\n\n\n9.8.3 Working with layout\nIn the code chunk below, Fruchterman and Reingold layout is used.\n\n\nCode\nvisNetwork(GAStech_nodes,\n           GAStech_edges_aggregated) %&gt;%\n  visIgraphLayout(layout = \"layout_with_fr\") \n\n\n\n\n\n\n\n\n9.8.4 Working with visual attributes - Nodes\nvisNetwork() looks for a field called “group” in the nodes object and colour the nodes according to the values of the group field.\nThe code chunk below rename Department field to group\n\n\nCode\nGAStech_nodes &lt;- GAStech_nodes %&gt;%\n  rename(group = Department) \n\n\n\n\nCode\nvisNetwork(GAStech_nodes,\n           GAStech_edges_aggregated) %&gt;%\n  visIgraphLayout(layout = \"layout_with_fr\") %&gt;%\n  visLegend() %&gt;%\n  visLayout(randomSeed = 123)\n\n\n\n\n\n\n\n\n9.8.5 Working with visual attributes - Edges\nIn the code run below visEdges() is used to symbolise the edges.\n- The argument arrows is used to define where to place the arrow.\n- The smooth argument is used to plot the edges using a smooth curve.\n\n\nCode\nvisNetwork(GAStech_nodes,\n           GAStech_edges_aggregated) %&gt;%\n  visIgraphLayout(layout = \"layout_with_fr\") %&gt;%\n  visEdges(arrows = \"to\", \n           smooth = list(enabled = TRUE, \n                         type = \"curvedCW\")) %&gt;%\n  visLegend() %&gt;%\n  visLayout(randomSeed = 123)\n\n\n\n\n\n\nVisit Option to find out more about visEdges’s argument.\n\n\n9.8.6 Interactivity\nIn the code chunk below, visOptions() is used to incorporate interactivity features in the data visualisation.\n\nThe argument highlightNearest highlights nearest when clicking a node.\nThe argument nodesIdSelection adds an id node selection creating an HTML select element.\n\n\n\nCode\nvisNetwork(GAStech_nodes,\n           GAStech_edges_aggregated) %&gt;%\n  visIgraphLayout(layout = \"layout_with_fr\") %&gt;%\n  visOptions(highlightNearest = TRUE,\n             nodesIdSelection = TRUE) %&gt;%\n  visLegend() %&gt;%\n  visLayout(randomSeed = 123)\n\n\n\n\n\n\nVisit Option to find out more about visOption’s argument."
+    "text": "9.8.1 Data Preparation\nBefore we can plot the interactive network graph, we need to prepare the data model by using the code chunk below:\n\n\nCode\nGAStech_edges_aggregated &lt;- GAStech_edges %&gt;%\n  left_join(GAStech_nodes, by = c(\"sourceLabel\" = \"label\")) %&gt;%\n  rename(from = id) %&gt;%\n  left_join(GAStech_nodes, by = c(\"targetLabel\" = \"label\")) %&gt;%\n  rename(to = id) %&gt;%\n  filter(MainSubject == \"Work related\") %&gt;%\n  group_by(from, to) %&gt;%\n    summarise(weight = n()) %&gt;%\n  filter(from!=to) %&gt;%\n  filter(weight &gt; 1) %&gt;%\n  ungroup()"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#plotting-the-first-interactive-network-graph",
+    "href": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#plotting-the-first-interactive-network-graph",
+    "title": "Hands-On_Ex05 - Modelling, Visualising and Analysing Network Data with R",
+    "section": "9.8.2 Plotting the first interactive network graph",
+    "text": "9.8.2 Plotting the first interactive network graph\nThe code chunk below will be used to plot an interactive network graph by using the data prepared.\n\n\nCode\nvisNetwork(GAStech_nodes, \n           GAStech_edges_aggregated)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#working-with-layout",
+    "href": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#working-with-layout",
+    "title": "Hands-On_Ex05 - Modelling, Visualising and Analysing Network Data with R",
+    "section": "9.8.3 Working with layout",
+    "text": "9.8.3 Working with layout\nIn the code chunk below, Fruchterman and Reingold layout is used.\n\n\nCode\nvisNetwork(GAStech_nodes,\n           GAStech_edges_aggregated) %&gt;%\n  visIgraphLayout(layout = \"layout_with_fr\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#working-with-visual-attributes---nodes",
+    "href": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#working-with-visual-attributes---nodes",
+    "title": "Hands-On_Ex05 - Modelling, Visualising and Analysing Network Data with R",
+    "section": "9.8.4 Working with visual attributes - Nodes",
+    "text": "9.8.4 Working with visual attributes - Nodes\nvisNetwork() looks for a field called “group” in the nodes object and colour the nodes according to the values of the group field.\nThe code chunk below rename Department field to group\n\n\nCode\nGAStech_nodes &lt;- GAStech_nodes %&gt;%\n  rename(group = Department) \n\n\n\n\nCode\nvisNetwork(GAStech_nodes,\n           GAStech_edges_aggregated) %&gt;%\n  visIgraphLayout(layout = \"layout_with_fr\") %&gt;%\n  visLegend() %&gt;%\n  visLayout(randomSeed = 123)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#working-with-visual-attributes---edges",
+    "href": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#working-with-visual-attributes---edges",
+    "title": "Hands-On_Ex05 - Modelling, Visualising and Analysing Network Data with R",
+    "section": "9.8.5 Working with visual attributes - Edges",
+    "text": "9.8.5 Working with visual attributes - Edges\nIn the code run below visEdges() is used to symbolise the edges.\n- The argument arrows is used to define where to place the arrow.\n- The smooth argument is used to plot the edges using a smooth curve.\n\n\nCode\nvisNetwork(GAStech_nodes,\n           GAStech_edges_aggregated) %&gt;%\n  visIgraphLayout(layout = \"layout_with_fr\") %&gt;%\n  visEdges(arrows = \"to\", \n           smooth = list(enabled = TRUE, \n                         type = \"curvedCW\")) %&gt;%\n  visLegend() %&gt;%\n  visLayout(randomSeed = 123)\n\n\n\n\n\n\nVisit Option to find out more about visEdges’s argument."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#interactivity",
+    "href": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#interactivity",
+    "title": "Hands-On_Ex05 - Modelling, Visualising and Analysing Network Data with R",
+    "section": "9.8.6 Interactivity",
+    "text": "9.8.6 Interactivity\nIn the code chunk below, visOptions() is used to incorporate interactivity features in the data visualisation.\n\nThe argument highlightNearest highlights nearest when clicking a node.\nThe argument nodesIdSelection adds an id node selection creating an HTML select element.\n\n\n\nCode\nvisNetwork(GAStech_nodes,\n           GAStech_edges_aggregated) %&gt;%\n  visIgraphLayout(layout = \"layout_with_fr\") %&gt;%\n  visOptions(highlightNearest = TRUE,\n             nodesIdSelection = TRUE) %&gt;%\n  visLegend() %&gt;%\n  visLayout(randomSeed = 123)\n\n\n\n\n\n\nVisit Option to find out more about visOption’s argument."
   }
 ]
