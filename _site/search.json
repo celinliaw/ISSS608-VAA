@@ -1018,8 +1018,8 @@
     "objectID": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#working-with-visual-attributes---edges",
     "href": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#working-with-visual-attributes---edges",
     "title": "Hands-On_Ex05 - Modelling, Visualising and Analysing Network Data with R",
-    "section": "9.8.5 Working with visual attributes - Edges",
-    "text": "9.8.5 Working with visual attributes - Edges\nIn the code run below visEdges() is used to symbolise the edges.\n- The argument arrows is used to define where to place the arrow.\n- The smooth argument is used to plot the edges using a smooth curve.\n\n\nCode\nvisNetwork(GAStech_nodes,\n           GAStech_edges_aggregated) %&gt;%\n  visIgraphLayout(layout = \"layout_with_fr\") %&gt;%\n  visEdges(arrows = \"to\", \n           smooth = list(enabled = TRUE, \n                         type = \"curvedCW\")) %&gt;%\n  visLegend() %&gt;%\n  visLayout(randomSeed = 123)\n\n\n\n\n\n\nVisit Option to find out more about visEdges’s argument."
+    "section": "9.8.5 Working with visual Attributes - Edges",
+    "text": "9.8.5 Working with visual Attributes - Edges\nIn the code run below visEdges() is used to symbolise the edges.\n- The argument arrows is used to define where to place the arrow.\n- The smooth argument is used to plot the edges using a smooth curve.\n\n\nCode\nvisNetwork(GAStech_nodes,\n           GAStech_edges_aggregated) %&gt;%\n  visIgraphLayout(layout = \"layout_with_fr\") %&gt;%\n  visEdges(arrows = \"to\", \n           smooth = list(enabled = TRUE, \n                         type = \"curvedCW\")) %&gt;%\n  visLegend() %&gt;%\n  visLayout(randomSeed = 123)\n\n\n\n\n\n\nVisit Option to find out more about visEdges’s argument."
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex05/Hands-On_Ex05.html#interactivity",

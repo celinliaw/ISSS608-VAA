@@ -662,3 +662,238 @@ visNetwork(GAStech_nodes,
 ```
 
 Visit [Option](http://datastorm-open.github.io/visNetwork/options.html) to find out more about visOption’s argument.
+
+# 9.9 Building Circular Plots - Extra 
+
+Generate random data using seed. There needs to be a character vector to represent categories, a numeric vector of x and y values.
+
+```{r}
+set.seed(999)
+n = 1000
+df = data.frame(sectors = sample(letters[1:8], n, replace = TRUE),
+    x = rnorm(n), y = runif(n))
+```
+
+Next, the circular layout will be initialized. the circle is split into sectors based on the data range on x-axes in each category. In the following code, dfx is split by sectors and the width of the sectors are automatically calculated based on data ranges in each category. By default, sectors are positioned starting from teter = 0 (in the polar coordinate system) and go along the circle clockwise. No track has been added so there will be no display yet.
+
+A global parameter *`track.height = 0.1`* is set by the option function `circis.par()` so that all tracks which will eb added have a default height of 0.1. The circle used by **circlize** always have a radius of 1, so a height of 0.1 means 10% of the circle radius.
+
+The allocation of sectors only need values on x direction (or on the circular direction), the values on y direction (radical direction) will be used in the step of creating tracks.
+
+After the circular layout is initialized, graphics can be added to the plot in a track-by-track manner. Before drawing anything, we need to know that all tracks should be first created by `circos.trackPlotRegion()` or, for short, `circos.track()`, then the low-level functions can be added afterwards. Just think in the base R graphic engine, you need first call `plot()` then you can use functions such as `points()` and `lines()` to add graphics. Since x-ranges for cells in the track have already been defined in the initialization step, here we only need to specify the y-range for each cell. The y-ranges can be specified by `y` argument as a numeric vector (so that y-range will be automatically extracted and calculated in each cell) or `ylim` argument as a vector of length two. In principle, y-ranges should be same for all cells in a same track
+
+```{r}
+library(circlize)
+circos.clear()
+circos.par("track.height" = 0.1)
+circos.initialize(factors = df$sectors, x = df$x)
+
+circos.track(df$sectors, y = df$y,
+    panel.fun = function(x, y) {
+        circos.text(CELL_META$xcenter, 
+            CELL_META$cell.ylim[3] + mm_y(5), 
+            CELL_META$sector.index)
+        circos.axis(labels.cex = 0.6)
+})
+col = rep(c("#FF0000", "#00FF00"), 4)
+circos.trackPoints(df$sectors, df$x, df$y, col = col, pch = 16, cex = 0.5)
+circos.text(-1, 0.5, "text", sector.index = "a", track.index = 1)
+```
+
+Next, axes are added by using `circos.axis()` inside `panel.fun`. `circos.track()` creates plotting region in a cell by cell manner and the `panel.fun` is actually executed immediately after the plotting region for a certain cell is created and adds graphics in the current cell. Without specifying any arguments, `circos.axis()` draws x-axes on the top of each cell.
+
+`circos.text` CELL_META provides "meta information" for the current cell. When specifying the position of text on the y-direction, an offset of `mm_y(5)` 5mm is added to the y position of the text. In `circos.text`, x and y values are measured in the data coordinate and there are some helper functions that convert absolute units to corresponding values in data coordinate.
+
+`circos.trackPoints()` add points in all cells simultaneously anc can be replaced by putting `circos.text()` in `panel.fun()`.
+
+`circos.trackHist()` creates a new track. `bin.size` is set explicitly to that the bin size for all histograms are the same and can be compared to each other.
+
+```{r}
+library(circlize)
+circos.clear()
+circos.par("track.height" = 0.1)
+circos.initialize(factors = df$sectors, x = df$x)
+
+circos.track(df$sectors, y = df$y,
+    panel.fun = function(x, y) {
+        circos.text(CELL_META$xcenter, 
+            CELL_META$cell.ylim[3] + mm_y(5), 
+            CELL_META$sector.index)
+        circos.axis(labels.cex = 0.6)
+})
+col = rep(c("#FF0000", "#00FF00"), 4)
+circos.trackPoints(df$sectors, df$x, df$y, col = col, pch = 16, cex = 0.5)
+circos.text(-1, 0.5, "text", sector.index = "a", track.index = 1)
+bgcol = rep(c("#EFEFEF", "#CCCCCC"), 4)
+circos.trackHist(df$sectors, df$x, bin.size = 0.2, bg.col = bgcol, col = NA)
+```
+
+In the third track, `panel.fun`, 10 data points are randomly picked in each cell and sorted by x-values and connected with lines. In the following code, when `sectors` x and y arguments are set in `circos.track()`, x values and y values are split by sectos and corresponding subset of x and y values are sent to `panel.fun` through the x and y arguments.
+
+```{r}
+library(circlize)
+circos.clear()
+circos.par("track.height" = 0.1)
+circos.initialize(factors = df$sectors, x = df$x)
+
+circos.track(df$sectors, y = df$y,
+    panel.fun = function(x, y) {
+        circos.text(CELL_META$xcenter, 
+            CELL_META$cell.ylim[3] + mm_y(5.5), 
+            CELL_META$sector.index)
+        circos.axis(labels.cex = 0.6)
+})
+
+col = rep(c("#FF0000", "#00FF00"), 4)
+circos.trackPoints(df$sectors, df$x, df$y, col = col, pch = 16, cex = 0.5)
+circos.text(-1, 0.5, "text", sector.index = "a", track.index = 1)
+bgcol = rep(c("#EFEFEF", "#CCCCCC"), 4)
+circos.trackHist(df$sectors, df$x, bin.size = 0.2, bg.col = bgcol, col = NA)
+
+circos.track(df$sectors, x = df$x, y = df$y,
+    panel.fun = function(x, y) {
+        ind = sample(length(x), 10)
+        x2 = x[ind]
+        y2 = y[ind]
+        od = order(x2)
+        circos.lines(x2[od], y2[od])
+})
+```
+
+In the next plot, the second track is updated in the cell in sector "d". This is done by `circos.updatePlotRegion()` or the short version `circos.update` . The function erases grgaphics which have been added but cannot modify the xlim and ylim of the cell.
+
+```{r}
+library(circlize)
+circos.clear()
+circos.par("track.height" = 0.1)
+circos.initialize(factors = df$sectors, x = df$x)
+
+circos.track(df$sectors, y = df$y,
+    panel.fun = function(x, y) {
+        circos.text(CELL_META$xcenter, 
+            CELL_META$cell.ylim[3] + mm_y(5.5), 
+            CELL_META$sector.index)
+        circos.axis(labels.cex = 0.6)
+})
+
+col = rep(c("#FF0000", "#00FF00"), 4)
+circos.trackPoints(df$sectors, df$x, df$y, col = col, pch = 16, cex = 0.5)
+circos.text(-1, 0.5, "text", sector.index = "a", track.index = 1)
+bgcol = rep(c("#EFEFEF", "#CCCCCC"), 4)
+circos.trackHist(df$sectors, df$x, bin.size = 0.2, bg.col = bgcol, col = NA)
+
+circos.track(df$sectors, x = df$x, y = df$y,
+    panel.fun = function(x, y) {
+        ind = sample(length(x), 10)
+        x2 = x[ind]
+        y2 = y[ind]
+        od = order(x2)
+        circos.lines(x2[od], y2[od])
+})
+
+circos.update(sector.index = "d", track.index = 2, 
+    bg.col = "#FF8080", bg.border = "black")
+circos.points(x = -2:2, y = rep(0.5, 5), col = "white")
+circos.text(CELL_META$xcenter, CELL_META$ycenter, "updated", col = "white")
+```
+
+New tracks will be created and heatmaps added by using `circos.rect()`.
+
+```{r}
+library(circlize)
+circos.clear()
+circos.par("track.height" = 0.1)
+circos.initialize(factors = df$sectors, x = df$x)
+
+circos.track(df$sectors, y = df$y,
+    panel.fun = function(x, y) {
+        circos.text(CELL_META$xcenter, 
+            CELL_META$cell.ylim[3] + mm_y(5.5), 
+            CELL_META$sector.index)
+        circos.axis(labels.cex = 0.6)
+})
+
+col = rep(c("#FF0000", "#00FF00"), 4)
+circos.trackPoints(df$sectors, df$x, df$y, col = col, pch = 16, cex = 0.5)
+circos.text(-1, 0.5, "text", sector.index = "a", track.index = 1)
+bgcol = rep(c("#EFEFEF", "#CCCCCC"), 4)
+circos.trackHist(df$sectors, df$x, bin.size = 0.2, bg.col = bgcol, col = NA)
+
+circos.track(df$sectors, x = df$x, y = df$y,
+    panel.fun = function(x, y) {
+        ind = sample(length(x), 10)
+        x2 = x[ind]
+        y2 = y[ind]
+        od = order(x2)
+        circos.lines(x2[od], y2[od])
+})
+
+circos.update(sector.index = "d", track.index = 2, 
+    bg.col = "#FF8080", bg.border = "black")
+circos.points(x = -2:2, y = rep(0.5, 5), col = "white")
+circos.text(CELL_META$xcenter, CELL_META$ycenter, "updated", col = "white")
+
+circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
+    xlim = CELL_META$xlim
+    ylim = CELL_META$ylim
+    breaks = seq(xlim[1], xlim[2], by = 0.1)
+    n_breaks = length(breaks)
+    circos.rect(breaks[-n_breaks], rep(ylim[1], n_breaks - 1),
+                breaks[-1], rep(ylim[2], n_breaks - 1),
+                col = rand_color(n_breaks), border = NA)
+})
+```
+
+In the most inside circle, links or ribbons are added using `circos.link`.
+
+```{r}
+library(circlize)
+circos.clear()
+circos.par("track.height" = 0.1)
+circos.initialize(factors = df$sectors, x = df$x)
+
+circos.track(df$sectors, y = df$y,
+    panel.fun = function(x, y) {
+        circos.text(CELL_META$xcenter, 
+            CELL_META$cell.ylim[3] + mm_y(5.5), 
+            CELL_META$sector.index)
+        circos.axis(labels.cex = 0.6)
+})
+
+col = rep(c("#FF0000", "#00FF00"), 4)
+circos.trackPoints(df$sectors, df$x, df$y, col = col, pch = 16, cex = 0.5)
+circos.text(-1, 0.5, "text", sector.index = "a", track.index = 1)
+bgcol = rep(c("#EFEFEF", "#CCCCCC"), 4)
+circos.trackHist(df$sectors, df$x, bin.size = 0.2, bg.col = bgcol, col = NA)
+
+circos.track(df$sectors, x = df$x, y = df$y,
+    panel.fun = function(x, y) {
+        ind = sample(length(x), 10)
+        x2 = x[ind]
+        y2 = y[ind]
+        od = order(x2)
+        circos.lines(x2[od], y2[od])
+})
+
+circos.update(sector.index = "d", track.index = 2, 
+    bg.col = "#FF8080", bg.border = "black")
+circos.points(x = -2:2, y = rep(0.5, 5), col = "white")
+circos.text(CELL_META$xcenter, CELL_META$ycenter, "updated", col = "white")
+
+circos.track(ylim = c(0, 1), panel.fun = function(x, y) {
+    xlim = CELL_META$xlim
+    ylim = CELL_META$ylim
+    breaks = seq(xlim[1], xlim[2], by = 0.1)
+    n_breaks = length(breaks)
+    circos.rect(breaks[-n_breaks], rep(ylim[1], n_breaks - 1),
+                breaks[-1], rep(ylim[2], n_breaks - 1),
+                col = rand_color(n_breaks), border = NA)
+})
+
+circos.link("a", 0, "b", 0, h = 0.4)
+circos.link("c", c(-0.5, 0.5), "d", c(-0.5,0.5), col = "red",
+    border = "blue", h = 0.2)
+circos.link("e", 0, "g", c(-1,1), col = "green", border = "black", lwd = 2, lty = 2)
+```
+
+To reset the graphic parameters, we can use `circos.clear()`.
