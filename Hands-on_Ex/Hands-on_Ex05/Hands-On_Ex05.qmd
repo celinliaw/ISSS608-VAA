@@ -663,7 +663,7 @@ visNetwork(GAStech_nodes,
 
 Visit [Option](http://datastorm-open.github.io/visNetwork/options.html) to find out more about visOption’s argument.
 
-# 9.9 Building Circular Plots - Extra 
+# 9.9 Building Circular Plots - Extra
 
 Generate random data using seed. There needs to be a character vector to represent categories, a numeric vector of x and y values.
 
