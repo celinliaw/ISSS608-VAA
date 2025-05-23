@@ -379,7 +379,7 @@ ggplot() +
 rice <- read_csv("data/rice.csv")
 ```
 
-10.5.2 Step 2: Plotting the Slopegraph
+## 10.5.2 Step 2: Plotting the Slopegraph
 
 ```{r}
 rice %>% 
