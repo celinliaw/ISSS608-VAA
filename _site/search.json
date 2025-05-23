@@ -1110,6 +1110,13 @@
     "href": "Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html#step-1-import-data",
     "title": "Hands-on Exercise 6",
     "section": "10.5.1 Step 1: Import data",
-    "text": "10.5.1 Step 1: Import data\n\n\nCode\nrice &lt;- read_csv(\"data/rice.csv\")\n\n\n10.5.2 Step 2: Plotting the Slopegraph\n\n\nCode\nrice %&gt;% \n  mutate(Year = factor(Year)) %&gt;%\n  filter(Year %in% c(1961, 1980)) %&gt;%\n  newggslopegraph(Year, Yield, Country,\n                Title = \"Rice Yield of Top 11 Asian Counties\",\n                SubTitle = \"1961-1980\",\n                Caption = \"Prepared by: Celin Liaw\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThings to learn from the code chunk above\n\n\n\nFor effective data visualistion design, factor() is used to convert the value type of Year field from numeric to factor"
+    "text": "10.5.1 Step 1: Import data\n\n\nCode\nrice &lt;- read_csv(\"data/rice.csv\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html#step-2-plotting-the-slopegraph",
+    "href": "Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html#step-2-plotting-the-slopegraph",
+    "title": "Hands-on Exercise 6",
+    "section": "10.5.2 Step 2: Plotting the Slopegraph",
+    "text": "10.5.2 Step 2: Plotting the Slopegraph\n\n\nCode\nrice %&gt;% \n  mutate(Year = factor(Year)) %&gt;%\n  filter(Year %in% c(1961, 1980)) %&gt;%\n  newggslopegraph(Year, Yield, Country,\n                Title = \"Rice Yield of Top 11 Asian Counties\",\n                SubTitle = \"1961-1980\",\n                Caption = \"Prepared by: Celin Liaw\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThings to learn from the code chunk above\n\n\n\nFor effective data visualistion design, factor() is used to convert the value type of Year field from numeric to factor"
   }
 ]
