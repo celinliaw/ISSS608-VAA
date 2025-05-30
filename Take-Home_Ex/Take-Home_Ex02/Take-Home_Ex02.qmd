@@ -26,7 +26,7 @@ Over the past decade, the community of Oceanus has faced numerous transformation
 
 Clepper Jessen, a former analyst at FishEye and now a seasoned journalist for the Hacklee Herald, has been keenly observing these rising tensions. Recently, he turned his attention towards the temporary closure of Nemo Reef. By listening to radio communications and utilizing his investigative tools, Clepper uncovered a complex web of expedited approvals and secretive logistics. These efforts revealed a story involving high-level Oceanus officials, Sailor Shift’s team, local influential families, and local conservationist group The Green Guardians, pointing towards a story of corruption and manipulation.
 
-# Task and Questions
+# Task and Question
 
 Clepper diligently recorded all intercepted radio communications over the last two weeks. With the help of his intern, they have analyzed their content to identify important events and relationships between key players. The result is a knowledge graph describing the last two weeks on Oceanus. Clepper and his intern have spent a large amount of time generating this knowledge graph, and they would now like some assistance using it to answer the following questions.
 
@@ -121,10 +121,7 @@ ExpCatViz(data=mc3_nodes,
 
 On the other hand, code chunk below uses `ExpCATViz()` of SmartEDA package to reveal the frequency distribution of all categorical fields in *mc3_edges* tibble dataframe
 
-```{r}
-ExpCatViz(data=mc3_edges,
-          col="lightblue")
-```
+`{# {r} # ExpCatViz(data=mc3_edges, #           col="lightblue")`
 
 ## Data Cleaning and Wrangling
 
@@ -164,19 +161,269 @@ Next, the code chunk will be used to:
 
 ```{r}
 mc3_edges_cleaned <- mc3_edges %>%
-  rename(from_id = source, 
+  rename(from_id = source,
          to_id = target) %>%
-  mutate(across(c(from_id, to_id), 
+  mutate(across(c(from_id, to_id),
                 as.character)) %>%
-  filter(from_id %in% mc3_nodes_cleaned$id, 
+  filter(from_id %in% mc3_nodes_cleaned$id,
          to_id %in% mc3_nodes_cleaned$id) %>%
   filter(!is.na(from_id), !is.na(to_id))
 ```
 
-Code chunk below will be used to create mapping of character id in `mc3_nodes_cleaned` to row index
+Next, code chunk below will be used to create mapping of character id in `mc3_nodes_cleaned` to row index.
 
 ```{r}
 node_index_lookup <- mc3_nodes_cleaned %>%
   mutate(.row_id = row_number()) %>%
   select(id, .row_id)
+```
+
+Next, the code chunk below will be used to join and convert `from_id` and `to_id` to integer indices. At the same time, we will drop rows with unmatched nodes.
+
+```{r}
+mc3_edges_indexed <- mc3_edges_cleaned %>%
+  left_join(node_index_lookup, 
+            by = c("from_id" = "id")) %>%
+  rename(from = .row_id) %>%
+  left_join(node_index_lookup, 
+            by = c("to_id" = "id")) %>%
+  rename(to = .row_id) %>%
+  select(from, to, is_inferred, type) %>%
+  filter(!is.na(from) & !is.na(to))  
+```
+
+Next, the code chunk below is used to subset nodes to only those referenced by edges
+
+```{r}
+used_node_indices <- sort(
+  unique(c(mc3_edges_indexed$from, 
+           mc3_edges_indexed$to)))
+
+mc3_nodes_final <- mc3_nodes_cleaned %>%
+  slice(used_node_indices) %>%
+  mutate(new_index = row_number())
+```
+
+We will then use th code chunk below to rebuild lookup from old index to new index
+
+```{r}
+old_to_new_index <- tibble(
+  old_index = used_node_indices,
+  new_index = seq_along(
+    used_node_indices))
+```
+
+Lastly, the code chunk below will be used to update edge indices to match new node table
+
+```{r}
+mc3_edges_final <- mc3_edges_indexed %>%
+  left_join(old_to_new_index, 
+            by = c("from" = "old_index")) %>%
+  rename(from_new = new_index) %>%
+  left_join(old_to_new_index, 
+            by = c("to" = "old_index")) %>%
+  rename(to_new = new_index) %>%
+  select(from = from_new, to = to_new, 
+         is_inferred, type)
+```
+
+```{r}
+glimpse(mc3_edges_final)
+```
+
+# Building the tidygraph object
+
+```{r}
+mc3_graph <- tbl_graph(
+  nodes = mc3_nodes_final,
+  edges = mc3_edges_final,
+  directed = TRUE
+)
+```
+
+```{r}
+str(mc3_graph)
+```
+
+# Visualising the knowledge graph
+
+Several of the ggraph layouts involve randomisation. In order to ensure reproducibility, it is necessary to set the seed value before plotting by using the code chunk below.
+
+```{r}
+set.seed(1234)
+```
+
+In the code chunk below, ggraph fundtions are used to create the whole graph
+
+```{r}
+ggraph(mc3_graph, 
+       layout = "fr") +
+  geom_edge_link(alpha = 0.3, 
+                 colour = "gray") +
+  geom_node_point(aes(color = `type`), 
+                  size = 4) +
+  geom_node_text(aes(label = type), 
+                 repel = TRUE, 
+                 size = 1.0) +
+  theme_void()
+```
+
+# Question 1
+
+```{r viz1-comm-heatmap, echo = TRUE}
+library(lubridate)   # date‐time parsing
+library(tidyverse)   # data manipulation & ggplot2
+
+# 1. Extract timestamp of each Communication event
+comm_times <- mc3_graph %>%
+  activate("nodes") %>%
+  as_tibble() %>%
+  filter(type=="Event", sub_type=="Communication") %>%
+  select(id, timestamp) %>%
+  mutate(
+    dt   = ymd_hms(timestamp),         # full POSIX
+    day  = as_date(dt),                # calendar date
+    hour = hour(dt)                    # hour of day
+  )
+
+# 2. Count per day/hour
+heat <- comm_times %>%
+  count(day, hour)
+
+# 3. Plot heatmap
+ggplot(heat, aes(x = day, y = hour, fill = n)) +
+  geom_tile(color="white") +
+  scale_fill_viridis_c(name="Messages") +
+  scale_y_continuous(breaks=0:23) +
+  labs(
+    title = "Communications by Day and Hour",
+    subtitle = "Two‐week window",
+    x = "Date", y = "Hour of Day"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=45, hjust=1))
+
+```
+
+```{r}
+
+---
+
+### Viz 2: Trend of daily message volume  
+**Q:** How do communication volumes shift over the two weeks?
+
+# 1. Re‐use comm_times from Viz 1
+daily_trend <- comm_times %>%
+  count(day)
+
+# 2. Plot line chart
+ggplot(daily_trend, aes(x = day, y = n)) +
+  geom_line(size=1) +
+  geom_point(size=2) +
+  labs(
+    title = "Daily Communication Volume",
+    x = "Date", y = "Number of Messages"
+  ) +
+  theme_minimal()
+
+```
+
+```{r viz4-community-topics-fixed, echo=TRUE}
+library(igraph)
+library(tidygraph)
+library(ggraph)
+library(dplyr)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 1. Detect communities on the igraph version of mc3_graph
+# ─────────────────────────────────────────────────────────────────────────────
+ig       <- as.igraph(mc3_graph)
+louv      <- cluster_louvain(ig)                    # run Louvain
+comm_vec  <- membership(louv)                       # numeric vector, one per node
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 2. Attach community membership to nodes
+# ─────────────────────────────────────────────────────────────────────────────
+nodes2 <- mc3_nodes_final %>% 
+  mutate(comm = comm_vec)                           # add new column 'comm'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 3. For each community, find the most‐common edge type
+# ─────────────────────────────────────────────────────────────────────────────
+#  3a. Join edges to their source node’s community
+edge_topics <- mc3_edges_final %>%
+  left_join(nodes2 %>% select(new_index, comm), 
+            by = c("from" = "new_index")) %>%
+  count(comm, type, name = "n") %>%
+  group_by(comm) %>%
+  slice_max(n, n = 1, with_ties = FALSE) %>%      # pick single top type
+  ungroup() %>%
+  select(comm, dominant_type = type)
+
+#  3b. Merge back so each node knows its community’s topic
+nodes2 <- nodes2 %>%
+  left_join(edge_topics, by = "comm")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4. Plot: color nodes by their community’s dominant topic
+# ─────────────────────────────────────────────────────────────────────────────
+ggraph(mc3_graph, layout = "fr") +
+  geom_edge_link(alpha = 0.15) +
+  geom_node_point(aes(color = dominant_type), 
+                  size = 4) +                    # big enough to see
+  geom_node_text(aes(
+    label = ifelse(sub_type %in% c("Person","Vessel"), 
+                   name, "")
+  ), repel = TRUE, size = 2) +                   # label only key actors
+  scale_color_brewer(palette = "Set2", 
+                     na.value = "gray70") +
+  labs(
+    title = "Communities colored by their predominant interaction type",
+    subtitle = "Each node is tinted by the topic (edge type) most frequent in its cluster"
+  ) +
+  theme_void()
+
+
+```
+
+```{r top20-communication-words, echo=TRUE}
+# ─────────────────────────────────────────────────────────────────────────────
+# Visualization 1.1: Bar chart of the top 20 words in Communication events
+# ─────────────────────────────────────────────────────────────────────────────
+library(tidyverse)    # dplyr, ggplot2
+library(tidytext)     # unnest_tokens, stop_words
+
+# 1. Extract all Communication event texts
+comms <- mc3_graph %>% 
+  activate("nodes") %>% 
+  as_tibble() %>% 
+  filter(type == "Event", sub_type == "Communication") %>% 
+  select(content)      # just keep the text column
+
+# 2. Tokenize into individual words (lowercased)
+words <- comms %>% 
+  unnest_tokens(word, content)
+
+# 3. Remove English stop-words (a, the, is, etc.)
+data("stop_words")    # from tidytext
+clean_words <- words %>% 
+  anti_join(stop_words, by = "word")
+
+# 4. Count and keep the top 20 most frequent words
+top20 <- clean_words %>% 
+  count(word, sort = TRUE) %>% 
+  slice_max(n, n = 20)
+
+# 5. Plot as a horizontal bar chart
+ggplot(top20, aes(x = reorder(word, n), y = n)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 20 Words in Communication Events",
+    x = "Word",
+    y = "Count"
+  ) +
+  theme_minimal()
+
+
 ```
