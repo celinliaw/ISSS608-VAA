@@ -1,0 +1,309 @@
+---
+title: "Take-Home_Ex02"
+author: "Liaw Ying Ting, Celin"
+date: 27 May 2025
+date-modified: "last-modified"
+
+format:
+  html:
+    code-fold: true
+    code-tools: true
+
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# Overview
+
+For this take-home exercise 2, Mini-Challenge 3 will be chosen and the visualisation will be done on this topic. The background of the mini challenge and the questions will be listed below. For this mini challenge, I will only be displaying and addressing Question 3 below.
+
+# Background
+
+Over the past decade, the community of Oceanus has faced numerous transformations and challenges evolving from its fishing-centric origins. Following major crackdowns on illegal fishing activities, suspects have shifted investments into more regulated sectors such as the ocean tourism industry, resulting in growing tensions. This increased tourism has recently attracted the likes of international pop star Sailor Shift, who announced plans to film a music video on the island.
+
+Clepper Jessen, a former analyst at FishEye and now a seasoned journalist for the Hacklee Herald, has been keenly observing these rising tensions. Recently, he turned his attention towards the temporary closure of Nemo Reef. By listening to radio communications and utilizing his investigative tools, Clepper uncovered a complex web of expedited approvals and secretive logistics. These efforts revealed a story involving high-level Oceanus officials, Sailor Shift’s team, local influential families, and local conservationist group The Green Guardians, pointing towards a story of corruption and manipulation.
+
+# Task and Question
+
+Clepper diligently recorded all intercepted radio communications over the last two weeks. With the help of his intern, they have analyzed their content to identify important events and relationships between key players. The result is a knowledge graph describing the last two weeks on Oceanus. Clepper and his intern have spent a large amount of time generating this knowledge graph, and they would now like some assistance using it to answer the following questions.
+
+1.  **Clepper found that messages frequently came in at around the same time each day.**
+
+    -   Develop a graph-based visual analytics approach to identify any daily temporal patterns in communications.
+
+    -   How do these patterns shift over the two weeks of observations?
+
+    -   Focus on a specific entity and use this information to determine who has influence over them.
+
+2.  **Clepper has noticed that people often communicate with (or about) the same people or vessels, and that grouping them together may help with the investigation.**
+
+    -   Use visual analytics to help Clepper understand and explore the interactions and relationships between vessels and people in the knowledge graph.
+
+    -   Are there groups that are more closely associated? If so, what are the topic areas that are predominant for each group?
+
+        -   For example, these groupings could be related to: Environmentalism (known associates of Green Guardians), Sailor Shift, and fishing/leisure vessels.
+
+3.  **It was noted by Clepper’s intern that some people and vessels are using pseudonyms to communicate.**
+
+    -   Expanding upon your prior visual analytics, determine who is using pseudonyms to communicate, and what these pseudonyms are.
+
+        Some that Clepper has already identified include: “Boss”, and “The Lookout”, but there appear to be many more.
+
+        To complicate the matter, pseudonyms may be used by multiple people or vessels.
+
+    -   Describe how your visualizations make it easier for Clepper to identify common entities in the knowledge graph.
+
+    -   How does your understanding of activities change given your understanding of pseudonyms?
+
+4.  **Clepper suspects that Nadia Conti, who was formerly entangled in an illegal fishing scheme, may have continued illicit activity within Oceanus.**
+
+    -   Through visual analytics, provide evidence that Nadia is, or is not, doing something illegal.
+
+    -   Summarize Nadia’s actions visually. Are Clepper’s suspicions justified?
+
+**Reflection Questions**
+
+-   Given the task to develop visualizations for knowledge graphs, did you find that the challenge pushed you to develop new techniques for visual representation?
+
+-   Did you participate in last year’s challenge? If so, did your experience last year help prepare you for this year’s challenge?
+
+-   What was the most difficult part of working on this year’s data and what could have made it more accessible?
+
+# MC3 Kickstarter
+
+## Getting Started
+
+In the code chunk below, `p_load()` of pacman package is used to load the R packages into R environment.
+
+```{r}
+pacman::p_load(tidyverse, jsonlite,
+               tidygraph, ggraph,
+               SmartEDA)
+```
+
+## Import knowledge Graph Data
+
+For this exercise, *mc3.json* file will be used. In the code chunk below, `fromJSON()` of jsonlite package is used to import *mc3.json* file into R and save the output object.
+
+```{r}
+MC3 <- fromJSON("data/MC3_graph.json")
+MC3_schema <- fromJSON("data/MC3_schema.json")
+```
+
+## Inspecting Knowledge graph structure
+
+In the code chunk below, `glimpse()` is used to reveal the structure of the *mc3* knowledge graph.
+
+```{r}
+glimpse(MC3)
+```
+
+## Extracting the edges and nodes tables
+
+Next, `as_tibble()` of tibble package is used to extract the nodes and links tibble data frames from *mc3* tibble dataframe into two separate tibble dataframes called *mc3_nodes* and *mc3_edges* respectively.
+
+```{r}
+mc3_nodes <- as_tibble(MC3$nodes)
+mc3_edges <- as_tibble(MC3$edges)
+```
+
+## Initial EDA
+
+In the code chunk below, `ExpCatViz()` of SmartEDA package is used to reveal the frequency distribution of all categorical fields in *mc3_nodes* tibble dataframe
+
+```{r}
+ExpCatViz(data=mc3_nodes,
+          col="lightblue")
+```
+
+On the other hand, code chunk below uses `ExpCATViz()` of SmartEDA package to reveal the frequency distribution of all categorical fields in *mc3_edges* tibble dataframe
+
+```{r}
+ExpCatViz(data=mc3_edges,
+          col="lightblue")
+```
+
+## Data Cleaning and Wrangling
+
+The code chunk below performs the following data cleaning tasks:
+
+-   convert values in id field into character data type
+
+-   exclude records with `id` value
+
+-   exclude records with similar id values
+
+-   exclude `thing_collected` field
+
+-   save the cleaned tibble dataframe into a new tibble datatable called `mc_nodes_cleaned`
+
+```{r}
+mc3_nodes_cleaned <- mc3_nodes %>%
+  mutate(id = as.character(id)) %>%
+  filter(!is.na(id)) %>%
+  distinct(id, .keep_all = TRUE) %>%
+  select(-thing_collected)
+```
+
+## Cleaning and wrangling edges
+
+Next, the code chunk will be used to:
+
+-   rename source and target fields to form_id and to_id respectively
+
+-   convert values in from_id and to_id fields to character data type
+
+-   exclude values in from_id and to_id which is not found in the id field of mc3_nodes_cleaned
+
+-   exclude records whereby from_id and/or to_id values are missing
+
+-   save the cleaned tibble dataframe and call it mc3_edges_cleaned
+
+```{r}
+mc3_edges_cleaned <- mc3_edges %>%
+  rename(from_id = source,
+         to_id = target) %>%
+  mutate(across(c(from_id, to_id),
+                as.character)) %>%
+  filter(from_id %in% mc3_nodes_cleaned$id,
+         to_id %in% mc3_nodes_cleaned$id) %>%
+  filter(!is.na(from_id), !is.na(to_id))
+```
+
+Next, code chunk below will be used to create mapping of character id in `mc3_nodes_cleaned` to row index.
+
+```{r}
+node_index_lookup <- mc3_nodes_cleaned %>%
+  mutate(.row_id = row_number()) %>%
+  select(id, .row_id)
+```
+
+Next, the code chunk below will be used to join and convert `from_id` and `to_id` to integer indices. At the same time, we will drop rows with unmatched nodes.
+
+```{r}
+mc3_edges_indexed <- mc3_edges_cleaned %>%
+  left_join(node_index_lookup, 
+            by = c("from_id" = "id")) %>%
+  rename(from = .row_id) %>%
+  left_join(node_index_lookup, 
+            by = c("to_id" = "id")) %>%
+  rename(to = .row_id) %>%
+  select(from, to, is_inferred, type) %>%
+  filter(!is.na(from) & !is.na(to))  
+```
+
+Next, the code chunk below is used to subset nodes to only those referenced by edges
+
+```{r}
+used_node_indices <- sort(
+  unique(c(mc3_edges_indexed$from, 
+           mc3_edges_indexed$to)))
+
+mc3_nodes_final <- mc3_nodes_cleaned %>%
+  slice(used_node_indices) %>%
+  mutate(new_index = row_number())
+```
+
+We will then use th code chunk below to rebuild lookup from old index to new index
+
+```{r}
+old_to_new_index <- tibble(
+  old_index = used_node_indices,
+  new_index = seq_along(
+    used_node_indices))
+```
+
+Lastly, the code chunk below will be used to update edge indices to match new node table
+
+```{r}
+mc3_edges_final <- mc3_edges_indexed %>%
+  left_join(old_to_new_index, 
+            by = c("from" = "old_index")) %>%
+  rename(from_new = new_index) %>%
+  left_join(old_to_new_index, 
+            by = c("to" = "old_index")) %>%
+  rename(to_new = new_index) %>%
+  select(from = from_new, to = to_new, 
+         is_inferred, type)
+```
+
+```{r}
+glimpse(mc3_edges_final)
+```
+
+# Building the tidygraph object
+
+```{r}
+mc3_graph <- tbl_graph(
+  nodes = mc3_nodes_final,
+  edges = mc3_edges_final,
+  directed = TRUE
+)
+```
+
+```{r}
+str(mc3_graph)
+```
+
+# Visualising the knowledge graph
+
+Several of the ggraph layouts involve randomisation. In order to ensure reproducibility, it is necessary to set the seed value before plotting by using the code chunk below.
+
+```{r}
+set.seed(1234)
+```
+
+In the code chunk below, ggraph fundtions are used to create the whole graph
+
+```{r}
+ggraph(mc3_graph, 
+       layout = "fr") +
+  geom_edge_link(alpha = 0.3, 
+                 colour = "gray") +
+  geom_node_point(aes(color = `type`), 
+                  size = 4) +
+  geom_node_text(aes(label = type), 
+                 repel = TRUE, 
+                 size = 1.0) +
+  theme_void()
+```
+
+# Question 1
+
+```{r viz1-comm-heatmap, echo = TRUE}
+library(lubridate)   # date‐time parsing
+library(tidyverse)   # data manipulation & ggplot2
+
+# 1. Extract timestamp of each Communication event
+comm_times <- mc3_graph %>%
+  activate("nodes") %>%
+  as_tibble() %>%
+  filter(type=="Event", sub_type=="Communication") %>%
+  select(id, timestamp) %>%
+  mutate(
+    dt   = ymd_hms(timestamp),         # full POSIX
+    day  = as_date(dt),                # calendar date
+    hour = hour(dt)                    # hour of day
+  )
+
+# 2. Count per day/hour
+heat <- comm_times %>%
+  count(day, hour)
+
+# 3. Plot heatmap
+ggplot(heat, aes(x = day, y = hour, fill = n)) +
+  geom_tile(color="white") +
+  scale_fill_viridis_c(name="Messages") +
+  scale_y_continuous(breaks=0:23) +
+  labs(
+    title = "Communications by Day and Hour",
+    subtitle = "Two‐week window",
+    x = "Date", y = "Hour of Day"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=45, hjust=1))
+
+```

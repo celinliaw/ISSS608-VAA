@@ -121,7 +121,10 @@ ExpCatViz(data=mc3_nodes,
 
 On the other hand, code chunk below uses `ExpCATViz()` of SmartEDA package to reveal the frequency distribution of all categorical fields in *mc3_edges* tibble dataframe
 
-`{# {r} # ExpCatViz(data=mc3_edges, #           col="lightblue")`
+```{r}
+ExpCatViz(data=mc3_edges,
+          col="lightblue")
+```
 
 ## Data Cleaning and Wrangling
 
@@ -307,11 +310,6 @@ ggplot(heat, aes(x = day, y = hour, fill = n)) +
 
 ```{r}
 
----
-
-### Viz 2: Trend of daily message volume  
-**Q:** How do communication volumes shift over the two weeks?
-
 # 1. Re‐use comm_times from Viz 1
 daily_trend <- comm_times %>%
   count(day)
@@ -325,64 +323,6 @@ ggplot(daily_trend, aes(x = day, y = n)) +
     x = "Date", y = "Number of Messages"
   ) +
   theme_minimal()
-
-```
-
-```{r viz4-community-topics-fixed, echo=TRUE}
-library(igraph)
-library(tidygraph)
-library(ggraph)
-library(dplyr)
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 1. Detect communities on the igraph version of mc3_graph
-# ─────────────────────────────────────────────────────────────────────────────
-ig       <- as.igraph(mc3_graph)
-louv      <- cluster_louvain(ig)                    # run Louvain
-comm_vec  <- membership(louv)                       # numeric vector, one per node
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 2. Attach community membership to nodes
-# ─────────────────────────────────────────────────────────────────────────────
-nodes2 <- mc3_nodes_final %>% 
-  mutate(comm = comm_vec)                           # add new column 'comm'
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 3. For each community, find the most‐common edge type
-# ─────────────────────────────────────────────────────────────────────────────
-#  3a. Join edges to their source node’s community
-edge_topics <- mc3_edges_final %>%
-  left_join(nodes2 %>% select(new_index, comm), 
-            by = c("from" = "new_index")) %>%
-  count(comm, type, name = "n") %>%
-  group_by(comm) %>%
-  slice_max(n, n = 1, with_ties = FALSE) %>%      # pick single top type
-  ungroup() %>%
-  select(comm, dominant_type = type)
-
-#  3b. Merge back so each node knows its community’s topic
-nodes2 <- nodes2 %>%
-  left_join(edge_topics, by = "comm")
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 4. Plot: color nodes by their community’s dominant topic
-# ─────────────────────────────────────────────────────────────────────────────
-ggraph(mc3_graph, layout = "fr") +
-  geom_edge_link(alpha = 0.15) +
-  geom_node_point(aes(color = dominant_type), 
-                  size = 4) +                    # big enough to see
-  geom_node_text(aes(
-    label = ifelse(sub_type %in% c("Person","Vessel"), 
-                   name, "")
-  ), repel = TRUE, size = 2) +                   # label only key actors
-  scale_color_brewer(palette = "Set2", 
-                     na.value = "gray70") +
-  labs(
-    title = "Communities colored by their predominant interaction type",
-    subtitle = "Each node is tinted by the topic (edge type) most frequent in its cluster"
-  ) +
-  theme_void()
-
 
 ```
 
@@ -425,5 +365,445 @@ ggplot(top20, aes(x = reorder(word, n), y = n)) +
   ) +
   theme_minimal()
 
+
+```
+
+```{r mc3_filtered_network, message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidygraph)
+library(ggraph)
+library(igraph)     # for arrow() helper
+library(grid)       # for unit()
+
+# 1. select only the nodes we care about
+selected_nodes <- mc3_nodes_final %>%
+  filter(
+    (type == "Entity"     & sub_type %in% c("Person", "Vessel")) |
+    (type == "Event"      & sub_type == "Communication")      |
+    (type == "Relationship")
+  ) %>%
+  mutate(idx = row_number())  # new index in the filtered graph
+
+# mapping old_index → new idx
+id_map <- selected_nodes %>%
+  select(old = new_index, new = idx)
+
+# 2. filter edges so both ends are in selected_nodes
+selected_edges <- mc3_edges_final %>%
+  filter(from %in% id_map$old, to %in% id_map$old) %>%
+  # 3. re-index the endpoints
+  left_join(id_map, by = c("from" = "old")) %>%
+  rename(from_new = new) %>%
+  left_join(id_map, by = c("to"   = "old")) %>%
+  rename(to_new   = new) %>%
+  select(from = from_new, to = to_new, type)
+
+# 4. rebuild and plot
+filtered_graph <- tbl_graph(
+  nodes    = selected_nodes,
+  edges    = selected_edges,
+  directed = TRUE
+)
+
+set.seed(1234)
+ggraph(filtered_graph, layout = "fr") +
+  geom_edge_link(
+    aes(color = type),
+    arrow    = arrow(length = unit(3, "mm")),
+    end_cap  = circle(2, "mm"),
+    alpha    = 0.6
+  ) +
+  geom_node_point(aes(color = sub_type), size = 4) +
+  geom_node_text(aes(label = label), repel = TRUE, size = 3) +
+  scale_edge_color_brewer(palette = "Dark2") +
+  scale_color_manual(
+    values = c(Person = "#1b9e77", Vessel = "#d95f02", Communication = "#7570b3", Relationship = "#e7298a")
+  ) +
+  theme_void() +
+  theme(legend.position = "right")
+
+```
+
+```{r mc3_daily_networks_fixed, message=FALSE, warning=FALSE, fig.width=12, fig.height=28}
+library(dplyr)
+library(tidygraph)
+library(ggraph)
+library(igraph)
+library(grid)
+library(lubridate)
+library(purrr)
+library(patchwork)
+
+# assume selected_nodes and selected_edges have been defined earlier
+
+daily_comms <- selected_nodes %>%
+  filter(type == "Event", sub_type == "Communication") %>%
+  mutate(date = as_date(timestamp)) %>%
+  select(idx, date)
+
+all_dates <- sort(unique(daily_comms$date)) %>% discard(is.na)
+
+plots <- map(all_dates, function(d) {
+  comm_idx <- daily_comms %>% filter(date == d) %>% pull(idx)
+  edges_d  <- selected_edges %>%
+    filter(from %in% comm_idx | to %in% comm_idx)
+  if (nrow(edges_d) == 0) return(NULL)
+
+  keep_idx <- unique(c(edges_d$from, edges_d$to))
+  nodes_d  <- selected_nodes %>% filter(idx %in% keep_idx)
+
+  node_map <- tibble(old = nodes_d$idx, new = seq_len(nrow(nodes_d)))
+  edges_d2 <- edges_d %>%
+    left_join(node_map, by = c("from" = "old")) %>% mutate(from = new) %>% select(-new) %>%
+    left_join(node_map, by = c("to"   = "old")) %>% mutate(to   = new) %>% select(-new)
+  nodes_d2 <- nodes_d %>% mutate(idx2 = seq_len(nrow(nodes_d)))
+
+  g_d <- tbl_graph(nodes = nodes_d2, edges = edges_d2, directed = TRUE)
+  lay <- create_layout(g_d, layout = "fr", niter = 500,
+                       area = vcount(g_d)^2, repulse = vcount(g_d)^1.2)
+
+  ggraph(lay) +
+    geom_edge_link(aes(color = type),
+                   arrow = arrow(length = unit(2, "mm")),
+                   lineend = "butt",
+                   alpha = 0.4,
+                   width = 1,
+                   show.legend = TRUE) +
+
+    geom_node_point(aes(color = sub_type),
+                    size = 4,
+                    show.legend = TRUE) +
+    geom_node_text(aes(label = ifelse(sub_type %in% c("Person","Vessel"), label, "")),
+                   repel = TRUE,
+                   point.padding = unit(0.2, "lines"),
+                   box.padding = unit(0.2, "lines"),
+                   size = 4) +
+    scale_edge_color_brewer(name = "Edge Type", palette = "Dark2", guide = guide_legend()) +
+    scale_color_manual(name = "Node Sub-type",
+                       values = c(
+                         Person        = "#1b9e77",
+                         Vessel        = "#d95f02",
+                         Communication = "#7570b3",
+                         Relationship  = "#e7298a"
+                       ),
+                       guide = guide_legend()) +
+    ggtitle(as.character(d)) +
+    theme_void() +
+    theme(
+      plot.title  = element_text(size = 8, hjust = 0.5),
+      plot.margin = margin(2,2,2,2)
+    )
+})
+
+wrap_plots(plots, ncol = 2) +
+  plot_layout(guides = "collect") +
+  plot_annotation(title = "MC3 Communications by Day") &
+  theme(
+    legend.position = "right",
+    legend.title    = element_text(size = 10),
+    legend.text     = element_text(size = 8)
+  )
+```
+
+```{r mc3_daily_networks_try, message=FALSE, warning=FALSE, fig.width=12, fig.height=28}
+library(dplyr)
+library(tidygraph)
+library(ggraph)
+library(igraph)
+library(grid)
+library(lubridate)
+library(purrr)
+library(patchwork)
+
+# assume selected_nodes and selected_edges have been defined earlier
+
+daily_comms <- selected_nodes %>%
+  filter(type == "Event", sub_type == "Communication") %>%
+  mutate(date = as_date(timestamp)) %>%
+  select(idx, date)
+
+all_dates <- sort(unique(daily_comms$date)) %>% discard(is.na)
+
+plots <- map(all_dates, function(d) {
+  comm_idx <- daily_comms %>% filter(date == d) %>% pull(idx)
+  edges_d  <- selected_edges %>%
+    filter(from %in% comm_idx | to %in% comm_idx)
+  if (nrow(edges_d) == 0) return(NULL)
+
+  keep_idx <- unique(c(edges_d$from, edges_d$to))
+  nodes_d  <- selected_nodes %>% filter(idx %in% keep_idx)
+
+  node_map <- tibble(old = nodes_d$idx, new = seq_len(nrow(nodes_d)))
+  edges_d2 <- edges_d %>%
+    left_join(node_map, by = c("from" = "old")) %>% mutate(from = new) %>% select(-new) %>%
+    left_join(node_map, by = c("to"   = "old")) %>% mutate(to   = new) %>% select(-new)
+  nodes_d2 <- nodes_d %>% mutate(idx2 = seq_len(nrow(nodes_d)))
+
+  g_d <- tbl_graph(nodes = nodes_d2, edges = edges_d2, directed = TRUE)
+  lay <- create_layout(g_d, layout = "fr", niter = 500,
+                       area = vcount(g_d)^2, repulse = vcount(g_d)^1.2)
+
+  ggraph(lay) +
+    geom_edge_link(aes(color = type),
+                   arrow = arrow(length = unit(2, "mm")),
+                   end_cap = circle(1.5, "mm"),
+                   alpha = 0.4,
+                   width = 1,
+                   show.legend = TRUE) +
+    geom_node_point(aes(color = sub_type),
+                    size = 4,
+                    show.legend = TRUE) +
+    geom_node_text(aes(label = ifelse(sub_type %in% c("Person","Vessel"), label, "")),
+                   repel = TRUE,
+                   point.padding = unit(0.2, "lines"),
+                   box.padding = unit(0.2, "lines"),
+                   size = 4) +
+    scale_edge_color_brewer(name = "Edge Type", palette = "Dark2", guide = guide_legend()) +
+    scale_color_manual(name = "Node Sub-type",
+                       values = c(
+                         Person        = "#1b9e77",
+                         Vessel        = "#d95f02",
+                         Communication = "#7570b3",
+                         Relationship  = "#e7298a"
+                       ),
+                       guide = guide_legend()) +
+    ggtitle(as.character(d)) +
+    theme_void() +
+    theme(
+      plot.title  = element_text(size = 8, hjust = 0.5),
+      plot.margin = margin(2,2,2,2)
+    )
+})
+
+wrap_plots(plots, ncol = 2) +
+  plot_layout(guides = "collect") +
+  plot_annotation(title = "MC3 Communications by Day") &
+  theme(
+    legend.position = "right",
+    legend.title    = element_text(size = 10),
+    legend.text     = element_text(size = 8)
+  )
+```
+
+```{# {r mc3_daily_networks, message=FALSE, warning=FALSE, fig.width=12, fig.height=26}
+# library(dplyr)
+# library(tidygraph)
+# library(ggraph)
+# library(igraph)
+# library(grid)
+# library(lubridate)
+# library(purrr)
+# library(patchwork)
+# 
+# # — assume selected_nodes, selected_edges have been defined earlier —
+# 
+# daily_comms <- selected_nodes %>%
+#   filter(type == "Event", sub_type == "Communication") %>%
+#   mutate(date = as_date(timestamp)) %>%
+#   select(idx, date)
+# 
+# all_dates <- sort(unique(daily_comms$date)) %>% discard(is.na)
+# 
+# plots <- map(all_dates, function(d) {
+#   comm_idx <- daily_comms %>% filter(date == d) %>% pull(idx)
+#   edges_d  <- selected_edges %>%
+#     filter(from %in% comm_idx | to %in% comm_idx)
+# 
+#   if (nrow(edges_d) == 0) return(NULL)
+# 
+#   # pick nodes touching those edges
+#   keep_idx <- unique(c(edges_d$from, edges_d$to))
+#   nodes_d   <- selected_nodes %>% filter(idx %in% keep_idx)
+# 
+#   # re‐index: build a node_map old→new
+#   node_map <- tibble(old = nodes_d$idx,
+#                      new = seq_len(nrow(nodes_d)))
+# 
+#   # **FIXED**: overwrite from/to via mutate + drop the helper column
+#   edges_d2 <- edges_d %>%
+#     left_join(node_map, by = c("from" = "old")) %>%
+#     mutate(from = new) %>%
+#     select(-new) %>%
+#     left_join(node_map, by = c("to" = "old")) %>%
+#     mutate(to = new) %>%
+#     select(-new)
+# 
+#   nodes_d2 <- nodes_d %>%
+#     mutate(idx2 = seq_len(nrow(nodes_d)))  # optional
+# 
+#   # build the subgraph
+#   g_d <- tbl_graph(nodes = nodes_d2, edges = edges_d2, directed = TRUE)
+# 
+#   # FR layout
+#   lay <- create_layout(g_d, layout = "fr", niter = 500,
+#                        area = vcount(g_d)^2, repulse = vcount(g_d)^1.2)
+# 
+#   # plot
+#   ggraph(lay) +
+#     geom_edge_link(aes(color = type),
+#                    arrow   = arrow(length = unit(2, "mm")),
+#                    end_cap = circle(1.5, "mm"),
+#                    alpha   = 0.4, width = 0.3) +
+#     geom_node_point(aes(color = sub_type), size = 2.5) +
+#     geom_node_text(aes(label = ifelse(sub_type %in% c("Person","Vessel"), label, "")),
+#                    repel         = TRUE,
+#                    point.padding = unit(0.2, "lines"),
+#                    box.padding   = unit(0.2, "lines"),
+#                    size          = 2) +
+#     scale_edge_color_brewer(palette = "Dark2") +
+#     scale_color_manual(values = c(
+#       Person        = "#1b9e77",
+#       Vessel        = "#d95f02",
+#       Communication = "#7570b3",
+#       Relationship  = "#e7298a"
+#     )) +
+#     ggtitle(as.character(d)) +
+#     theme_void() +
+#     theme(
+#       legend.position = "right",
+#       plot.title      = element_text(size = 8, hjust = 0.5),
+#       plot.margin     = margin(2,2,2,2)
+#     )
+# })
+# 
+# wrap_plots(compact(plots), ncol = 7) & 
+#   plot_annotation(title = "MC3 Communications by Day")
+# 
+#   # sub‐graph
+#   g_d <- tbl_graph(nodes = nodes_d, edges = edges_d, directed = TRUE)
+#   
+#   # FR layout (reuse same seed so all days “look” similar)
+#   lay <- create_layout(g_d, layout = "fr", niter = 500,
+#                        area = vcount(g_d)^2, repulse = vcount(g_d)^1.2)
+#   
+#   # plot
+#   ggraph(lay) +
+#     geom_edge_link(aes(color = type),
+#                    arrow   = arrow(length = unit(2, "mm")),
+#                    end_cap = circle(1.5, "mm"),
+#                    alpha   = 0.4,
+#                    width   = 0.3) +
+#     geom_node_point(aes(color = sub_type), size = 2.5) +
+#     # only label Persons/Vessels
+#     geom_node_text(aes(label = ifelse(sub_type %in% c("Person","Vessel"), label, "")),
+#                    repel         = TRUE,
+#                    point.padding = unit(0.2, "lines"),
+#                    box.padding   = unit(0.2, "lines"),
+#                    size          = 2) +
+#     scale_edge_color_brewer(palette = "Dark2") +
+#     scale_color_manual(values = c(
+#       Person        = "#1b9e77",
+#       Vessel        = "#d95f02",
+#       Communication = "#7570b3",
+#       Relationship  = "#e7298a"
+#     )) +
+#     ggtitle(as.character(d)) +
+#     theme_void() +
+#     theme(
+#       legend.position = "right",
+#       plot.title      = element_text(size = 8, hjust = 0.5),
+#       plot.margin     = margin(2,2,2,2)
+#     )
+# 
+# # 3. stitch them into a grid — e.g. 7 days across
+# wrap_plots(plots, ncol = 2) & 
+#   plot_annotation(title = "MC3 Communications by Day")
+
+```
+
+```{r mc3_daily_networks_tryagain, message=FALSE, warning=FALSE, fig.width=16, fig.height=28}
+library(dplyr)
+library(tidygraph)
+library(ggraph)
+library(igraph)
+library(grid)
+library(lubridate)
+library(purrr)
+library(patchwork)
+
+# — assume selected_nodes and selected_edges have been defined earlier —
+
+daily_comms <- selected_nodes %>%
+  filter(type == "Event", sub_type == "Communication") %>%
+  mutate(date = as_date(timestamp)) %>%
+  select(idx, date)
+
+all_dates <- sort(unique(daily_comms$date)) %>% discard(is.na)
+
+plots <- map(all_dates, function(d) {
+  comm_idx <- daily_comms %>% filter(date == d) %>% pull(idx)
+  edges_d  <- selected_edges %>%
+    filter(from %in% comm_idx | to %in% comm_idx)
+
+  if (nrow(edges_d) == 0) return(NULL)
+
+  # pick nodes touching those edges
+  keep_idx <- unique(c(edges_d$from, edges_d$to))
+  nodes_d   <- selected_nodes %>% filter(idx %in% keep_idx)
+
+  # re-index: build a node_map old→new
+  node_map <- tibble(old = nodes_d$idx,
+                     new = seq_len(nrow(nodes_d)))
+
+  edges_d2 <- edges_d %>%
+    left_join(node_map, by = c("from" = "old")) %>%
+    mutate(from = new) %>% select(-new) %>%
+    left_join(node_map, by = c("to" = "old")) %>%
+    mutate(to = new) %>% select(-new)
+
+  nodes_d2 <- nodes_d %>% mutate(idx2 = seq_len(nrow(nodes_d)))
+
+  # build the subgraph
+  g_d <- tbl_graph(nodes = nodes_d2, edges = edges_d2, directed = TRUE)
+
+  # FR layout
+  lay <- create_layout(g_d, layout = "fr", niter = 500,
+                       area = vcount(g_d)^2, repulse = vcount(g_d)^1.2)
+
+  # plot
+  ggraph(lay) +
+    geom_edge_link(aes(color = type),
+                   arrow = arrow(length = unit(2, "mm")),
+                   lineend = "butt",
+                   alpha = 0.4,
+                   width = 2) +          # thicker arrows
+    geom_node_point(aes(color = sub_type), size = 8) +
+    geom_node_text(aes(label = ifelse(sub_type %in% c("Person","Vessel"), label, "")),
+                   repel = TRUE,
+                   point.padding = unit(0.5, "lines"),
+                   box.padding   = unit(0.5, "lines"),
+                   size = 6) +
+    scale_edge_color_manual(name = "Edge Type",
+                            values = c(
+                              evidence_for = "#1B9E77",
+                              received     = "#D95F02",
+                              sent         = "#7570B3",
+                              "NA"           = "#999999"
+                            ),
+                            guide = guide_legend(override.aes = list(
+                              linetype = 1,
+                              shape    = NA,
+                              size     = 1
+                            ))) +
+    scale_color_manual(name = "Node Sub-type",
+                       values = c(
+                         Person        = "#1b9e77",
+                         Vessel        = "#d95f02",
+                         Communication = "#7570b3",
+                         Relationship  = "#e7298a"
+                       )) +
+    ggtitle(as.character(d)) +
+    theme_void() +
+    theme(
+      plot.title      = element_text(size = 12, hjust = 0.5),
+      plot.margin     = margin(2,2,2,2),
+      legend.position = "right"
+    )
+})
+
+# Combine all daily plots into a 2-column grid with one shared legend
+wrap_plots(plots, ncol = 2) +
+  plot_layout(guides = "collect") +
+  plot_annotation(title = "MC3 Communications by Day")
 
 ```
