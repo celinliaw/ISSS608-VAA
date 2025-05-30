@@ -16,6 +16,8 @@ execute:
   freeze: true
 ---
 
+
+
 # Overview
 
 For this take-home exercise 2, Mini-Challenge 3 will be chosen and the visualisation will be done on this topic. The background of the mini challenge and the questions will be listed below. For this mini challenge, I will only be displaying and addressing Question 3 below.
@@ -78,53 +80,77 @@ Clepper diligently recorded all intercepted radio communications over the last t
 
 In the code chunk below, `p_load()` of pacman package is used to load the R packages into R environment.
 
+
+
 ```{r}
 pacman::p_load(tidyverse, jsonlite,
                tidygraph, ggraph,
                SmartEDA)
 ```
 
+
+
 ## Import knowledge Graph Data
 
 For this exercise, *mc3.json* file will be used. In the code chunk below, `fromJSON()` of jsonlite package is used to import *mc3.json* file into R and save the output object.
+
+
 
 ```{r}
 MC3 <- fromJSON("data/MC3_graph.json")
 MC3_schema <- fromJSON("data/MC3_schema.json")
 ```
 
+
+
 ## Inspecting Knowledge graph structure
 
 In the code chunk below, `glimpse()` is used to reveal the structure of the *mc3* knowledge graph.
+
+
 
 ```{r}
 glimpse(MC3)
 ```
 
+
+
 ## Extracting the edges and nodes tables
 
 Next, `as_tibble()` of tibble package is used to extract the nodes and links tibble data frames from *mc3* tibble dataframe into two separate tibble dataframes called *mc3_nodes* and *mc3_edges* respectively.
+
+
 
 ```{r}
 mc3_nodes <- as_tibble(MC3$nodes)
 mc3_edges <- as_tibble(MC3$edges)
 ```
 
+
+
 ## Initial EDA
 
 In the code chunk below, `ExpCatViz()` of SmartEDA package is used to reveal the frequency distribution of all categorical fields in *mc3_nodes* tibble dataframe
+
+
 
 ```{r}
 ExpCatViz(data=mc3_nodes,
           col="lightblue")
 ```
 
+
+
 On the other hand, code chunk below uses `ExpCATViz()` of SmartEDA package to reveal the frequency distribution of all categorical fields in *mc3_edges* tibble dataframe
+
+
 
 ```{r}
 ExpCatViz(data=mc3_edges,
           col="lightblue")
 ```
+
+
 
 ## Data Cleaning and Wrangling
 
@@ -140,6 +166,8 @@ The code chunk below performs the following data cleaning tasks:
 
 -   save the cleaned tibble dataframe into a new tibble datatable called `mc_nodes_cleaned`
 
+
+
 ```{r}
 mc3_nodes_cleaned <- mc3_nodes %>%
   mutate(id = as.character(id)) %>%
@@ -147,6 +175,8 @@ mc3_nodes_cleaned <- mc3_nodes %>%
   distinct(id, .keep_all = TRUE) %>%
   select(-thing_collected)
 ```
+
+
 
 ## Cleaning and wrangling edges
 
@@ -162,6 +192,8 @@ Next, the code chunk will be used to:
 
 -   save the cleaned tibble dataframe and call it mc3_edges_cleaned
 
+
+
 ```{r}
 mc3_edges_cleaned <- mc3_edges %>%
   rename(from_id = source,
@@ -173,7 +205,11 @@ mc3_edges_cleaned <- mc3_edges %>%
   filter(!is.na(from_id), !is.na(to_id))
 ```
 
+
+
 Next, code chunk below will be used to create mapping of character id in `mc3_nodes_cleaned` to row index.
+
+
 
 ```{r}
 node_index_lookup <- mc3_nodes_cleaned %>%
@@ -181,7 +217,11 @@ node_index_lookup <- mc3_nodes_cleaned %>%
   select(id, .row_id)
 ```
 
+
+
 Next, the code chunk below will be used to join and convert `from_id` and `to_id` to integer indices. At the same time, we will drop rows with unmatched nodes.
+
+
 
 ```{r}
 mc3_edges_indexed <- mc3_edges_cleaned %>%
@@ -195,7 +235,11 @@ mc3_edges_indexed <- mc3_edges_cleaned %>%
   filter(!is.na(from) & !is.na(to))  
 ```
 
+
+
 Next, the code chunk below is used to subset nodes to only those referenced by edges
+
+
 
 ```{r}
 used_node_indices <- sort(
@@ -207,7 +251,11 @@ mc3_nodes_final <- mc3_nodes_cleaned %>%
   mutate(new_index = row_number())
 ```
 
+
+
 We will then use th code chunk below to rebuild lookup from old index to new index
+
+
 
 ```{r}
 old_to_new_index <- tibble(
@@ -216,7 +264,11 @@ old_to_new_index <- tibble(
     used_node_indices))
 ```
 
+
+
 Lastly, the code chunk below will be used to update edge indices to match new node table
+
+
 
 ```{r}
 mc3_edges_final <- mc3_edges_indexed %>%
@@ -234,7 +286,11 @@ mc3_edges_final <- mc3_edges_indexed %>%
 glimpse(mc3_edges_final)
 ```
 
+
+
 # Building the tidygraph object
+
+
 
 ```{r}
 mc3_graph <- tbl_graph(
@@ -248,15 +304,23 @@ mc3_graph <- tbl_graph(
 str(mc3_graph)
 ```
 
+
+
 # Visualising the knowledge graph
 
 Several of the ggraph layouts involve randomisation. In order to ensure reproducibility, it is necessary to set the seed value before plotting by using the code chunk below.
+
+
 
 ```{r}
 set.seed(1234)
 ```
 
+
+
 In the code chunk below, ggraph fundtions are used to create the whole graph
+
+
 
 ```{r}
 ggraph(mc3_graph, 
@@ -271,7 +335,11 @@ ggraph(mc3_graph,
   theme_void()
 ```
 
+
+
 # Question 1
+
+
 
 ```{r viz1-comm-heatmap, echo = TRUE}
 library(lubridate)   # date‐time parsing
@@ -807,3 +875,4 @@ combined & theme(
 )
 
 ```
+
