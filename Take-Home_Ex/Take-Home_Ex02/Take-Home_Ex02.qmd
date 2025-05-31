@@ -18,7 +18,7 @@ execute:
 
 # Overview
 
-For this take-home exercise 2, Mini-Challenge 3 will be chosen and the visualisation will be done on this topic. The background of the mini challenge and the questions will be listed below. For this mini challenge, I will only be displaying and addressing Question 3 below.
+For this take-home exercise 2, Mini-Challenge 3 will be chosen and the visualisation will be done on this topic. The background of the mini challenge and the questions will be listed below. For this mini challenge, I will only be displaying and addressing **Questions 2 and 3** below.
 
 # Background
 
@@ -81,7 +81,10 @@ In the code chunk below, `p_load()` of pacman package is used to load the R pack
 ```{r}
 pacman::p_load(tidyverse, jsonlite,
                tidygraph, ggraph,
-               SmartEDA)
+               SmartEDA, lubridate,
+               dplyr, igraph,
+               grid)
+
 ```
 
 ## Import knowledge Graph Data
@@ -256,7 +259,7 @@ Several of the ggraph layouts involve randomisation. In order to ensure reproduc
 set.seed(1234)
 ```
 
-In the code chunk below, ggraph fundtions are used to create the whole graph
+In the code chunk below, ggraph functions are used to create the whole graph
 
 ```{r}
 ggraph(mc3_graph, 
@@ -273,118 +276,36 @@ ggraph(mc3_graph,
 
 # Question 1
 
-```{r viz1-comm-heatmap, echo = TRUE}
-library(lubridate)   # date‐time parsing
-library(tidyverse)   # data manipulation & ggplot2
-
-# 1. Extract timestamp of each Communication event
-comm_times <- mc3_graph %>%
-  activate("nodes") %>%
-  as_tibble() %>%
-  filter(type=="Event", sub_type=="Communication") %>%
-  select(id, timestamp) %>%
-  mutate(
-    dt   = ymd_hms(timestamp),         # full POSIX
-    day  = as_date(dt),                # calendar date
-    hour = hour(dt)                    # hour of day
-  )
-
-# 2. Count per day/hour
-heat <- comm_times %>%
-  count(day, hour)
-
-# 3. Plot heatmap
-ggplot(heat, aes(x = day, y = hour, fill = n)) +
-  geom_tile(color="white") +
-  scale_fill_viridis_c(name="Messages") +
-  scale_y_continuous(breaks=0:23) +
-  labs(
-    title = "Communications by Day and Hour",
-    subtitle = "Two‐week window",
-    x = "Date", y = "Hour of Day"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle=45, hjust=1))
-
-```
-
-```{r}
-
-# 1. Re‐use comm_times from Viz 1
-daily_trend <- comm_times %>%
-  count(day)
-
-# 2. Plot line chart
-ggplot(daily_trend, aes(x = day, y = n)) +
-  geom_line(size=1) +
-  geom_point(size=2) +
-  labs(
-    title = "Daily Communication Volume",
-    x = "Date", y = "Number of Messages"
-  ) +
-  theme_minimal()
-
-```
+For question 1 visualisations, kindly refer to my teammate [Shermainn's](https://isss608-sherm.netlify.app/take-home_ex/take-home_ex02/take-home_ex02) website and I will be building on her answers.
 
 # Question 2
 
-```{r top20-communication-words, echo=TRUE}
-# ─────────────────────────────────────────────────────────────────────────────
-# Visualization 1.1: Bar chart of the top 20 words in Communication events
-# ─────────────────────────────────────────────────────────────────────────────
-library(tidyverse)    # dplyr, ggplot2
-library(tidytext)     # unnest_tokens, stop_words
+For nodes, the code `filter()` will be used to filter out only *Person and Vessel* from *Entity*, and *Communication* from *Event* and their *relationship.*
 
-# 1. Extract all Communication event texts
-comms <- mc3_graph %>% 
-  activate("nodes") %>% 
-  as_tibble() %>% 
-  filter(type == "Event", sub_type == "Communication") %>% 
-  select(content)      # just keep the text column
+After this filter, the nodes only contain:
 
-# 2. Tokenize into individual words (lowercased)
-words <- comms %>% 
-  unnest_tokens(word, content)
+-   entity nodes whose sub_type is Person or Vessel
 
-# 3. Remove English stop-words (a, the, is, etc.)
-data("stop_words")    # from tidytext
-clean_words <- words %>% 
-  anti_join(stop_words, by = "word")
+-   Event nodes whose sub_type is Communication
 
-# 4. Count and keep the top 20 most frequent words
-top20 <- clean_words %>% 
-  count(word, sort = TRUE) %>% 
-  slice_max(n, n = 20)
+-   Any node whose type is Relationship.
 
-# 5. Plot as a horizontal bar chart
-ggplot(top20, aes(x = reorder(word, n), y = n)) +
-  geom_col(fill = "steelblue") +
-  coord_flip() +
-  labs(
-    title = "Top 20 Words in Communication Events",
-    x = "Word",
-    y = "Count"
-  ) +
-  theme_minimal()
+`mutate()` adds a new column called idx to the filtered data frame
 
+`select()` extracts 2 columns from *selected_nodes* and give them a new id and rename to *id_map*
 
-```
+For Edges, `filter()` keeps only those where both endpoints are in the *old* column of *id_map.*
+
+`left_join()` matches each row's *to* value against *id_map\$old* and brings in *id_map\$new* for that *to* node and renames it *to_new*. Same thing for the *from* column.
 
 ```{r}
-library(dplyr)
-library(tidygraph)
-library(ggraph)
-library(igraph)     # for arrow() helper
-library(grid)       # for unit()
-
-# 1. select only the nodes we care about
 selected_nodes <- mc3_nodes_final %>%
   filter(
     (type == "Entity"     & sub_type %in% c("Person", "Vessel")) |
     (type == "Event"      & sub_type == "Communication")      |
     (type == "Relationship")
   ) %>%
-  mutate(idx = row_number())  # new index in the filtered graph
+  mutate(idx = row_number())
 
 # mapping old_index → new idx
 id_map <- selected_nodes %>%
@@ -393,6 +314,7 @@ id_map <- selected_nodes %>%
 # 2. filter edges so both ends are in selected_nodes
 selected_edges <- mc3_edges_final %>%
   filter(from %in% id_map$old, to %in% id_map$old) %>%
+  
   # 3. re-index the endpoints
   left_join(id_map, by = c("from" = "old")) %>%
   rename(from_new = new) %>%
@@ -401,82 +323,37 @@ selected_edges <- mc3_edges_final %>%
   select(from = from_new, to = to_new, type)
 ```
 
-```{r mc3_viznetwork, message=FALSE, warning=FALSE}
-library(visNetwork)
-library(dplyr)
+Step 1: we proceed to `filter()` only the edges that we want, specifically *sent, received and evidence_for*. The labels for the edges show "sent", "received" and "evidence_for" using `transmute()`.
 
-# — assume selected_nodes and selected_edges have already been defined earlier —
+Step 2: We then build the node table and colour by sub_type which is called *group*. The label for the names/vessels will be placed under the node using *label.*
 
-# 1) Filter edges to only the three types we care about
-viz_edges <- selected_edges %>%
-  filter(type %in% c("sent", "received", "evidence_for")) %>%
-  transmute(
-    from = from,
-    to   = to,
-    label = type,        # show “sent” / “received” / “evidence_for” on hover
-    arrows = "to"        # add an arrowhead pointing at the “to” node
-  )
-
-# 2) Build a node table containing every node that appears in viz_edges
-all_node_ids <- unique(c(viz_edges$from, viz_edges$to))
-viz_nodes <- selected_nodes %>%
-  filter(idx %in% all_node_ids) %>%
-  transmute(
-    id    = idx,             # must match viz_edges$from/to
-    label = label,           # human‐readable name for hover/selection
-    group = sub_type         # this will drive automatic coloring and legend
-  )
-
-# 3) A minimal visNetwork call
-visNetwork(viz_nodes, viz_edges, width = "100%", height = "700px") %>%
-  visEdges(
-    color = list(
-      color     = "#999999",  # default edge color (light gray)
-      highlight = "#FF0000"   # color when you hover over an edge
-    ),
-    arrows = "to"
-  ) %>%
-  visOptions(
-    highlightNearest  = TRUE,   # highlight edges when you hover a node
-    nodesIdSelection  = TRUE    # dropdown to select a node by label
-  ) %>%
-  visLegend(
-    useGroups = TRUE,
-    position  = "right",
-    main      = "Node Sub-type"
-  ) %>%
-  visLayout(randomSeed = 123)
-
-```
+Step 3: Draw a Viznetwork graph.
 
 ```{r mc3_viznetwork_multi_select, message=FALSE, warning=FALSE}
-library(dplyr)
 library(visNetwork)
 
-# — assume selected_nodes & selected_edges exist already —
-
-# 1) Filter only the edges we want
+# 1
 viz_edges <- selected_edges %>%
   filter(type %in% c("sent", "received", "evidence_for")) %>%
   transmute(
     from   = from,
     to     = to,
-    label  = type,      # hover‐label shows sent/received/evidence_for
-    arrows = "to"       # draw one arrowhead pointing toward the “to” node
+    label  = type,      
+    arrows = "to"       
   )
 
-# 2) Build the node table: color by exact sub_type, which we’ll call “group”
+# 2 
 all_node_ids <- unique(c(viz_edges$from, viz_edges$to))
 viz_nodes <- selected_nodes %>%
   filter(idx %in% all_node_ids) %>%
   transmute(
-    id    = idx,        # must match viz_edges$from/to
-    label = label,      # human‐readable name under each node
-    group = sub_type    # exact sub_type: Person, Vessel, Communication,
-                        # or any of the eight Relationship subtypes
+    id    = idx,        
+    label = label,      
+    group = sub_type   
+                        
   )
 
-# 3) Draw a visNetwork with multi‐select enabled on “group”
+# 3
 visNetwork(viz_nodes, viz_edges, width = "100%", height = "700px") %>%
   visEdges(
     arrows = "to",
@@ -493,7 +370,6 @@ visNetwork(viz_nodes, viz_edges, width = "100%", height = "700px") %>%
     # Here’s the key change: allow multiple groups to be selected at once
     selectedBy       = list(
       variable = "group",
-      multiple = TRUE,     # multi‐select dropdown: you can pick (“Person”, “Vessel”) together
       style    = 'width:200px; height:26px; font-size:14px;'
     )
   ) %>%
@@ -503,6 +379,490 @@ visNetwork(viz_nodes, viz_edges, width = "100%", height = "700px") %>%
     main      = "Node Sub-types"
   ) %>%
   visLayout(randomSeed = 42)
+```
+
+```         
+```
+
+```{r mc3_viznetwork_multi_select_with_pv_rel, message=FALSE, warning=FALSE}
+
+
+# 1) Build the “base” edges exactly as before, but include a default color
+viz_edges_base <- selected_edges %>%
+  filter(type %in% c("sent", "received", "evidence_for")) %>%
+  transmute(
+    from   = from,
+    to     = to,
+    label  = type,          # “sent” / “received” / “evidence_for”
+    arrows = "to",
+    color  = "#AAAAAA"      # default gray for these original edges
+  )
+
+# 2) Identify Person/Vessel ↔ Communication links (type = sent or received).
+#    For “sent”:   from = Person/Vessel, to = Communication
+#    For “received”: from = Communication, to = Person/Vessel
+pc_links <- selected_edges %>%
+  filter(type %in% c("sent", "received")) %>%
+  transmute(
+    person = ifelse(type == "sent", from, to),
+    comm   = ifelse(type == "sent", to, from)
+  )
+
+# 3) Identify Communication → Relationship edges (type = evidence_for)
+cr_links <- selected_edges %>%
+  filter(type == "evidence_for") %>%
+  transmute(
+    comm         = from,
+    relationship = to
+  )
+
+# 4) Join them so that for each (person, comm) we find all (comm → relationship).
+#    This creates new edges: Person → Relationship
+new_pv_rel_edges <- pc_links %>%
+  inner_join(cr_links, by = "comm") %>%
+  transmute(
+    from   = person,
+    to     = relationship,
+    label  = "implied",   # or “related”—pick any hover‐label you like
+    arrows = "to",
+    color  = "blue"       # draw these edges in blue
+  ) %>%
+  distinct()             # in case multiple duplicates arise
+
+# 5) Combine the “base” edges with our new Person→Relationship edges
+viz_edges <- bind_rows(viz_edges_base, new_pv_rel_edges)
+
+# 6) Build the node data frame from all IDs appearing in viz_edges
+all_node_ids <- unique(c(viz_edges$from, viz_edges$to))
+viz_nodes <- selected_nodes %>%
+  filter(idx %in% all_node_ids) %>%
+  transmute(
+    id    = idx,         # must match viz_edges$from/to
+    label = label,       # human‐readable node label
+    group = sub_type     # Person, Vessel, Communication, or Relationship
+  )
+
+# 7) Plot with visNetwork. Because each edge row has its own 'color',
+#    visNetwork will draw original edges in gray and the new Person→Relationship
+#    edges in blue. We still supply highlight color for hover, and allow multi‐select.
+visNetwork(viz_nodes, viz_edges, width = "100%", height = "700px") %>%
+  visEdges(
+    color = list(highlight = "#FF0000"),  # when hovering, edge turns red
+    width = 4
+  ) %>%
+  visNodes(
+    size = 30,
+    font = list(size = 20)
+  ) %>%
+  visOptions(
+    highlightNearest  = TRUE,
+    nodesIdSelection  = FALSE,
+    selectedBy        = list(
+      variable = "group",
+      style    = 'width:200px; height:26px; font-size:14px;'
+    )
+  ) %>%
+  visLegend(
+    useGroups = TRUE,
+    position  = "right",
+    main      = "Node Sub-types"
+  ) %>%
+  visLayout(randomSeed = 42)
+
+```
+
+By selecting the different sub-groups from the drop-down below, we can conclude the following information.
+
+**Colleagues:**
+
+Person and Person:
+
+-   The Accountant and The Middleman
+
+-   The Intern and Lookout
+
+-   Small Fry and Davis
+
+-   Elise and Nadia Conti
+
+-   Liame Thorne and Nadia Conti
+
+-   Boss and Rodriguez
+
+-   Kelly and Sam
+
+-   Boss and Mrs Money
+
+Person and Vessel:
+
+-   Nadia Conti and Neptune
+
+**Friends:**
+
+-   Sam and Kelly
+
+-   The Intern and Lookout
+
+```{r}
+# -------------------------------------------------------------------
+# Continue from after mc3_edges_final has been created
+# -------------------------------------------------------------------
+
+library(dplyr)
+library(tidyr)       # for pivot_longer()
+library(visNetwork)
+library(RColorBrewer)
+
+# 1. Build sender/receiver pairs and their relationship nodes
+send_pairs <- mc3_edges_final %>%
+  filter(type == "sent") %>%
+  rename(sender = from, comm = to) %>%
+  select(sender, comm)
+
+recv_pairs <- mc3_edges_final %>%
+  filter(type == "received") %>%
+  rename(receiver = to, comm = from) %>%
+  select(receiver, comm)
+
+rel_edges <- mc3_edges_final %>%
+  filter(type %in% c("evidence_for", "is_inferred")) %>%
+  rename(rel = to, comm = from) %>%
+  select(rel, comm)
+
+# 2. Join to get each (sender, receiver, rel) for every communication event
+triplets <- send_pairs %>%
+  inner_join(recv_pairs, by = "comm") %>%          
+  inner_join(rel_edges, by = "comm") %>%            
+  mutate(
+    person1 = pmin(sender, receiver),
+    person2 = pmax(sender, receiver)
+  ) %>%
+  distinct(person1, person2, rel, .keep_all = TRUE) %>% 
+  select(person1, person2, rel)
+
+# 3. Collect unique node‐IDs used (persons/vessels and relationship nodes)
+node_ids_used <- unique(c(triplets$person1, triplets$person2, triplets$rel))
+
+# 4. Build a small lookup of node info for those IDs
+nodes_sub <- mc3_nodes_final %>%
+  filter(new_index %in% node_ids_used) %>%
+  select(new_index, label, type, sub_type)
+
+# 4a. Define groups:
+#    - For entity (Person/Vessel) nodes: group = the person's label (unique per entity)
+#    - For relationship nodes: group = the relationship subtype (common to many)
+nodes_grouped <- nodes_sub %>%
+  mutate(
+    group = case_when(
+      type == "Entity" & sub_type %in% c("Person", "Vessel") ~ label,
+      type == "Relationship"                              ~ sub_type
+    )
+  )
+
+# 4b. Assign one distinct color per entity (Person/Vessel) group
+entity_groups <- nodes_grouped %>%
+  filter(type == "Entity") %>%
+  distinct(group) %>%
+  arrange(group)
+n_entities <- nrow(entity_groups)
+entity_colors <- grDevices::rainbow(n_entities)
+entity_map <- tibble(
+  group = entity_groups$group,
+  color_entity = entity_colors
+)
+
+# 4c. Assign one distinct color per relationship subtype group
+rel_groups <- nodes_grouped %>%
+  filter(type == "Relationship") %>%
+  distinct(group) %>%
+  arrange(group) 
+n_rels <- nrow(rel_groups)
+if (n_rels > 0) {
+  brewer_base <- brewer.pal(min(n_rels, 8), "Set1")
+  rel_colors <- if (n_rels > length(brewer_base)) {
+    colorRampPalette(brewer_base)(n_rels)
+  } else {
+    brewer_base[1:n_rels]
+  }
+  rel_map <- tibble(
+    group = rel_groups$group,
+    color_rel = rel_colors
+  )
+} else {
+  rel_map <- tibble(group = character(0), color_rel = character(0))
+}
+
+# 4d. Combine color assignments and build nodes_vis
+nodes_vis <- nodes_grouped %>%
+  left_join(entity_map, by = "group") %>%
+  left_join(rel_map,    by = "group") %>%
+  transmute(
+    id    = new_index,
+    label = label,
+    group = group,
+    color = ifelse(!is.na(color_entity), color_entity, color_rel)
+  )
+
+# 5. Build the visNetwork 'edges' data frame
+# 5a. Edges between the two people/vessels (the "communication" edge)
+edges_comm_vis <- triplets %>%
+  transmute(
+    from   = person1,
+    to     = person2,
+    label  = "comm",
+    width  = 2,
+    arrows = "to"
+  )
+
+# 5b. For each triplet, connect both persons to the relationship node (no label text)
+edges_rel_vis <- triplets %>%
+  pivot_longer(
+    cols      = c(person1, person2),
+    names_to  = NULL,
+    values_to = "person"
+  ) %>%
+  transmute(
+    from   = person,
+    to     = rel,
+    label  = "",   # blank so "is_inferred"/"evidence_for" does not show
+    width  = 1,
+    arrows = "to"
+  )
+
+# 5c. Combine both sets of edges
+edges_vis <- bind_rows(edges_comm_vis, edges_rel_vis)
+
+# 6. Draw the visNetwork with a dropdown filter by 'group'
+visNetwork(nodes_vis, edges_vis) %>%
+  visNodes(
+    borderWidth         = 1,
+    borderWidthSelected = 2
+  ) %>%
+  visEdges(
+    arrows = "to",
+    color  = list(color = "#AAAAAA", highlight = "#FF0000"),
+    font   = list(align = "middle")
+  ) %>%
+  visOptions(
+    highlightNearest = TRUE,
+    nodesIdSelection = TRUE,
+    selectedBy       = "group"
+  ) %>%
+  visLegend(
+    addNodes = data.frame(
+      label = c(entity_map$group, rel_map$group),
+      shape = "dot",
+      color = c(entity_map$color_entity, rel_map$color_rel),
+      title = "Group"
+    ),
+    useGroups = FALSE
+  )
+
+
+```
+
+```{r warning=FALSE}
+library(dplyr)
+library(tidytext)
+library(wordcloud)
+
+# 1. Extract communication‐event nodes with their new_index and content
+comm_nodes <- mc3_nodes_final %>%
+  filter(type == "Event", sub_type == "Communication") %>%
+  select(event_index = new_index, content)
+
+# 2. Build a mapping from communication events to entities (Organization subtype)
+send_map <- mc3_edges_final %>%
+  filter(type == "sent") %>%
+  transmute(entity_index = from, event_index = to)
+
+recv_map <- mc3_edges_final %>%
+  filter(type == "received") %>%
+  transmute(event_index = from, entity_index = to)
+
+event_to_entity <- bind_rows(send_map, recv_map)
+
+# 3. Join event_to_entity with comm_nodes, then keep only Organization entities
+comm_by_entity <- event_to_entity %>%
+  inner_join(comm_nodes, by = "event_index") %>%
+  inner_join(
+    mc3_nodes_final %>% 
+      select(entity_index = new_index, sub_type, label),
+    by = "entity_index"
+  ) %>%
+  filter(sub_type == "Organization") %>%
+  select(organization = label, content)
+
+# 4. Collapse all texts per organization
+org_texts <- comm_by_entity %>%
+  group_by(organization) %>%
+  summarize(text = paste(content, collapse = " "), .groups = "drop")
+
+# 5. Tokenize, remove stop‐words, and compute word frequencies per organization
+tidy_org_words <- org_texts %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words, by = "word") %>%
+  count(organization, word, sort = TRUE)
+
+# 6. Plot one word cloud per organization
+org_list <- unique(tidy_org_words$organization)
+n_orgs   <- length(org_list)
+n_cols   <- 2
+n_rows   <- ceiling(n_orgs / n_cols)
+
+par(mfrow = c(n_rows, n_cols), mar = c(0, 0, 2, 0))
+for (org in org_list) {
+  freq_tbl <- tidy_org_words %>% filter(organization == org)
+  if (nrow(freq_tbl) == 0) {
+    plot.new()
+    title(main = org)
+    next
+  }
+  v <- setNames(freq_tbl$n, freq_tbl$word)
+  wordcloud(
+    words        = names(v),
+    freq         = as.numeric(v),
+    max.words    = 100,
+    scale        = c(3, 0.5),
+    random.order = FALSE
+  )
+  title(main = org, line = -1)
+}
+par(mfrow = c(1, 1))
+
+```
+
+# Question 3
+
+```{r mc3_daily_networks_direct_trimmed, message=FALSE, warning=FALSE, fig.width=16, fig.height=28}
+
+
+daily_comms <- selected_nodes %>%
+  filter(type=="Event", sub_type=="Communication") %>%
+  mutate(date=as_date(timestamp)) %>%
+  select(idx, date)
+
+all_dates <- sort(unique(daily_comms$date)) %>% discard(is.na)
+
+plots <- map(all_dates, function(d) {
+  comm_idx <- daily_comms %>% filter(date==d) %>% pull(idx)
+  es <- selected_edges %>% filter(type=="sent", to %in% comm_idx) %>% transmute(comm=to, sender=from)
+  er <- selected_edges %>% filter(type=="received", from %in% comm_idx) %>% transmute(comm=from, receiver=to)
+  dp <- inner_join(es, er, by="comm") %>% transmute(from=sender, to=receiver, type="sent")
+  if (nrow(dp)==0) return(NULL)
+
+  nodes_d <- selected_nodes %>%
+    filter(idx %in% unique(c(dp$from, dp$to)), sub_type %in% c("Person", "Vessel"))
+  dp <- dp %>% filter(from %in% nodes_d$idx, to %in% nodes_d$idx)
+  if (nrow(dp)==0) return(NULL)
+
+  nm <- tibble(old=nodes_d$idx, new=seq_len(nrow(nodes_d)))
+  edges2 <- dp %>%
+    left_join(nm, by=c("from"="old")) %>% mutate(from=new) %>% select(-new) %>%
+    left_join(nm, by=c("to"="old")) %>% mutate(to=new) %>% select(-new)
+  nodes2 <- nodes_d %>% mutate(idx2=seq_len(nrow(nodes_d)))
+
+  g <- tbl_graph(nodes=nodes2, edges=edges2, directed=TRUE)
+  lay <- create_layout(g, layout="fr", niter=500, area=vcount(g)^2, repulse=vcount(g)^1.2)
+
+  ggraph(lay) +
+    geom_edge_link(aes(color=type),
+                   arrow=arrow(length=unit(4,"mm"), type="closed"),
+                   alpha=0.8, width=1) +
+    geom_node_point(aes(color=sub_type), size=4) +
+    geom_node_text(aes(label=ifelse(sub_type %in% c("Person","Vessel"), label, "")),
+                   repel=TRUE, point.padding=unit(0.5,"lines"),
+                   box.padding=unit(0.5,"lines"), size=6) +
+    scale_edge_color_manual(values=c(sent="#7570B3")) +
+    scale_color_manual(values=c(Person="#1b9e77", Vessel="#d95f02")) +
+    ggtitle(as.character(d)) +
+    theme_void() +
+    theme(plot.title=element_text(size=12,hjust=0.5), legend.position="right")
+})
+
+wrap_plots(plots, ncol=2) +
+  plot_layout(guides="collect") +
+  plot_annotation(title="MC3 Communications by Day")
+
+```
+
+## Part A
+
+The pseudonyms used are:
+
+-   Boss
+
+-   The Intern
+
+-   Mrs Money
+
+-   The Lookout
+
+-   The Accountant
+
+-   The Middleman
+
+## Part B
+
+My visualisations help to break down the communication on a daily basis and to draw the connections between the different relationships.
+
+From the figures above, it can be seen that the Boss is mostly always on the receiving end of the communication, with the exception of Mako. The ones who are in direct contact with Boss are Mrs Money, The Middleman, Davis, Liam Thorne, The Accountant and Mako (Vessel).
+
+Mrs Money, however, receives information mainly from The Intern.
+
+The Lookout and The Intern, however, usually communicates in both directions, with The Intern usually on the receiving end of information.
+
+The Lookout also sends informations to Sam.
+
+**There is a clear hierachy when sending information:**
+
+Lookout -\> Intern -\> Mrs Money/The Accountant/The Middleman -\> Boss
+
+Lookout -\> Sam
+
+**Additional visualisations are done below to further investigate the communication between the pseudonyms and real names.**
+
+```{r}
+library(dplyr)
+library(visNetwork)
+
+# 1. Keep only Person/Vessel nodes, assigning colors by sub_type
+nodes <- selected_nodes %>%
+  filter(sub_type %in% c("Person", "Vessel")) %>%
+  transmute(
+    id    = idx,
+    label = label,
+    color = ifelse(sub_type == "Person", "#1b9e77", "#d95f02")
+  )
+
+# 2. Build direct sender→receiver pairs from communication events
+es <- selected_edges %>%
+  filter(type == "sent") %>%
+  transmute(comm = to, sender = from)
+er <- selected_edges %>%
+  filter(type == "received") %>%
+  transmute(comm = from, receiver = to)
+
+# 3. Join on the communication node to get from→to, then count occurrences
+dp <- inner_join(es, er, by = "comm") %>%
+  transmute(from = sender, to = receiver)
+
+edges <- dp %>%
+  count(from, to, name = "count") %>%
+  filter(from %in% nodes$id, to %in% nodes$id) %>%
+  mutate(width = count, label = as.character(count))
+
+# 4. Draw a visNetwork: node colors by type, edge width and label by count
+visNetwork(nodes, edges) %>%
+  visEdges(
+    arrows = "to",
+    color  = list(color = "#AAAAAA", highlight = "#FF0000"),
+    font   = list(align = "middle")
+  ) %>%
+  visOptions(
+    highlightNearest  = TRUE,
+    nodesIdSelection  = TRUE
+  )
 
 
 
