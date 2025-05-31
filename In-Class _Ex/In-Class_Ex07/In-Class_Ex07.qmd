@@ -1,6 +1,6 @@
 ---
-title: "In Class Exercise 04"
-date: 10 May 2025
+title: "In Class Exercise 07"
+date: 31 May 2025
 date-modified: "last-modified"
 author: "Liaw Ying Ting, Celin"
 execute: 
