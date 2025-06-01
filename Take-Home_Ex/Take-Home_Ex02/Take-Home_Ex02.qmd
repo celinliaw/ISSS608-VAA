@@ -16,7 +16,7 @@ execute:
   freeze: true
 ---
 
-# Overview
+# Overview - Mini Challenge 3
 
 For this take-home exercise 2, Mini-Challenge 3 will be chosen and the visualisation will be done on this topic. The background of the mini challenge and the questions will be listed below. For this mini challenge, I will only be displaying and addressing **Questions 2 and 3** below.
 
@@ -274,11 +274,10 @@ ggraph(mc3_graph,
   theme_void()
 ```
 
-# Question 1
-
-For question 1 visualisations, kindly refer to my teammate [Shermainn's](https://isss608-sherm.netlify.app/take-home_ex/take-home_ex02/take-home_ex02) website and I will be building on her answers.
-
 # Question 2
+
+::: panel-tabset
+### Data Cleaning
 
 For nodes, the code `filter()` will be used to filter out only *Person and Vessel* from *Entity*, and *Communication* from *Event* and their *relationship.*
 
@@ -323,191 +322,15 @@ selected_edges <- mc3_edges_final %>%
   select(from = from_new, to = to_new, type)
 ```
 
+### People/Vessel Vs Relationship Subtypes
+
 Step 1: we proceed to `filter()` only the edges that we want, specifically *sent, received and evidence_for*. The labels for the edges show "sent", "received" and "evidence_for" using `transmute()`.
 
 Step 2: We then build the node table and colour by sub_type which is called *group*. The label for the names/vessels will be placed under the node using *label.*
 
-Step 3: Draw a Viznetwork graph.
-
-```{r mc3_viznetwork_multi_select, message=FALSE, warning=FALSE}
-library(visNetwork)
-
-# 1
-viz_edges <- selected_edges %>%
-  filter(type %in% c("sent", "received", "evidence_for")) %>%
-  transmute(
-    from   = from,
-    to     = to,
-    label  = type,      
-    arrows = "to"       
-  )
-
-# 2 
-all_node_ids <- unique(c(viz_edges$from, viz_edges$to))
-viz_nodes <- selected_nodes %>%
-  filter(idx %in% all_node_ids) %>%
-  transmute(
-    id    = idx,        
-    label = label,      
-    group = sub_type   
-                        
-  )
-
-# 3
-visNetwork(viz_nodes, viz_edges, width = "100%", height = "700px") %>%
-  visEdges(
-    arrows = "to",
-    color  = list(color = "#AAAAAA", highlight = "#FF0000"),
-    width  = 4            # thicker edge lines
-  ) %>%
-  visNodes(
-    size = 30,            # bigger node circles
-    font = list(size = 20) # bigger node labels
-  ) %>%
-  visOptions(
-    highlightNearest = TRUE,
-    nodesIdSelection = FALSE,
-    # Here’s the key change: allow multiple groups to be selected at once
-    selectedBy       = list(
-      variable = "group",
-      style    = 'width:200px; height:26px; font-size:14px;'
-    )
-  ) %>%
-  visLegend(
-    useGroups = TRUE,
-    position  = "right",
-    main      = "Node Sub-types"
-  ) %>%
-  visLayout(randomSeed = 42)
-```
-
-```         
-```
-
-```{r mc3_viznetwork_multi_select_with_pv_rel, message=FALSE, warning=FALSE}
-
-
-# 1) Build the “base” edges exactly as before, but include a default color
-viz_edges_base <- selected_edges %>%
-  filter(type %in% c("sent", "received", "evidence_for")) %>%
-  transmute(
-    from   = from,
-    to     = to,
-    label  = type,          # “sent” / “received” / “evidence_for”
-    arrows = "to",
-    color  = "#AAAAAA"      # default gray for these original edges
-  )
-
-# 2) Identify Person/Vessel ↔ Communication links (type = sent or received).
-#    For “sent”:   from = Person/Vessel, to = Communication
-#    For “received”: from = Communication, to = Person/Vessel
-pc_links <- selected_edges %>%
-  filter(type %in% c("sent", "received")) %>%
-  transmute(
-    person = ifelse(type == "sent", from, to),
-    comm   = ifelse(type == "sent", to, from)
-  )
-
-# 3) Identify Communication → Relationship edges (type = evidence_for)
-cr_links <- selected_edges %>%
-  filter(type == "evidence_for") %>%
-  transmute(
-    comm         = from,
-    relationship = to
-  )
-
-# 4) Join them so that for each (person, comm) we find all (comm → relationship).
-#    This creates new edges: Person → Relationship
-new_pv_rel_edges <- pc_links %>%
-  inner_join(cr_links, by = "comm") %>%
-  transmute(
-    from   = person,
-    to     = relationship,
-    label  = "implied",   # or “related”—pick any hover‐label you like
-    arrows = "to",
-    color  = "blue"       # draw these edges in blue
-  ) %>%
-  distinct()             # in case multiple duplicates arise
-
-# 5) Combine the “base” edges with our new Person→Relationship edges
-viz_edges <- bind_rows(viz_edges_base, new_pv_rel_edges)
-
-# 6) Build the node data frame from all IDs appearing in viz_edges
-all_node_ids <- unique(c(viz_edges$from, viz_edges$to))
-viz_nodes <- selected_nodes %>%
-  filter(idx %in% all_node_ids) %>%
-  transmute(
-    id    = idx,         # must match viz_edges$from/to
-    label = label,       # human‐readable node label
-    group = sub_type     # Person, Vessel, Communication, or Relationship
-  )
-
-# 7) Plot with visNetwork. Because each edge row has its own 'color',
-#    visNetwork will draw original edges in gray and the new Person→Relationship
-#    edges in blue. We still supply highlight color for hover, and allow multi‐select.
-visNetwork(viz_nodes, viz_edges, width = "100%", height = "700px") %>%
-  visEdges(
-    color = list(highlight = "#FF0000"),  # when hovering, edge turns red
-    width = 4
-  ) %>%
-  visNodes(
-    size = 30,
-    font = list(size = 20)
-  ) %>%
-  visOptions(
-    highlightNearest  = TRUE,
-    nodesIdSelection  = FALSE,
-    selectedBy        = list(
-      variable = "group",
-      style    = 'width:200px; height:26px; font-size:14px;'
-    )
-  ) %>%
-  visLegend(
-    useGroups = TRUE,
-    position  = "right",
-    main      = "Node Sub-types"
-  ) %>%
-  visLayout(randomSeed = 42)
-
-```
-
-By selecting the different sub-groups from the drop-down below, we can conclude the following information.
-
-**Colleagues:**
-
-Person and Person:
-
--   The Accountant and The Middleman
-
--   The Intern and Lookout
-
--   Small Fry and Davis
-
--   Elise and Nadia Conti
-
--   Liame Thorne and Nadia Conti
-
--   Boss and Rodriguez
-
--   Kelly and Sam
-
--   Boss and Mrs Money
-
-Person and Vessel:
-
--   Nadia Conti and Neptune
-
-**Friends:**
-
--   Sam and Kelly
-
--   The Intern and Lookout
+Step 3: Draw a Visnetwork graph.
 
 ```{r}
-# -------------------------------------------------------------------
-# Continue from after mc3_edges_final has been created
-# -------------------------------------------------------------------
-
 library(dplyr)
 library(tidyr)       # for pivot_longer()
 library(visNetwork)
@@ -531,90 +354,82 @@ rel_edges <- mc3_edges_final %>%
 
 # 2. Join to get each (sender, receiver, rel) for every communication event
 triplets <- send_pairs %>%
-  inner_join(recv_pairs, by = "comm") %>%          
-  inner_join(rel_edges, by = "comm") %>%            
+  inner_join(recv_pairs, by = "comm") %>%
+  inner_join(rel_edges, by = "comm") %>%
   mutate(
     person1 = pmin(sender, receiver),
     person2 = pmax(sender, receiver)
   ) %>%
-  distinct(person1, person2, rel, .keep_all = TRUE) %>% 
+  distinct(person1, person2, rel, .keep_all = TRUE) %>%
   select(person1, person2, rel)
 
 # 3. Collect unique node‐IDs used (persons/vessels and relationship nodes)
 node_ids_used <- unique(c(triplets$person1, triplets$person2, triplets$rel))
 
-# 4. Build a small lookup of node info for those IDs
+# 4. Build a lookup of node info for those IDs,
+#    but filter to only Person/Vessel entity subtypes and Relationship nodes
 nodes_sub <- mc3_nodes_final %>%
   filter(new_index %in% node_ids_used) %>%
-  select(new_index, label, type, sub_type)
+  filter(
+    sub_type %in% c("Person", "Vessel") |
+    type == "Relationship"
+  ) %>%
+  select(new_index, label, sub_type, type)
 
-# 4a. Define groups:
-#    - For entity (Person/Vessel) nodes: group = the person's label (unique per entity)
-#    - For relationship nodes: group = the relationship subtype (common to many)
-nodes_grouped <- nodes_sub %>%
-  mutate(
-    group = case_when(
-      type == "Entity" & sub_type %in% c("Person", "Vessel") ~ label,
-      type == "Relationship"                              ~ sub_type
-    )
-  )
-
-# 4b. Assign one distinct color per entity (Person/Vessel) group
-entity_groups <- nodes_grouped %>%
-  filter(type == "Entity") %>%
-  distinct(group) %>%
-  arrange(group)
-n_entities <- nrow(entity_groups)
-entity_colors <- grDevices::rainbow(n_entities)
-entity_map <- tibble(
-  group = entity_groups$group,
-  color_entity = entity_colors
+# 4a. Define pleasing, non‐grey colors for entity subtypes
+entity_color_map <- tibble(
+  sub_type = c("Person", "Vessel"),
+  color    = c("#2c7fb8", "#e6550d")  # blue for Person, orange for Vessel
 )
 
-# 4c. Assign one distinct color per relationship subtype group
-rel_groups <- nodes_grouped %>%
+# 4b. Identify all relationship subtypes and assign distinct, visually pleasing colors
+rel_subtypes <- nodes_sub %>%
   filter(type == "Relationship") %>%
-  distinct(group) %>%
-  arrange(group) 
-n_rels <- nrow(rel_groups)
+  distinct(sub_type) %>%
+  arrange(sub_type) %>%
+  pull(sub_type)
+
+n_rels <- length(rel_subtypes)
 if (n_rels > 0) {
-  brewer_base <- brewer.pal(min(n_rels, 8), "Set1")
-  rel_colors <- if (n_rels > length(brewer_base)) {
-    colorRampPalette(brewer_base)(n_rels)
+  base_palette <- brewer.pal(min(n_rels, 8), "Set2")
+  if (n_rels > length(base_palette)) {
+    rel_colors <- colorRampPalette(base_palette)(n_rels)
   } else {
-    brewer_base[1:n_rels]
+    rel_colors <- base_palette[1:n_rels]
   }
-  rel_map <- tibble(
-    group = rel_groups$group,
-    color_rel = rel_colors
+  rel_color_map <- tibble(
+    sub_type = rel_subtypes,
+    color    = rel_colors
   )
 } else {
-  rel_map <- tibble(group = character(0), color_rel = character(0))
+  rel_color_map <- tibble(sub_type = character(0), color = character(0))
 }
 
-# 4d. Combine color assignments and build nodes_vis
-nodes_vis <- nodes_grouped %>%
-  left_join(entity_map, by = "group") %>%
-  left_join(rel_map,    by = "group") %>%
+# 4c. Combine entity and relationship color mappings
+color_map <- bind_rows(entity_color_map, rel_color_map)
+
+# 4d. Build nodes_vis with assigned colors (no grey)
+nodes_vis <- nodes_sub %>%
+  left_join(color_map, by = "sub_type") %>%
   transmute(
-    id    = new_index,
-    label = label,
-    group = group,
-    color = ifelse(!is.na(color_entity), color_entity, color_rel)
+    id       = new_index,
+    label    = label,
+    sub_type = sub_type,
+    color    = color
   )
 
 # 5. Build the visNetwork 'edges' data frame
-# 5a. Edges between the two people/vessels (the "communication" edge)
+# 5a. Edges between the two people/vessels (no label)
 edges_comm_vis <- triplets %>%
   transmute(
     from   = person1,
     to     = person2,
-    label  = "comm",
+    label  = "",     # no “comm” text
     width  = 2,
     arrows = "to"
   )
 
-# 5b. For each triplet, connect both persons to the relationship node (no label text)
+# 5b. For each triplet, connect both persons to the relationship node (no label)
 edges_rel_vis <- triplets %>%
   pivot_longer(
     cols      = c(person1, person2),
@@ -624,7 +439,7 @@ edges_rel_vis <- triplets %>%
   transmute(
     from   = person,
     to     = rel,
-    label  = "",   # blank so "is_inferred"/"evidence_for" does not show
+    label  = "",    # no text here
     width  = 1,
     arrows = "to"
   )
@@ -632,7 +447,8 @@ edges_rel_vis <- triplets %>%
 # 5c. Combine both sets of edges
 edges_vis <- bind_rows(edges_comm_vis, edges_rel_vis)
 
-# 6. Draw the visNetwork with a dropdown filter by 'group'
+# 6. Draw the visNetwork with a dropdown filter by sub_type.
+#    Legend shows only subtypes in the graph, in oval shape, larger, and using our custom colors.
 visNetwork(nodes_vis, edges_vis) %>%
   visNodes(
     borderWidth         = 1,
@@ -640,28 +456,125 @@ visNetwork(nodes_vis, edges_vis) %>%
   ) %>%
   visEdges(
     arrows = "to",
-    color  = list(color = "#AAAAAA", highlight = "#FF0000"),
+    color  = list(color = "#333333", highlight = "#FF0000"),  # dark edge color
     font   = list(align = "middle")
   ) %>%
   visOptions(
     highlightNearest = TRUE,
     nodesIdSelection = TRUE,
-    selectedBy       = "group"
+    selectedBy       = "sub_type"
   ) %>%
   visLegend(
     addNodes = data.frame(
-      label = c(entity_map$group, rel_map$group),
-      shape = "dot",
-      color = c(entity_map$color_entity, rel_map$color_rel),
-      title = "Group"
+      label = color_map$sub_type,
+      shape = "ellipse", 
+      color = color_map$color,
+      size  = rep(20, nrow(color_map))
+    ),
+    useGroups = FALSE
+  )
+  
+
+```
+
+### People vs Relationship Subtype
+
+```{r}
+# 7. Exclude all “Vessel” nodes and any edges involving them
+nodes_vis2 <- nodes_vis %>%
+  filter(sub_type != "Vessel")
+
+edges_vis2 <- edges_vis %>%
+  filter(from %in% nodes_vis2$id, to %in% nodes_vis2$id)
+
+# 8. Build a reduced legend data.frame for the remaining subtypes
+legend_map2 <- color_map %>%
+  filter(sub_type %in% unique(nodes_vis2$sub_type))
+
+# 9. Draw the new visNetwork without Vessel nodes
+visNetwork(nodes_vis2, edges_vis2) %>%
+  visNodes(
+    borderWidth         = 1,
+    borderWidthSelected = 2
+  ) %>%
+  visEdges(
+    arrows = "to",
+    color  = list(color = "#333333", highlight = "#FF0000"),
+    font   = list(align = "middle")
+  ) %>%
+  visOptions(
+    highlightNearest = TRUE,
+    nodesIdSelection = TRUE,
+    selectedBy       = "sub_type"
+  ) %>%
+  visLegend(
+    addNodes = data.frame(
+      label = legend_map2$sub_type,
+      shape = "ellipse",
+      color = legend_map2$color,
+      size  = rep(20, nrow(legend_map2))
     ),
     useGroups = FALSE
   )
 
-
 ```
+:::
 
-```{r warning=FALSE}
+### Q2 Part A
+
+By selecting the different sub-groups from the drop-down below, we can conclude the following information.
+
+**Colleagues:**
+
+-   Boss, Mrs Money and The Middleman
+
+-   Boss, The Accountant and The Middleman
+
+-   The Lookout, The Intern and Mrs Money
+
+-   Mrs Money and The Intern
+
+-   Boss and Mrs Money
+
+-   Boss and Rodriguez
+
+-   Small Fry and Davis
+
+-   Nadia Conti and Davis
+
+-   Nadia Conti and Elise
+
+-   Nadia Conti and Liam Thorne
+
+-   Sam and Kelly
+
+**Friends:**
+
+-   Sam and Kelly
+
+-   The Intern and The Lookout
+
+**Unfriendly:**
+
+-   Elise and Nadia Conti
+
+**Suspicious:**
+
+-   Boss, Mrs Money, The Intern, The Lookout, The Accountant
+-   Sam, Kelly, Liam Thorne, Elise, Nadia Conti, Davis
+
+From the above results, it can be seen that either Sam or Kelly holds the status of The Intern and The Lookout as they are the only ones with the relationship of friends in the conclusion above.
+
+Boss seems to be the one with the most information and power as Mrs Money, The Accountant and The Middlman transmit information to The Boss only
+
+## Q2 Part B
+
+Based on the question 2b, I have categorised them into the 3 different Entity Subgroups: Person, Organisation and Vessel
+
+::: panel-tabset
+### Group by organisation
+
+```{r warning=FALSE, fig.width=10, fig.height=5}
 library(dplyr)
 library(tidytext)
 library(wordcloud)
@@ -707,10 +620,10 @@ tidy_org_words <- org_texts %>%
 # 6. Plot one word cloud per organization
 org_list <- unique(tidy_org_words$organization)
 n_orgs   <- length(org_list)
-n_cols   <- 2
+n_cols   <- 3
 n_rows   <- ceiling(n_orgs / n_cols)
 
-par(mfrow = c(n_rows, n_cols), mar = c(0, 0, 2, 0))
+par(mfrow = c(n_rows, n_cols), mar = c(0, 0, 0, 0))
 for (org in org_list) {
   freq_tbl <- tidy_org_words %>% filter(organization == org)
   if (nrow(freq_tbl) == 0) {
@@ -722,7 +635,7 @@ for (org in org_list) {
   wordcloud(
     words        = names(v),
     freq         = as.numeric(v),
-    max.words    = 100,
+    max.words    = 20,
     scale        = c(3, 0.5),
     random.order = FALSE
   )
@@ -732,9 +645,210 @@ par(mfrow = c(1, 1))
 
 ```
 
+For Organisation: It can be seen that Team Glitters does not have any pre-dominant topic area.
+
+Oceanus City Council, Sailor Shift Team and Green Guardians seems to have common words like nemo, city, reef ,equipment and vessel, showing that they are more concerned about the environment.
+
+V. Miesel Shipping however, is more concerned about regulations as the most commonly used words are permit, operations and documentation.
+
+### Group by Person
+
+```{r warning=FALSE, fig.width=14, fig.height=14}
+# (Assuming you already have mc3_nodes_final and mc3_edges_final loaded)
+
+library(dplyr)
+library(tidytext)
+library(wordcloud)
+
+# 1. Extract communication‐event nodes with their new_index and content
+comm_nodes <- mc3_nodes_final %>%
+  filter(type == "Event", sub_type == "Communication") %>%
+  select(event_index = new_index, content)
+
+# 2. Build a mapping from communication events to entities
+send_map <- mc3_edges_final %>%
+  filter(type == "sent") %>%
+  transmute(entity_index = from, event_index = to)
+
+recv_map <- mc3_edges_final %>%
+  filter(type == "received") %>%
+  transmute(event_index = from, entity_index = to)
+
+event_to_entity <- bind_rows(send_map, recv_map)
+
+# 3. Join event_to_entity with comm_nodes, then keep only Person entities
+comm_by_person <- event_to_entity %>%
+  inner_join(comm_nodes, by = "event_index") %>%
+  inner_join(
+    mc3_nodes_final %>% 
+      select(entity_index = new_index, sub_type, label),
+    by = "entity_index"
+  ) %>%
+  filter(sub_type == "Person") %>%
+  select(person = label, content)
+
+# 4. Collapse all texts per person
+person_texts <- comm_by_person %>%
+  group_by(person) %>%
+  summarize(text = paste(content, collapse = " "), .groups = "drop")
+
+# 5. Tokenize, remove stop‐words, and compute word frequencies per person
+tidy_person_words <- person_texts %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words, by = "word") %>%
+  count(person, word, sort = TRUE)
+
+# 6. Plot one word cloud per person
+person_list <- unique(tidy_person_words$person)
+n_persons   <- length(person_list)
+n_cols      <- 4
+n_rows      <- ceiling(n_persons / n_cols)
+
+par(mfrow = c(n_rows, n_cols), mar = c(0, 0, 0, 0))
+for (p in person_list) {
+  freq_tbl <- tidy_person_words %>% filter(person == p)
+  if (nrow(freq_tbl) == 0) {
+    plot.new()
+    title(main = p)
+    next
+  }
+  v <- setNames(freq_tbl$n, freq_tbl$word)
+  wordcloud(
+    words        = names(v),
+    freq         = as.numeric(v),
+    max.words    = 10,
+    scale        = c(3, 0.5),
+    random.order = FALSE
+  )
+  title(main = p, line = -1)
+}
+par(mfrow = c(1, 1))
+```
+
+**For Person Subgroups:**
+
+**Top 3 Commonly Used Words:**
+
+Mrs Money: Meeting, Nemo Reef, Intern
+
+The Intern: Nemo Reef, Lookout, Money
+
+The Lookout: Nemo Reef, Intern, tomorrow
+
+Boss: Nemo Reef, meeting, middleman
+
+The Middleman: Nemo Reef, boss, meeting
+
+The Accountant: meeting, middleman, boss
+
+**It can be seen that these 6 people are in contact with each other as their most commonly used terms concern each other and usually revolves around Nemo Reef.**
+
+Liam Thorne: Nemo Reef, council, report
+
+Nadia Conti: Nemo Reef, documentation, meeting
+
+Rodriguez: Nemo reef, davis, remora
+
+Samantha Blake: Nemo Reef, tomorrow, city council
+
+Elise: Nemo Reef, tomorrow, meeting
+
+**It can also be seen that these group of people have common schedules like meeting, tomorrow and City Council, and they are also concerned about Nemo Reef.**
+
+Clepper Jensen: Miranda, equipment, environmental
+
+Miranda Jordan: Miranda, equipment, clepper Jensen
+
+Davis: Mako, security, equipment
+
+Sam: birdwatching, lookout, reef
+
+Mako: try, team, remora
+
+Kelly: sam, kelly
+
+**These group of people here have different focus and do not have commonailities with the groups above.**
+
+### Group by Vessels
+
+```{r warning=FALSE, fig.width=14, fig.height=10}
+
+# 1. Extract communication‐event nodes with their new_index and content
+comm_nodes <- mc3_nodes_final %>%
+  filter(type == "Event", sub_type == "Communication") %>%
+  select(event_index = new_index, content)
+
+# 2. Build a mapping from communication events to entities (sender/receiver)
+send_map <- mc3_edges_final %>%
+  filter(type == "sent") %>%
+  transmute(entity_index = from, event_index = to)
+
+recv_map <- mc3_edges_final %>%
+  filter(type == "received") %>%
+  transmute(event_index = from, entity_index = to)
+
+event_to_entity <- bind_rows(send_map, recv_map)
+
+# 3. Join event_to_entity with comm_nodes, then keep only Vessel entities
+comm_by_vessel <- event_to_entity %>%
+  inner_join(comm_nodes, by = "event_index") %>%
+  inner_join(
+    mc3_nodes_final %>%
+      select(entity_index = new_index, sub_type, label),
+    by = "entity_index"
+  ) %>%
+  filter(sub_type == "Vessel") %>%      # <— change here
+  select(vessel = label, content)
+
+# 4. Collapse all texts per vessel
+vessel_texts <- comm_by_vessel %>%
+  group_by(vessel) %>%
+  summarize(text = paste(content, collapse = " "), .groups = "drop")
+
+# 5. Tokenize, remove stop‐words, and compute word frequencies per vessel
+tidy_vessel_words <- vessel_texts %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words, by = "word") %>%
+  count(vessel, word, sort = TRUE)
+
+# 6. Plot one word cloud per vessel
+vessel_list <- unique(tidy_vessel_words$vessel)
+n_vess   <- length(vessel_list)
+n_cols   <- 4
+n_rows   <- ceiling(n_vess / n_cols)
+
+par(mfrow = c(n_rows, n_cols), mar = c(0, 0, 0, 0))
+for (ves in vessel_list) {
+  freq_tbl <- tidy_vessel_words %>% filter(vessel == ves)
+  if (nrow(freq_tbl) == 0) {
+    plot.new()
+    title(main = ves)
+    next
+  }
+  v <- setNames(freq_tbl$n, freq_tbl$word)
+  wordcloud(
+    words        = names(v),
+    freq         = as.numeric(v),
+    max.words    = 20,
+    scale        = c(3, 0.5),
+    random.order = FALSE
+  )
+  title(main = ves, line = -1)
+}
+par(mfrow = c(1, 1))
+
+
+```
+:::
+
 # Question 3
 
+::: panel-tabset
+### Daily Network Graph of Communication
+
 ```{r mc3_daily_networks_direct_trimmed, message=FALSE, warning=FALSE, fig.width=16, fig.height=28}
+
+library(patchwork)
 
 
 daily_comms <- selected_nodes %>%
@@ -786,39 +900,7 @@ wrap_plots(plots, ncol=2) +
 
 ```
 
-## Part A
-
-The pseudonyms used are:
-
--   Boss
-
--   The Intern
-
--   Mrs Money
-
--   The Lookout
-
--   The Accountant
-
--   The Middleman
-
-## Part B
-
-My visualisations help to break down the communication on a daily basis and to draw the connections between the different relationships.
-
-From the figures above, it can be seen that the Boss is mostly always on the receiving end of the communication, with the exception of Mako. The ones who are in direct contact with Boss are Mrs Money, The Middleman, Davis, Liam Thorne, The Accountant and Mako (Vessel).
-
-Mrs Money, however, receives information mainly from The Intern.
-
-The Lookout and The Intern, however, usually communicates in both directions, with The Intern usually on the receiving end of information.
-
-The Lookout also sends informations to Sam.
-
-**There is a clear hierachy when sending information:**
-
-Lookout -\> Intern -\> Mrs Money/The Accountant/The Middleman -\> Boss
-
-Lookout -\> Sam
+### Communication between People and Vessels
 
 **Additional visualisations are done below to further investigate the communication between the pseudonyms and real names.**
 
@@ -854,16 +936,73 @@ edges <- dp %>%
 
 # 4. Draw a visNetwork: node colors by type, edge width and label by count
 visNetwork(nodes, edges) %>%
+  visIgraphLayout(layout = "layout_with_fr", randomSeed = 123) %>%
   visEdges(
     arrows = "to",
     color  = list(color = "#AAAAAA", highlight = "#FF0000"),
     font   = list(align = "middle")
   ) %>%
   visOptions(
-    highlightNearest  = TRUE,
-    nodesIdSelection  = TRUE
+    highlightNearest = TRUE,
+    nodesIdSelection = TRUE
   )
 
 
-
 ```
+:::
+
+## Q3 Part A
+
+The pseudonyms used are:
+
+-   Boss
+
+-   The Intern
+
+-   Mrs Money
+
+-   The Lookout
+
+-   The Accountant
+
+-   The Middleman
+
+## Q3 Part B
+
+My visualisations help to break down the communication on a daily basis and to draw the connections between the different people based on their communication groups.
+
+From the figures above, it can be seen that the Boss is mostly always on the receiving end of the communication, with the exception of Mako(Vessel). The ones who are in direct contact with Boss are Mrs Money, The Middleman, Rodriguez, Davis, Liam Thorne, The Accountant and Mako (Vessel).
+
+Mrs Money, however, receives information mainly from The Intern.
+
+The Lookout and The Intern, however, usually communicates in both directions, with The Intern usually on the receiving end of information.
+
+The Accountant only communicated with Boss on 11 October and he is often communicating with The Middleman.
+
+The Lookout also sends informations to Sam.
+
+**There is a clear hierachy when sending information:**
+
+Lookout -\> Intern -\> Mrs Money/The Accountant/The Middleman -\> Boss
+
+Lookout -\> Sam
+
+## Q3 Part C
+
+These visualisations have confirmed my understanding that Boss is likely the leader of the group and the Vessel that is in contact with boss is likely Mako for illegal activities. The illegal activities should be taking place around Nemo Reef or meetings are held around Nemo Reef. The ones of higher positions are probably Mrs Money, The Middleman and The Accountant who reports directly to Boss.
+
+Rodriguez, Liam Thorne and Davis seem to be involved directly with The Boss as well.
+
+Strangely, Nadia Conti seems to be at the receiving end of the communciation from Elise, Davis and Rodriguez and only replies to Liam Thorne. Nadia Conti is also in contact with several vessels.
+
+The Intern and The Lookout seems to be of the same position in the syndicate, but The Intern is the only one who communicates with Mrs Money.
+
+The Lookout seems to be reporting to Sam as well, as the communication is always in 1 direction.
+
+**From all the previous analysis, I would like to conclude that Rodriguez and Davis are likely involved in the illegal activities as they are in direct contact with Boss. Sam is also likely involved as The Lookout reports to him frequently.**
+
+# References
+
+-   [ISSS608 AY2024-25 April Term](https://isss608-ay2024-25apr.netlify.app/)
+
+-   [visNetwork](https://datastorm-open.github.io/visNetwork/)

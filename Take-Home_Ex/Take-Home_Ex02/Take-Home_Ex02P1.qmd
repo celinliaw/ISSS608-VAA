@@ -16,7 +16,7 @@ execute:
   freeze: true
 ---
 
-# Overview
+# Overview - Mini Challenge 3
 
 For this take-home exercise 2, Mini-Challenge 3 will be chosen and the visualisation will be done on this topic. The background of the mini challenge and the questions will be listed below. For this mini challenge, I will only be displaying and addressing Question 3 below.
 
