@@ -348,7 +348,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">June 1, 2025</p>
+      <p class="date-modified">June 8, 2025</p>
     </div>
   </div>
     
@@ -2842,7 +2842,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb45-779"><a href="#cb45-779" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-780"><a href="#cb45-780" aria-hidden="true" tabindex="-1"></a>Boss: Nemo Reef, meeting, middleman</span>
 <span id="cb45-781"><a href="#cb45-781" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-782"><a href="#cb45-782" aria-hidden="true" tabindex="-1"></a>The Middleman: Nemo reef, boss, meeting</span>
+<span id="cb45-782"><a href="#cb45-782" aria-hidden="true" tabindex="-1"></a>The Middleman: Nemo Reef, boss, meeting</span>
 <span id="cb45-783"><a href="#cb45-783" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-784"><a href="#cb45-784" aria-hidden="true" tabindex="-1"></a>The Accountant: meeting, middleman, boss</span>
 <span id="cb45-785"><a href="#cb45-785" aria-hidden="true" tabindex="-1"></a></span>
@@ -3005,108 +3005,112 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb45-942"><a href="#cb45-942" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-943"><a href="#cb45-943" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb45-944"><a href="#cb45-944" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-945"><a href="#cb45-945" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-946"><a href="#cb45-946" aria-hidden="true" tabindex="-1"></a><span class="fu">### Communication between People and Vessels</span></span>
-<span id="cb45-947"><a href="#cb45-947" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-948"><a href="#cb45-948" aria-hidden="true" tabindex="-1"></a>**Additional visualisations are done below to further investigate the communication between the pseudonyms and real names.**</span>
-<span id="cb45-949"><a href="#cb45-949" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-952"><a href="#cb45-952" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb45-953"><a href="#cb45-953" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb45-954"><a href="#cb45-954" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(visNetwork)</span>
-<span id="cb45-955"><a href="#cb45-955" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-956"><a href="#cb45-956" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Keep only Person/Vessel nodes, assigning colors by sub_type</span></span>
-<span id="cb45-957"><a href="#cb45-957" aria-hidden="true" tabindex="-1"></a>nodes <span class="ot">&lt;-</span> selected_nodes <span class="sc">%&gt;%</span></span>
-<span id="cb45-958"><a href="#cb45-958" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sub_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Person"</span>, <span class="st">"Vessel"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb45-959"><a href="#cb45-959" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
-<span id="cb45-960"><a href="#cb45-960" aria-hidden="true" tabindex="-1"></a>    <span class="at">id    =</span> idx,</span>
-<span id="cb45-961"><a href="#cb45-961" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> label,</span>
-<span id="cb45-962"><a href="#cb45-962" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="fu">ifelse</span>(sub_type <span class="sc">==</span> <span class="st">"Person"</span>, <span class="st">"#1b9e77"</span>, <span class="st">"#d95f02"</span>)</span>
-<span id="cb45-963"><a href="#cb45-963" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb45-964"><a href="#cb45-964" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-965"><a href="#cb45-965" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Build direct sender→receiver pairs from communication events</span></span>
-<span id="cb45-966"><a href="#cb45-966" aria-hidden="true" tabindex="-1"></a>es <span class="ot">&lt;-</span> selected_edges <span class="sc">%&gt;%</span></span>
-<span id="cb45-967"><a href="#cb45-967" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">"sent"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb45-968"><a href="#cb45-968" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">comm =</span> to, <span class="at">sender =</span> from)</span>
-<span id="cb45-969"><a href="#cb45-969" aria-hidden="true" tabindex="-1"></a>er <span class="ot">&lt;-</span> selected_edges <span class="sc">%&gt;%</span></span>
-<span id="cb45-970"><a href="#cb45-970" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">"received"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb45-971"><a href="#cb45-971" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">comm =</span> from, <span class="at">receiver =</span> to)</span>
-<span id="cb45-972"><a href="#cb45-972" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-973"><a href="#cb45-973" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Join on the communication node to get from→to, then count occurrences</span></span>
-<span id="cb45-974"><a href="#cb45-974" aria-hidden="true" tabindex="-1"></a>dp <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(es, er, <span class="at">by =</span> <span class="st">"comm"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb45-975"><a href="#cb45-975" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">from =</span> sender, <span class="at">to =</span> receiver)</span>
-<span id="cb45-976"><a href="#cb45-976" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-977"><a href="#cb45-977" aria-hidden="true" tabindex="-1"></a>edges <span class="ot">&lt;-</span> dp <span class="sc">%&gt;%</span></span>
-<span id="cb45-978"><a href="#cb45-978" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(from, to, <span class="at">name =</span> <span class="st">"count"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb45-979"><a href="#cb45-979" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(from <span class="sc">%in%</span> nodes<span class="sc">$</span>id, to <span class="sc">%in%</span> nodes<span class="sc">$</span>id) <span class="sc">%&gt;%</span></span>
-<span id="cb45-980"><a href="#cb45-980" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">width =</span> count, <span class="at">label =</span> <span class="fu">as.character</span>(count))</span>
-<span id="cb45-981"><a href="#cb45-981" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-982"><a href="#cb45-982" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Draw a visNetwork: node colors by type, edge width and label by count</span></span>
-<span id="cb45-983"><a href="#cb45-983" aria-hidden="true" tabindex="-1"></a><span class="fu">visNetwork</span>(nodes, edges) <span class="sc">%&gt;%</span></span>
-<span id="cb45-984"><a href="#cb45-984" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visIgraphLayout</span>(<span class="at">layout =</span> <span class="st">"layout_with_fr"</span>, <span class="at">randomSeed =</span> <span class="dv">123</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb45-985"><a href="#cb45-985" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visEdges</span>(</span>
-<span id="cb45-986"><a href="#cb45-986" aria-hidden="true" tabindex="-1"></a>    <span class="at">arrows =</span> <span class="st">"to"</span>,</span>
-<span id="cb45-987"><a href="#cb45-987" aria-hidden="true" tabindex="-1"></a>    <span class="at">color  =</span> <span class="fu">list</span>(<span class="at">color =</span> <span class="st">"#AAAAAA"</span>, <span class="at">highlight =</span> <span class="st">"#FF0000"</span>),</span>
-<span id="cb45-988"><a href="#cb45-988" aria-hidden="true" tabindex="-1"></a>    <span class="at">font   =</span> <span class="fu">list</span>(<span class="at">align =</span> <span class="st">"middle"</span>)</span>
-<span id="cb45-989"><a href="#cb45-989" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb45-990"><a href="#cb45-990" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visOptions</span>(</span>
-<span id="cb45-991"><a href="#cb45-991" aria-hidden="true" tabindex="-1"></a>    <span class="at">highlightNearest =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb45-992"><a href="#cb45-992" aria-hidden="true" tabindex="-1"></a>    <span class="at">nodesIdSelection =</span> <span class="cn">TRUE</span></span>
-<span id="cb45-993"><a href="#cb45-993" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb45-945"><a href="#cb45-945" aria-hidden="true" tabindex="-1"></a><span class="fu">### Communication between People and Vessels</span></span>
+<span id="cb45-946"><a href="#cb45-946" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-947"><a href="#cb45-947" aria-hidden="true" tabindex="-1"></a>**Additional visualisations are done below to further investigate the communication between the pseudonyms and real names.**</span>
+<span id="cb45-948"><a href="#cb45-948" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-951"><a href="#cb45-951" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-952"><a href="#cb45-952" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb45-953"><a href="#cb45-953" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(visNetwork)</span>
+<span id="cb45-954"><a href="#cb45-954" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-955"><a href="#cb45-955" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Keep only Person/Vessel nodes, assigning colors by sub_type</span></span>
+<span id="cb45-956"><a href="#cb45-956" aria-hidden="true" tabindex="-1"></a>nodes <span class="ot">&lt;-</span> selected_nodes <span class="sc">%&gt;%</span></span>
+<span id="cb45-957"><a href="#cb45-957" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sub_type <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Person"</span>, <span class="st">"Vessel"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb45-958"><a href="#cb45-958" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb45-959"><a href="#cb45-959" aria-hidden="true" tabindex="-1"></a>    <span class="at">id    =</span> idx,</span>
+<span id="cb45-960"><a href="#cb45-960" aria-hidden="true" tabindex="-1"></a>    <span class="at">label =</span> label,</span>
+<span id="cb45-961"><a href="#cb45-961" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="fu">ifelse</span>(sub_type <span class="sc">==</span> <span class="st">"Person"</span>, <span class="st">"#1b9e77"</span>, <span class="st">"#d95f02"</span>)</span>
+<span id="cb45-962"><a href="#cb45-962" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb45-963"><a href="#cb45-963" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-964"><a href="#cb45-964" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Build direct sender→receiver pairs from communication events</span></span>
+<span id="cb45-965"><a href="#cb45-965" aria-hidden="true" tabindex="-1"></a>es <span class="ot">&lt;-</span> selected_edges <span class="sc">%&gt;%</span></span>
+<span id="cb45-966"><a href="#cb45-966" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">"sent"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb45-967"><a href="#cb45-967" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">comm =</span> to, <span class="at">sender =</span> from)</span>
+<span id="cb45-968"><a href="#cb45-968" aria-hidden="true" tabindex="-1"></a>er <span class="ot">&lt;-</span> selected_edges <span class="sc">%&gt;%</span></span>
+<span id="cb45-969"><a href="#cb45-969" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">"received"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb45-970"><a href="#cb45-970" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">comm =</span> from, <span class="at">receiver =</span> to)</span>
+<span id="cb45-971"><a href="#cb45-971" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-972"><a href="#cb45-972" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Join on the communication node to get from→to, then count occurrences</span></span>
+<span id="cb45-973"><a href="#cb45-973" aria-hidden="true" tabindex="-1"></a>dp <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(es, er, <span class="at">by =</span> <span class="st">"comm"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb45-974"><a href="#cb45-974" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">from =</span> sender, <span class="at">to =</span> receiver)</span>
+<span id="cb45-975"><a href="#cb45-975" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-976"><a href="#cb45-976" aria-hidden="true" tabindex="-1"></a>edges <span class="ot">&lt;-</span> dp <span class="sc">%&gt;%</span></span>
+<span id="cb45-977"><a href="#cb45-977" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(from, to, <span class="at">name =</span> <span class="st">"count"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb45-978"><a href="#cb45-978" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(from <span class="sc">%in%</span> nodes<span class="sc">$</span>id, to <span class="sc">%in%</span> nodes<span class="sc">$</span>id) <span class="sc">%&gt;%</span></span>
+<span id="cb45-979"><a href="#cb45-979" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">width =</span> count, <span class="at">label =</span> <span class="fu">as.character</span>(count))</span>
+<span id="cb45-980"><a href="#cb45-980" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-981"><a href="#cb45-981" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Draw a visNetwork: node colors by type, edge width and label by count</span></span>
+<span id="cb45-982"><a href="#cb45-982" aria-hidden="true" tabindex="-1"></a><span class="fu">visNetwork</span>(nodes, edges) <span class="sc">%&gt;%</span></span>
+<span id="cb45-983"><a href="#cb45-983" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visIgraphLayout</span>(<span class="at">layout =</span> <span class="st">"layout_with_fr"</span>, <span class="at">randomSeed =</span> <span class="dv">123</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb45-984"><a href="#cb45-984" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visEdges</span>(</span>
+<span id="cb45-985"><a href="#cb45-985" aria-hidden="true" tabindex="-1"></a>    <span class="at">arrows =</span> <span class="st">"to"</span>,</span>
+<span id="cb45-986"><a href="#cb45-986" aria-hidden="true" tabindex="-1"></a>    <span class="at">color  =</span> <span class="fu">list</span>(<span class="at">color =</span> <span class="st">"#AAAAAA"</span>, <span class="at">highlight =</span> <span class="st">"#FF0000"</span>),</span>
+<span id="cb45-987"><a href="#cb45-987" aria-hidden="true" tabindex="-1"></a>    <span class="at">font   =</span> <span class="fu">list</span>(<span class="at">align =</span> <span class="st">"middle"</span>)</span>
+<span id="cb45-988"><a href="#cb45-988" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb45-989"><a href="#cb45-989" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visOptions</span>(</span>
+<span id="cb45-990"><a href="#cb45-990" aria-hidden="true" tabindex="-1"></a>    <span class="at">highlightNearest =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb45-991"><a href="#cb45-991" aria-hidden="true" tabindex="-1"></a>    <span class="at">nodesIdSelection =</span> <span class="cn">TRUE</span></span>
+<span id="cb45-992"><a href="#cb45-992" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb45-993"><a href="#cb45-993" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-994"><a href="#cb45-994" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-995"><a href="#cb45-995" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-996"><a href="#cb45-996" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb45-997"><a href="#cb45-997" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb45-998"><a href="#cb45-998" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-999"><a href="#cb45-999" aria-hidden="true" tabindex="-1"></a><span class="fu">## Q3 Part A </span></span>
-<span id="cb45-1000"><a href="#cb45-1000" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1001"><a href="#cb45-1001" aria-hidden="true" tabindex="-1"></a>The pseudonyms used are:</span>
-<span id="cb45-1002"><a href="#cb45-1002" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1003"><a href="#cb45-1003" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Boss</span>
-<span id="cb45-1004"><a href="#cb45-1004" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1005"><a href="#cb45-1005" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The Intern</span>
-<span id="cb45-1006"><a href="#cb45-1006" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1007"><a href="#cb45-1007" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Mrs Money</span>
-<span id="cb45-1008"><a href="#cb45-1008" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1009"><a href="#cb45-1009" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The Lookout</span>
-<span id="cb45-1010"><a href="#cb45-1010" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1011"><a href="#cb45-1011" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The Accountant</span>
-<span id="cb45-1012"><a href="#cb45-1012" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1013"><a href="#cb45-1013" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The Middleman</span>
-<span id="cb45-1014"><a href="#cb45-1014" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1015"><a href="#cb45-1015" aria-hidden="true" tabindex="-1"></a><span class="fu">## Q3 Part B</span></span>
-<span id="cb45-1016"><a href="#cb45-1016" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1017"><a href="#cb45-1017" aria-hidden="true" tabindex="-1"></a>My visualisations help to break down the communication on a daily basis and to draw the connections between the different people based on their communication groups.</span>
-<span id="cb45-1018"><a href="#cb45-1018" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1019"><a href="#cb45-1019" aria-hidden="true" tabindex="-1"></a>From the figures above, it can be seen that the Boss is mostly always on the receiving end of the communication, with the exception of Mako(Vessel). The ones who are in direct contact with Boss are Mrs Money, The Middleman, Rodriguez, Davis, Liam Thorne, The Accountant and Mako (Vessel).</span>
-<span id="cb45-1020"><a href="#cb45-1020" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1021"><a href="#cb45-1021" aria-hidden="true" tabindex="-1"></a>Mrs Money, however, receives information mainly from The Intern.</span>
-<span id="cb45-1022"><a href="#cb45-1022" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1023"><a href="#cb45-1023" aria-hidden="true" tabindex="-1"></a>The Lookout and The Intern, however, usually communicates in both directions, with The Intern usually on the receiving end of information.</span>
-<span id="cb45-1024"><a href="#cb45-1024" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1025"><a href="#cb45-1025" aria-hidden="true" tabindex="-1"></a>The Accountant only got communicated with Boss on 11 October and he is often communicating with The Middleman.</span>
-<span id="cb45-1026"><a href="#cb45-1026" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1027"><a href="#cb45-1027" aria-hidden="true" tabindex="-1"></a>The Lookout also sends informations to Sam.</span>
-<span id="cb45-1028"><a href="#cb45-1028" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1029"><a href="#cb45-1029" aria-hidden="true" tabindex="-1"></a>**There is a clear hierachy when sending information:**</span>
-<span id="cb45-1030"><a href="#cb45-1030" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1031"><a href="#cb45-1031" aria-hidden="true" tabindex="-1"></a>Lookout -<span class="sc">\&gt;</span> Intern -<span class="sc">\&gt;</span> Mrs Money/The Accountant/The Middleman -<span class="sc">\&gt;</span> Boss</span>
-<span id="cb45-1032"><a href="#cb45-1032" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1033"><a href="#cb45-1033" aria-hidden="true" tabindex="-1"></a>Lookout -<span class="sc">\&gt;</span> Sam</span>
-<span id="cb45-1034"><a href="#cb45-1034" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-995"><a href="#cb45-995" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-996"><a href="#cb45-996" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb45-997"><a href="#cb45-997" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-998"><a href="#cb45-998" aria-hidden="true" tabindex="-1"></a><span class="fu">## Q3 Part A</span></span>
+<span id="cb45-999"><a href="#cb45-999" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1000"><a href="#cb45-1000" aria-hidden="true" tabindex="-1"></a>The pseudonyms used are:</span>
+<span id="cb45-1001"><a href="#cb45-1001" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1002"><a href="#cb45-1002" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Boss</span>
+<span id="cb45-1003"><a href="#cb45-1003" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1004"><a href="#cb45-1004" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The Intern</span>
+<span id="cb45-1005"><a href="#cb45-1005" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1006"><a href="#cb45-1006" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Mrs Money</span>
+<span id="cb45-1007"><a href="#cb45-1007" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1008"><a href="#cb45-1008" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The Lookout</span>
+<span id="cb45-1009"><a href="#cb45-1009" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1010"><a href="#cb45-1010" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The Accountant</span>
+<span id="cb45-1011"><a href="#cb45-1011" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1012"><a href="#cb45-1012" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The Middleman</span>
+<span id="cb45-1013"><a href="#cb45-1013" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1014"><a href="#cb45-1014" aria-hidden="true" tabindex="-1"></a><span class="fu">## Q3 Part B</span></span>
+<span id="cb45-1015"><a href="#cb45-1015" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1016"><a href="#cb45-1016" aria-hidden="true" tabindex="-1"></a>My visualisations help to break down the communication on a daily basis and to draw the connections between the different people based on their communication groups.</span>
+<span id="cb45-1017"><a href="#cb45-1017" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1018"><a href="#cb45-1018" aria-hidden="true" tabindex="-1"></a>From the figures above, it can be seen that the Boss is mostly always on the receiving end of the communication, with the exception of Mako(Vessel). The ones who are in direct contact with Boss are Mrs Money, The Middleman, Rodriguez, Davis, Liam Thorne, The Accountant and Mako (Vessel).</span>
+<span id="cb45-1019"><a href="#cb45-1019" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1020"><a href="#cb45-1020" aria-hidden="true" tabindex="-1"></a>Mrs Money, however, receives information mainly from The Intern.</span>
+<span id="cb45-1021"><a href="#cb45-1021" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1022"><a href="#cb45-1022" aria-hidden="true" tabindex="-1"></a>The Lookout and The Intern, however, usually communicates in both directions, with The Intern usually on the receiving end of information.</span>
+<span id="cb45-1023"><a href="#cb45-1023" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1024"><a href="#cb45-1024" aria-hidden="true" tabindex="-1"></a>The Accountant only communicated with Boss on 11 October and he is often communicating with The Middleman.</span>
+<span id="cb45-1025"><a href="#cb45-1025" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1026"><a href="#cb45-1026" aria-hidden="true" tabindex="-1"></a>The Lookout also sends informations to Sam.</span>
+<span id="cb45-1027"><a href="#cb45-1027" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1028"><a href="#cb45-1028" aria-hidden="true" tabindex="-1"></a>**There is a clear hierachy when sending information:**</span>
+<span id="cb45-1029"><a href="#cb45-1029" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1030"><a href="#cb45-1030" aria-hidden="true" tabindex="-1"></a>Lookout -<span class="sc">\&gt;</span> Intern -<span class="sc">\&gt;</span> Mrs Money/The Accountant/The Middleman -<span class="sc">\&gt;</span> Boss</span>
+<span id="cb45-1031"><a href="#cb45-1031" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1032"><a href="#cb45-1032" aria-hidden="true" tabindex="-1"></a>Lookout -<span class="sc">\&gt;</span> Sam</span>
+<span id="cb45-1033"><a href="#cb45-1033" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1034"><a href="#cb45-1034" aria-hidden="true" tabindex="-1"></a><span class="fu">## Q3 Part C</span></span>
 <span id="cb45-1035"><a href="#cb45-1035" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1036"><a href="#cb45-1036" aria-hidden="true" tabindex="-1"></a><span class="fu">## Q3 Part C</span></span>
+<span id="cb45-1036"><a href="#cb45-1036" aria-hidden="true" tabindex="-1"></a>These visualisations have confirmed my understanding that Boss is likely the leader of the group and the Vessel that is in contact with boss is likely Mako for illegal activities. The illegal activities should be taking place around Nemo Reef or meetings are held around Nemo Reef. The ones of higher positions are probably Mrs Money, The Middleman and The Accountant who reports directly to Boss.</span>
 <span id="cb45-1037"><a href="#cb45-1037" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1038"><a href="#cb45-1038" aria-hidden="true" tabindex="-1"></a>These visualisations have confirmed my understanding that Boss is likely the leader of the group and the Vessel that is in contact with boss is likely Mako for illegal activities. The illegal activities should be taking place around Nemo Reef or meetings are held around Nemo Reef. The ones of higher positions are probably Mrs Money, The Middleman and The Accountant who reports directly to Boss.</span>
+<span id="cb45-1038"><a href="#cb45-1038" aria-hidden="true" tabindex="-1"></a>Rodriguez, Liam Thorne and Davis seem to be involved directly with The Boss as well.</span>
 <span id="cb45-1039"><a href="#cb45-1039" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1040"><a href="#cb45-1040" aria-hidden="true" tabindex="-1"></a>Rodriguez, Liam Thorne and Davis seem to be involved directly with The Boss as well.</span>
+<span id="cb45-1040"><a href="#cb45-1040" aria-hidden="true" tabindex="-1"></a>Strangely, Nadia Conti seems to be at the receiving end of the communciation from Elise, Davis and Rodriguez and only replies to Liam Thorne. Nadia Conti is also in contact with several vessels.</span>
 <span id="cb45-1041"><a href="#cb45-1041" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1042"><a href="#cb45-1042" aria-hidden="true" tabindex="-1"></a>Strangely, Nadia Conti seems to be at the receiving end of the communciation from Elise, Davis and Rodriguez and only replies to Liam Thorne. Nadia Conti is also in contact with several vessels.</span>
+<span id="cb45-1042"><a href="#cb45-1042" aria-hidden="true" tabindex="-1"></a>The Intern and The Lookout seems to be of the same position in the syndicate, but The Intern is the only one who communicates with Mrs Money.</span>
 <span id="cb45-1043"><a href="#cb45-1043" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1044"><a href="#cb45-1044" aria-hidden="true" tabindex="-1"></a>The Intern and The Lookout seems to be of the same position in the syndicate, but The Intern is the only one who communicates with Mrs Money.</span>
+<span id="cb45-1044"><a href="#cb45-1044" aria-hidden="true" tabindex="-1"></a>The Lookout seems to be reporting to Sam as well, as the communication is always in 1 direction.</span>
 <span id="cb45-1045"><a href="#cb45-1045" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1046"><a href="#cb45-1046" aria-hidden="true" tabindex="-1"></a>The Lookout seems to be reporting to Sam as well, as the communication is always in 1 direction.</span>
+<span id="cb45-1046"><a href="#cb45-1046" aria-hidden="true" tabindex="-1"></a>**From all the previous analysis, I would like to conclude that Rodriguez and Davis are likely involved in the illegal activities as they are in direct contact with Boss. Sam is also likely involved as The Lookout reports to him frequently.**</span>
 <span id="cb45-1047"><a href="#cb45-1047" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-1048"><a href="#cb45-1048" aria-hidden="true" tabindex="-1"></a>**From all the previous analysis, I would like to conclude that Rodriguez and Davis are likely involved in the illegal activities as they are in direct contact with Boss. Sam is also likely involved as The Lookout reports to him frequently.**</span>
+<span id="cb45-1048"><a href="#cb45-1048" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb45-1049"><a href="#cb45-1049" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1050"><a href="#cb45-1050" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">ISSS608 AY2024-25 April Term</span><span class="co">](https://isss608-ay2024-25apr.netlify.app/)</span></span>
+<span id="cb45-1051"><a href="#cb45-1051" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-1052"><a href="#cb45-1052" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">visNetwork</span><span class="co">](https://datastorm-open.github.io/visNetwork/)</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
