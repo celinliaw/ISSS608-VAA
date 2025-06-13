@@ -1426,5 +1426,47 @@
     "title": "Hands-on Exercise 08 Part 2",
     "section": "12.5 Reference",
     "text": "12.5 Reference\n\n12.5.1 All about tmap package\n\ntmap: Thematic Maps in R\ntmap\ntmap: get started!\ntmap: changes in version 2.0\ntmap: creating thematic maps in a flexible way (useR!2015)\nExploring and presenting maps with tmap (useR!2017)\n\n\n\n12.5.2 Geospatial data wrangling\n\nsf: Simple Features for R\nSimple Features for R: StandardizedSupport for Spatial Vector Data\nReading, Writing and Converting Simple Features\n\n\n\n12.5.3 Data wrangling\n\ndplyr\nTidy data\ntidyr: Easily Tidy Data with ‘spread()’ and ‘gather()’ Functions"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html",
+    "href": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html",
+    "title": "Take-Home_Ex03 - Storyboard",
+    "section": "",
+    "text": "This storyboard will contain the tasks and questions from VAST Challenge and Mini Challenge 3. The visualisations will help to answer question 2 and 3 from MC3.\nOver the past decade, the community of Oceanus has faced numerous transformations and challenges evolving from its fishing-centric origins. Following major crackdowns on illegal fishing activities, suspects have shifted investments into more regulated sectors such as the ocean tourism industry, resulting in growing tensions. This increased tourism has recently attracted the likes of international pop star Sailor Shift, who announced plans to film a music video on the island.\nClepper Jessen, a former analyst at FishEye and now a seasoned journalist for the Hacklee Herald, has been keenly observing these rising tensions. Recently, he turned his attention towards the temporary closure of Nemo Reef. By listening to radio communications and utilizing his investigative tools, Clepper uncovered a complex web of expedited approvals and secretive logistics. These efforts revealed a story involving high-level Oceanus officials, Sailor Shift’s team, local influential families, and local conservationist group The Green Guardians, pointing towards a story of corruption and manipulation"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html#importing-libraries",
+    "href": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html#importing-libraries",
+    "title": "Take-Home_Ex03 - Storyboard",
+    "section": "1. Importing Libraries",
+    "text": "1. Importing Libraries\nAll these libraries will be used to build the Shiny website.\n\nshiny - Build and serve interactive web apps entirely in R\njsonlite - Read, write and manipulate JSON data quickly\ndplyr - Filter, mutate and summarise\npurr - For elegant list/vector iteration\nvisnetwork - create interactive network graphs\nDT - Render Interactive Data Tables\ntidygraph - Tidy-style verbs for graph data (nodes/edges) manipulation\nggraph - graphics plotting for network/graph objects\npatchwork - combine ggplots\ngrid - low level graphics system underpinning lattice, ggpllot\n\n\n\nCode\nlibrary(shiny)\nlibrary(jsonlite)\nlibrary(dplyr)\nlibrary(purrr)\nlibrary(visNetwork)\nlibrary(DT)\nlibrary(tidygraph)\nlibrary(ggraph)\nlibrary(patchwork)\nlibrary(grid)"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html#creating-legend",
+    "href": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html#creating-legend",
+    "title": "Take-Home_Ex03 - Storyboard",
+    "section": "2. Creating Legend",
+    "text": "2. Creating Legend\nGive a legend to\nlegend_cols &lt;- c(\n  Person        = \"#1b9e77\",\n  Vessel        = \"#d95f02\",\n  Organization  = \"#7570b3\",\n  Relationship  = \"#e7298a\",\n  Group         = \"#e6ab02\",\n  Location      = \"#66a61e\"\n)"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html#load-and-process-data",
+    "href": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html#load-and-process-data",
+    "title": "Take-Home_Ex03 - Storyboard",
+    "section": "3. Load and Process Data",
+    "text": "3. Load and Process Data"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html#ui",
+    "href": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html#ui",
+    "title": "Take-Home_Ex03 - Storyboard",
+    "section": "4. UI",
+    "text": "4. UI"
+  },
+  {
+    "objectID": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html#server",
+    "href": "Take-Home_Ex/Take-Home_Ex03/Storyboard.html#server",
+    "title": "Take-Home_Ex03 - Storyboard",
+    "section": "5. Server",
+    "text": "5. Server"
   }
 ]
