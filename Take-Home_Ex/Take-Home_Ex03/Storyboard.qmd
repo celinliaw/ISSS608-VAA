@@ -238,12 +238,11 @@ ui <- fluidPage(
     )
   )
 )
-
 ```
 
 ## 5. Server
 
-``` R
+``` r
 
 server <- function(input, output, session) {
 
@@ -486,6 +485,8 @@ server <- function(input, output, session) {
   })
 }
 ```
+
+## 6. Final Visualisations
 
 ### Creating the Interactive Network
 
