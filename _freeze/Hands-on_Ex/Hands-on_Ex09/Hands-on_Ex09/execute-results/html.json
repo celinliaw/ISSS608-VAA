@@ -1,0 +1,15 @@
+{
+  "hash": "e457a43e888e2ac1edca43ebeb8169e9",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Hands-on Exercise 9 Part 1\"\nauthor: \"Liaw Ying Ting, Celin\"\ndate: 10 June 2025\ndate-modified: \"last-modified\"\n\nformat:\n  html:\n    code-fold: true\n    code-tools: true\n\nexecute: \n  eval: true\n  echo: true\n  warning: false\n  freeze: true\n---\n\n\n\n\n\n# 14 Creating Ternary Plot with R\n\n## 14.1 Overview\n\nTernary plots are a way of displaying the distribution and variability of three-part compositional data. (For example, the proportion of aged, economy active and young population or sand, silt, and clay in soil.) It’s display is a triangle with sides scaled from 0 to 1. Each side represents one of the three components. A point is plotted so that a line drawn perpendicular from the point to each leg of the triangle intersect at the component values of the point.\n\nIn this hands-on, you will learn how to build ternary plot programmatically using R for visualising and analysing population structure of Singapore.\n\nThe hands-on exercise consists of four steps:\n\n-   Install and launch **tidyverse** and **ggtern** packages.\n\n-   Derive three new measures using *mutate()* function of **dplyr** package.\n\n-   Build a static ternary plot using *ggtern()* function of **ggtern** package.\n\n-   Build an interactive ternary plot using *plot-ly()* function of **Plotly R** package.\n\n## 14.2 Installing and Launching R Packages\n\nFor this exercise, two main R packages will be used in this hands-on exercise, they are:\n\n-   [**ggtern**](http://www.ggtern.com/), a ggplot extension specially designed to plot ternary diagrams. The package will be used to plot static ternary plots.\n\n-   [**Plotly R**](https://plot.ly/r/), an R package for creating interactive web-based graphs via plotly’s JavaScript graphing library, plotly.js . The **plotly R** libary contains the *ggplotly* function, which will convert **ggplot2** figures into a Plotly object.\n\nWe will also need to ensure that selected **tidyverse** family packages namely: **readr**, **dplyr** and **tidyr** are also installed and loaded.\n\nIn this exercise, version 3.2.1 of **ggplot2** will be installed instead of the latest version of **ggplot2**. This is because the current version of **ggtern** package is not compatible to the latest version of **ggplot2**.\n\nThe code chunks below will accomplish the task.\n\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(plotly, ggtern, tidyverse, readr, dplyr, tidyr)\n```\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
