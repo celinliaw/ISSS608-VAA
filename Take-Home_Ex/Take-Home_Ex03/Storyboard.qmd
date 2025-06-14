@@ -1,6 +1,6 @@
 ---
 title: "Take-Home_Ex03 - Storyboard"
-author: "Celin Liaw, Shermainn Ng, Stefanie Felicia"
+authors: "Celin Liaw, Shermainn Ng, Stefanie Felicia"
 date: 11 June 2025
 date-modified: "last-modified"
 
