@@ -10,7 +10,7 @@ format:
     code-tools: true
 
 execute: 
-  eval: true
+  eval: false
   echo: true
   warning: false
   freeze: true

@@ -1524,5 +1524,19 @@
     "title": "Hands-on Exercise 9 Part 4",
     "section": "",
     "text": "parallelPlot is an R package specially designed to plot a parallel coordinates plot by using ‘htmlwidgets’ package and d3.js. In this section, you will learn how to use functions provided in parallelPlot package to build interactive parallel coordinates plot.\n\n\nThe code chunk below plot an interactive parallel coordinates plot by using parallelPlot().\n\n\nCode\nwh &lt;- wh %&gt;%\n  select(\"Happiness score\", \n         columns = c(7:12))\nparallelPlot(wh,\n             width = 320,\n             height = 250)\n\n\n\n\n\n\nNotice that some of the axis labels are too long. The problem will be overcome in the next step.\n\n\n\nIn the code chunk below, rotateTitle argument is used to avoid overlapping axis labels.\n\n\nCode\nparallelPlot(wh,\n             rotateTitle = TRUE)\n\n\n\n\n\n\nOne of the useful interactive feature of parallelPlot is we can click on a variable of interest, for example Happiness score, the monotonous blue colour (default) will change a blues with different intensity colour scheme will be used.\n\n\n\nWe can change the default blue color scheme by using continuousCS argument as shown in the code chunk below.\n\n\nCode\nparallelPlot(wh,\n             continuousCS = \"YlOrRd\",\n             rotateTitle = TRUE)\n\n\n\n\n\n\n\n\n\nIn the code chunk below, histoVisibility argument is used to plot histogram along the axis of each variables.\n\n\nCode\nhistoVisibility &lt;- rep(TRUE, ncol(wh))\nparallelPlot(wh,\n             rotateTitle = TRUE,\n             histoVisibility = histoVisibility)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09_Part5.html",
+    "href": "Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09_Part5.html",
+    "title": "Hands-on Exercise 9 Part 5",
+    "section": "",
+    "text": "In this hands-on exercise, you will gain hands-on experiences on designing treemap using appropriate R packages. The hands-on exercise consists of three main section. First, you will learn how to manipulate transaction data into a treemap strcuture by using selected functions provided in dplyr package. Then, you will learn how to plot static treemap by using treemap package. In the third section, you will learn how to design interactive treemap by using d3treeR package."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09_Part5.html#overview",
+    "href": "Hands-on_Ex/Hands-on_Ex09/Hands-on_Ex09_Part5.html#overview",
+    "title": "Hands-on Exercise 9 Part 5",
+    "section": "",
+    "text": "In this hands-on exercise, you will gain hands-on experiences on designing treemap using appropriate R packages. The hands-on exercise consists of three main section. First, you will learn how to manipulate transaction data into a treemap strcuture by using selected functions provided in dplyr package. Then, you will learn how to plot static treemap by using treemap package. In the third section, you will learn how to design interactive treemap by using d3treeR package."
   }
 ]
