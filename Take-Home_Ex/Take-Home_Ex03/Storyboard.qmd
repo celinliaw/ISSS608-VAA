@@ -1,6 +1,6 @@
 ---
 title: "Take-Home_Ex03 - Storyboard"
-author: Celin Liaw, Shermainn Ng, Stefanie Felicia
+author: "Celin Liaw, Shermainn Ng, Stefanie Felicia"
 date: 11 June 2025
 date-modified: "last-modified"
 
@@ -235,7 +235,7 @@ This sidebar layout enables the user to filter out specific entities and their d
 
 ## 5. Final Visualisations
 
-### 1st Tab - Data Table 
+### 1st Tab - Data Table
 
 **Overview of Nodes and Edges**
 
