@@ -271,7 +271,7 @@ This daily communication graph allows the user to filter the communication for t
 
 Overall, the aim of the article is to showcase the initial idea in the development of the Shiny Application that we are planning to build to answer the questions in Mini Challenge 3. This is to allow users with different needs to use this application to filter out relevant necessary information to find out the people who are involved in the illegal activities on Nemo Reef.
 
-Additionally, with the various filters for entities and relationship, it allows the user to narrow down the suspects before zooming in onto the activities and communication that the specific entities are involved in. The user will then be able to manipulate and evaluate the results based on the information extracted.
+The visualization uses colour to differentiate between entity types such as person, vessel, organization, location, or group, which which helps bring clarity to viewers. Additionally, filters are employed to highlight key information, helping users avoid distractions from irrelevant data. We also implemented different data visualization techniques (e.g. heatmap, timeline and network graph) which enables multidimensional exploration, where multiple visual elements complement each other to form a more complete picture of the underlying patterns. Combined with the filters for entities and relationships, users can progressively narrow down potential suspects before zooming in on specific activities and communications. This interactive process empowers users to manipulate and evaluate the network based on the extracted information, facilitating deeper insights and more targeted investigations
 
 # Reference
 

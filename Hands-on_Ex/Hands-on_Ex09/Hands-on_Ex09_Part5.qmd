@@ -15,3 +15,9 @@ execute:
   warning: false
   freeze: true
 ---
+
+# 18 Treemap Visualisation with R
+
+## 18.1 Overview
+
+In this hands-on exercise, you will gain hands-on experiences on designing treemap using appropriate R packages. The hands-on exercise consists of three main section. First, you will learn how to manipulate transaction data into a treemap strcuture by using selected functions provided in **dplyr** package. Then, you will learn how to plot static treemap by using **treemap** package. In the third section, you will learn how to design interactive treemap by using **d3treeR** package.
