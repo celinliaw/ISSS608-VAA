@@ -1,0 +1,17 @@
+---
+title: "Hands-on Exercise 9 Part 5"
+author: "Liaw Ying Ting, Celin"
+date: 15 June 2025
+date-modified: "last-modified"
+
+format:
+  html:
+    code-fold: true
+    code-tools: true
+
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
