@@ -55,7 +55,7 @@ reactablefmtr, gt, gtExtras, tidyverse)
 
 For the purpose of this study, a personal database in Microsoft Access mdb format called *Coffee Chain* will be used.
 
-### 19.3.2 Importing Database into R 
+### 19.3.2 Importing Database into R
 
 In the code chunk below, `odbcConnectAccess()` of [**RODBC**](https://cran.r-project.org/web/packages/RODBC/index.html) package is used used to import a database query table into R.
 
